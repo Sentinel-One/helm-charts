@@ -1,0 +1,16 @@
+{{- if .Values.helper.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "sentinelone.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{ end }}

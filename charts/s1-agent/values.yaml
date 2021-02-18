@@ -1,0 +1,129 @@
+# Default values for sentinelone.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+    pullPolicy: IfNotPresent
+    imagePullSecrets:
+    # EDIT HERE
+    #  - name: "<secret-name>"
+    nameOverride: ""
+    fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: sentinelone
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  portName: http
+  annotations: {}
+
+ingress:
+  ## Specifies whether ingress should be created
+  enabled: true
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+secrets:
+  # Specifies whether secrets should be created
+  create: true
+
+helper:
+  # Specifies whether a helper should be created
+  create: true
+  # The name of the helper to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: s1-helper
+  image:
+    # EDIT HERE
+    repository: "<s1-helper-image>"
+    tag: "<s1-helper-tag>"
+  env:
+    # The name of the cluster.
+    # EDIT HERE
+    cluster: "<cluster-name>"
+    # Optional log levels: "error", "warning", "info", "debug", "trace".
+    # If not set, the log level is "info".
+    # log_level: ""
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  replicaCount: 1
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 900m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  rbac:
+    # Specifies whether cluster role and cluster role bindings should be created
+    create: true
+
+agent:
+  # Specifies whether an agent should be created
+  create: true
+  # The name of the agent to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: s1-agent
+  image:
+    # EDIT HERE
+    repository: "<s1-agent-image>"
+    tag: "<s1-agent-tag>"
+  env:
+    host_mount_path: "/host"
+    # If secrets.create is true, the site token is referred to as a plain text and will be saved as a secret.
+    # If secrets.create is false, the site token is referred to as a secret which was
+    #    created by the user with the same format as templates/secrets.yaml format and in the right namespace.
+    # EDIT HERE
+    site_key: "<site-token>"
+    management_proxy: ""
+    heap_trimming_enable: "" # to enable heap trimming replace to "true"
+    heap_trimming_interval: 120 # heap trimming default interval
+  podAnnotations:
+    container.apparmor.security.beta.kubernetes.io/agent: unconfined
+  nodeSelector: {}
+  tolerations:
+  - effect: NoExecute
+    operator: Exists
+  - effect: NoSchedule
+    operator: Exists
+  updateStrategy: RollingUpdate
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 900m
+      memory: 1.8Gi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+

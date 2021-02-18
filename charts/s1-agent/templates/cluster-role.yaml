@@ -1,0 +1,15 @@
+{{ if .Values.helper.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "pods", "namespaces", "replicationcontrollers"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["batch", "apps"]
+  resources: ["jobs", "deployments", "daemonsets", "replicasets", "statefulsets", "crontabs"]
+  verbs: ["get", "watch", "list"]
+{{ end }}
