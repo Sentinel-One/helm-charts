@@ -1,0 +1,90 @@
+apiVersion: {{ template "daemonset.apiVersion" . }}
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}-agent
+  labels:
+{{- include "sentinelone.agent.labels" . | nindent 4 }}
+spec:
+  updateStrategy:
+    type: {{ .Values.agent.updateStrategy }}
+  selector:
+    matchLabels:
+{{- include "sentinelone.agent.selector.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+{{- include "sentinelone.agent.labels" . | nindent 8 }}
+      {{- if .Values.agent.podAnnotations }}
+      annotations:
+{{ toYaml .Values.agent.podAnnotations | indent 8 }}
+      {{- end }}
+    spec:
+    {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      hostPID: true
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      restartPolicy: Always
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      containers:
+      - name: agent
+        image: "{{ .Values.agent.image.repository }}:{{ .Values.agent.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+{{ toYaml .Values.agent.resources | indent 10 }}
+        env:
+        - name: SITE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ if .Values.secrets.create }}{{ .Release.Name }}{{- else }}{{ .Values.agent.env.site_key }}{{- end }}
+              key: site-key
+        - name: S1_HELPER_ADDRESS
+          value: {{ .Release.Name }}
+        - name: S1_HELPER_PORT
+          value: "{{ .Values.service.port }}"
+        - name: S1_AGENT_HOST_MOUNT_PATH
+          value: "{{ .Values.agent.env.host_mount_path }}"
+        - name: S1_MANAGEMENT_PROXY
+          value: "{{ .Values.agent.env.management_proxy }}"
+        - name: S1_HEAP_TRIMMING_ENABLE
+          value: "{{ .Values.agent.env.heap_trimming_enable }}"
+        - name: S1_HEAP_TRIMMING_INTERVAL
+          value: "{{ .Values.agent.env.heap_trimming_interval }}"
+        volumeMounts:
+          - name: debugfs
+            mountPath: /sys/kernel/debug/
+          - name: host
+            mountPath: {{ .Values.agent.env.host_mount_path }}
+        securityContext:
+          capabilities:
+            add:
+              - AUDIT_CONTROL
+              - AUDIT_WRITE
+              - DAC_OVERRIDE
+              - DAC_READ_SEARCH
+              - FOWNER
+              - IPC_LOCK
+              - KILL
+              - NET_ADMIN
+              - NET_RAW
+              - SETGID
+              - SETUID
+              - SYS_ADMIN
+              - SYS_PTRACE
+              - SYS_RAWIO
+              - SYS_RESOURCE
+              - SYSLOG
+      volumes:
+        - name: debugfs
+          hostPath:
+            path: /sys/kernel/debug/
+        - name: host
+          hostPath:
+            path: /
+    {{- with .Values.agent.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

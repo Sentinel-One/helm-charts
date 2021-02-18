@@ -1,0 +1,62 @@
+apiVersion: {{ template "deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-helper
+  labels:
+    {{- include "sentinelone.helper.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.helper.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "sentinelone.helper.selector.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sentinelone.helper.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: helper
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.helper.image.repository }}:{{ .Values.helper.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: CLUSTER_NAME
+            value: {{ .Values.helper.env.cluster }}
+          - name: SERVER_PORT
+            value: "{{ .Values.service.targetPort }}"
+          - name: LOG_LEVEL
+            value: {{ .Values.helper.env.log_level }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+        {{- if .Values.probe }}
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 30
+            periodSeconds: 5
+        {{- end }}
+          resources:
+            {{- toYaml .Values.helper.resources | nindent 12 }}
+      {{- with .Values.helper.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.helper.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.helper.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
