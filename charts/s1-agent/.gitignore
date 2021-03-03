@@ -1,0 +1,5 @@
+/files/**/*
+**/*.tgz
+*.cmd
+*.sh
+*.zip

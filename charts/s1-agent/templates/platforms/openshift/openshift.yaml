@@ -1,0 +1,49 @@
+{{- if (and (eq .Values.configuration.platform.type "openshift") .Values.configuration.platform.openshift.scc.create) }}
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: s1 
+  labels:
+    {{- include "sentinelone.helper.labels" . | nindent 4 }}
+allowHostDirVolumePlugin: true
+allowHostIPC: false
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: false
+allowedCapabilities:
+  - AUDIT_CONTROL
+  - AUDIT_WRITE
+  - DAC_OVERRIDE
+  - DAC_READ_SEARCH
+  - FOWNER
+  - IPC_LOCK
+  - KILL
+  - NET_ADMIN
+  - NET_RAW
+  - SETGID
+  - SETUID
+  - SYS_ADMIN
+  - SYS_PTRACE
+  - SYS_RAWIO
+  - SYS_RESOURCE
+  - SYSLOG
+fsGroup:
+  type: RunAsAny
+groups: []
+priority: 0
+readOnlyRootFilesystem: false
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+seccompProfiles:
+  - '*'
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:{{ .Release.Namespace }}
+  - system:serviceaccount:{{ .Release.Namespace }}:{{ include "sentinelone.serviceAccountName" . }}
+volumes:
+  - hostPath
+  - secret
+{{- end }}

@@ -6,7 +6,7 @@ metadata:
 {{- include "sentinelone.agent.labels" . | nindent 4 }}
 spec:
   updateStrategy:
-    type: {{ .Values.agent.updateStrategy }}
+    type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}
   selector:
     matchLabels:
 {{- include "sentinelone.agent.selector.labels" . | nindent 6 }}
@@ -19,10 +19,10 @@ spec:
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
     spec:
-    {{- with .Values.image.imagePullSecrets }}
+{{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        - name: {{ .Values.secrets.imagePullSecret }}
+{{- end }}
       hostPID: true
       securityContext:
         runAsUser: 1000
@@ -31,33 +31,43 @@ spec:
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
       - name: agent
-        image: "{{ .Values.agent.image.repository }}:{{ .Values.agent.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ default "docker.pkg.github.com/s1-agents/cwpp_agent/s1agent" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for image pullling" .Values.configuration.tag.agent }}"
+{{- if .Values.configuration.custom_ca }}
+        # run update-ca-certificates before starting agent in case a custom certificate is used
+        command: ["/bin/sh", "-c", "sudo update-ca-certificates && /home/user/deployment.sh"]
+{{- end }}
+        imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
         resources:
 {{ toYaml .Values.agent.resources | indent 10 }}
         env:
         - name: SITE_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.secrets.create }}{{ .Release.Name }}{{- else }}{{ .Values.agent.env.site_key }}{{- end }}
+              name: {{ if .Values.secrets.site_key.create }}{{ .Release.Name }}{{- else }}{{ .Values.secrets.site_key.name }}{{- end }}
               key: site-key
         - name: S1_HELPER_ADDRESS
           value: {{ .Release.Name }}
         - name: S1_HELPER_PORT
-          value: "{{ .Values.service.port }}"
+          value: "80"
         - name: S1_AGENT_HOST_MOUNT_PATH
-          value: "{{ .Values.agent.env.host_mount_path }}"
+          value: "{{ default "/host" .Values.configuration.env.host_mount_path }}"
         - name: S1_MANAGEMENT_PROXY
-          value: "{{ .Values.agent.env.management_proxy }}"
+          value: "{{ default "" .Values.configuration.proxy }}"
         - name: S1_HEAP_TRIMMING_ENABLE
-          value: "{{ .Values.agent.env.heap_trimming_enable }}"
+          value: "{{ .Values.configuration.env.heap_trimming_enable }}"
         - name: S1_HEAP_TRIMMING_INTERVAL
-          value: "{{ .Values.agent.env.heap_trimming_interval }}"
+          value: "{{ .Values.configuration.env.heap_trimming_interval }}"
         volumeMounts:
+{{- if .Values.configuration.custom_ca }}
+          - name: ca-cert
+            mountPath: /usr/local/share/ca-certificates/ca.pem
+            subPath: ca.pem
+{{- end}}
           - name: debugfs
             mountPath: /sys/kernel/debug/
           - name: host
-            mountPath: {{ .Values.agent.env.host_mount_path }}
+            mountPath: {{ default "/host" .Values.configuration.env.host_mount_path }}
+            mountPropagation: HostToContainer
         securityContext:
           capabilities:
             add:
@@ -78,6 +88,11 @@ spec:
               - SYS_RESOURCE
               - SYSLOG
       volumes:
+{{- if .Values.configuration.custom_ca }}
+        - name: ca-cert
+          secret:
+            secretName: {{ .Release.Name }}-custom-ca
+{{- end }}
         - name: debugfs
           hostPath:
             path: /sys/kernel/debug/

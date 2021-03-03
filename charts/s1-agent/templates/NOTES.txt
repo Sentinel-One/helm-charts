@@ -1,19 +1,51 @@
-1. Get the application URL by running these commands:
-{{- if .Values.ingress.enabled }}
-{{- range $host := .Values.ingress.hosts }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host }}{{ . }}
+{{- if not (mustRegexMatch "^(kubernetes|openshift)$" .Values.configuration.platform.type) -}}
+{{ fail "configuration.platform.type must be one of: kubernetes, openshift" }}
+{{- end -}}
+{{- if not (mustRegexMatch "^(info|error|warning|debug|trace|)$" .Values.configuration.log_level) -}}
+{{ fail "configuration.log_level must be one of: info, error, warning, debug, trace [or empty to default to 'info']" }}
+{{- end -}}
+
+Installed the SentinelOne Agent Helm chart to your cluster.
+
+Configuration options used to deploy:
+
+* Cluster name: '{{ .Values.configuration.cluster.name }}'.
+  This will be reported as the "Cluster Name" in your console, in the details of every node of this cluster.
+* Platform support enabled for: '{{ .Values.configuration.platform.type }}'
+
+{{- if .Values.secrets.site_key.create }}
+* A site-key secret was CREATED (or overwritten if it already existed).
+{{- else }}
+* The name of the PRE-EXISTING site-key secret to use is '{{ .Values.secrets.site_key.name }}'
 {{- end }}
-{{- else if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "sentinelone.fullname" . }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" .Values.service.type }}
-     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "sentinelone.fullname" . }}'
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "sentinelone.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo http://$SERVICE_IP:{{ .Values.service.port }}
-{{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "sentinelone.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80
+{{- if .Values.configuration.custom_ca }}
+* A custom CA certificate will be loaded into the agent image.
 {{- end }}
+{{- if .Values.configuration.proxy }}
+* A proxy will be used between AGENTS and MANAGEMENT: '{{ .Values.configuration.proxy }}'
+{{- else }}
+* NO proxy will be used between AGENTS and MANAGEMENT.
+{{- end }}
+* The repositories that will be used to pull the images are:
+  - Agent:  '{{ .Values.configuration.repositories.agent }}', tag: '{{ .Values.configuration.tag.agent }}'
+  - Helper: '{{ .Values.configuration.repositories.helper }}', tag: '{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}'
+{{- if ne .Values.configuration.tag.agent .Values.configuration.tag.helper }}
+
+  !!! Agent and helper tag are different; this is not normally desirable. Please use matching versions unless instructed otherwise by technical support. !!!
+{{- end }}
+
+If the pods do not start, please check if:
+
+* The images can be pulled. This requires that:
+  - The image pull secret '{{ .Values.secrets.imagePullSecret }}' exists in the namespace of this chart
+  - The registries for Agent and Helper images can be reached
+
+If the agents do not show up in the console, please check that:
+
+* If a proxy needs to be used, it is configured and reachable for the agent pods.
+* If an on-prem console with a certificate signed by a private CA is used, a CA certificate was supplied.
+  If you supplied a CA certificate, check that it is stored in the namespace of this chart in your cluster as 'ca-certificate'
+* Agent pods can reach the console via HTTPS
+{{- if not .Values.secrets.site_key.create }}
+* You had opted to use an EXISTING site key. Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ .Values.secrets.site_key.name }}' ACTUALLY exists, or agents will be unable to register.
+{{- end -}}
