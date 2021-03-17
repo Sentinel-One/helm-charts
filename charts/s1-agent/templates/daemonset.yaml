@@ -58,6 +58,7 @@ spec:
             mountPath: /sys/kernel/debug/
           - name: host
             mountPath: {{ .Values.agent.env.host_mount_path }}
+            mountPropagation: HostToContainer
         securityContext:
           capabilities:
             add:
