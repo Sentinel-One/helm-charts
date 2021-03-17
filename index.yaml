@@ -11,4 +11,15 @@ entries:
     urls:
     - https://github.com/Sentinel-One/helm-charts/releases/download/v0.1.0/s1-agent-0.1.0.tgz
     version: 0.1.0
-generated: "2021-03-02T09:41:36.494971+02:00"
+  sentinelone:
+  - apiVersion: v1
+    appVersion: 4.7.1
+    created: "2021-03-17T10:44:24.765478102+02:00"
+    description: A Helm chart for Kubernetes
+    digest: b22af7f0520e5c8b3500df4d3ec5ce28fd950c956f24fd56f1431d9745d5d756
+    name: sentinelone
+    type: application
+    urls:
+    - https://github.com/Sentinel-One/helm-charts/releases/download/v4.7.1/sentinelone-4.7.1.tgz
+    version: 4.7.1
+generated: "2021-03-17T10:44:24.764363689+02:00"
