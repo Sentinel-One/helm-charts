@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   s1-agent:
   - apiVersion: v1
+    appVersion: 5.0.1
+    created: "2021-03-17T11:02:27.969850731+02:00"
+    description: A Helm chart for Kubernetes
+    digest: 53bc92f515fecced15f3491d241c6c5cb892d3d106c8b39cf562af053e2f6b7a
+    name: s1-agent
+    type: application
+    urls:
+    - https://github.com/Sentinel-One/helm-charts/releases/download/v5.0.1/s1-agent-5.0.1.tgz
+    version: 5.0.1
+  - apiVersion: v1
     appVersion: 4.6.2
     created: "2021-03-02T09:41:36.495968+02:00"
     description: A Helm chart for Kubernetes
@@ -22,4 +32,4 @@ entries:
     urls:
     - https://github.com/Sentinel-One/helm-charts/releases/download/v4.7.1/sentinelone-4.7.1.tgz
     version: 4.7.1
-generated: "2021-03-17T10:44:24.764363689+02:00"
+generated: "2021-03-17T11:02:27.968413212+02:00"
