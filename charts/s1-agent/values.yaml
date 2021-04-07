@@ -48,13 +48,15 @@ serviceAccount:
 securityContext: {}
 
 helper:
+  labels: {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  probe: false
   resources:
     limits:
       cpu: 900m
-      memory: 1Gi
+      memory: 1.9Gi
     requests:
       cpu: 100m
       memory: 100Mi
@@ -63,6 +65,8 @@ helper:
     create: true
 
 agent:
+  labels: {}
+  nodeSelector: {}
   podAnnotations:
     container.apparmor.security.beta.kubernetes.io/agent: unconfined
   tolerations:
@@ -70,10 +74,11 @@ agent:
       operator: Exists
     - effect: NoSchedule
       operator: Exists
+  affinity: {}
   resources:
     limits:
       cpu: 900m
-      memory: 1.8Gi
+      memory: 1.9Gi
     requests:
       cpu: 100m
       memory: 100Mi
