@@ -57,6 +57,11 @@ chart: {{ include "sentinelone.chart" . }}
 version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 managed-by: {{ .Release.Service }}
+{{- if .Values.agent.labels }}
+{{- with .Values.agent.labels }}
+{{ tpl (toYaml .) $ }}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
 
@@ -67,6 +72,11 @@ chart: {{ include "sentinelone.chart" . }}
 version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 managed-by: {{ .Release.Service }}
+{{- if .Values.helper.labels }}
+{{- with .Values.helper.labels }}
+{{ tpl (toYaml .) $ }}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -92,5 +102,31 @@ Create the name of the service account to use
     {{ default (include "sentinelone.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "agent.fullname" -}}
+{{- if .Values.agent.fullnameOverride -}}
+{{- .Values.agent.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "agent" .Values.agent.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "helper.fullname" -}}
+{{- if .Values.agent.fullnameOverride -}}
+{{- .Values.agent.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "helper" .Values.agent.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
