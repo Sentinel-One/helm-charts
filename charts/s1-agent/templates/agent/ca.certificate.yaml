@@ -2,9 +2,8 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-custom-ca
-  labels:
-    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  name: {{ include "agent.fullname" . }}-custom-ca
+  labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
 type: Opaque
 data:
 {{ range $path, $_ := .Files.Glob "files/*.pem" }}

@@ -1,7 +1,7 @@
 apiVersion: {{ template "deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{.Release.Name}}-helper
+  name: {{ include "helper.fullname" . }}
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
 spec:
@@ -39,25 +39,31 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-        {{- if .Values.probe }}
+        {{- if .Values.helper.probe }}
           livenessProbe:
-            httpGet:
+            tcpSocket:
               port: 8080
             initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          startupProbe:
+            tcpSocket:
+              port: 80
+            failureThreshold: 30
             periodSeconds: 5
         {{- end }}
           resources:
             {{- toYaml .Values.helper.resources | nindent 12 }}
-      {{- with .Values.helper.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+    {{- with .Values.helper.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+    {{- end }}
     {{- with .Values.helper.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
+      affinity: {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.helper.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
+      tolerations: {{- toYaml . | nindent 8 }}
     {{- end }}
-

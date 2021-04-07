@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Release.Name}}
-  labels:
-    {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  name: {{ include "helper.fullname" . }}
+  labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
 {{- with .Values.service.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}

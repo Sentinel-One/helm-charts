@@ -1,9 +1,8 @@
 apiVersion: {{ template "daemonset.apiVersion" . }}
 kind: DaemonSet
 metadata:
-  name: {{ .Release.Name }}-agent
-  labels:
-{{- include "sentinelone.agent.labels" . | nindent 4 }}
+  name: {{ include "agent.fullname" . }}
+  labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
 spec:
   updateStrategy:
     type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}
@@ -43,10 +42,10 @@ spec:
         - name: SITE_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.secrets.site_key.create }}{{ .Release.Name }}{{- else }}{{ .Values.secrets.site_key.name }}{{- end }}
+              name: {{ if .Values.secrets.site_key.create }}{{ include "agent.fullname" . }}{{- else }}{{ .Values.secrets.site_key.name }}{{- end }}
               key: site-key
         - name: S1_HELPER_ADDRESS
-          value: {{ .Release.Name }}
+          value: {{ include "helper.fullname" . }}
         - name: S1_HELPER_PORT
           value: "80"
         - name: S1_AGENT_HOST_MOUNT_PATH
@@ -93,7 +92,7 @@ spec:
 {{- if .Values.configuration.custom_ca }}
         - name: ca-certs
           secret:
-            secretName: "{{ $.Release.Name }}-custom-ca"
+            secretName: "{{ include "agent.fullname" . }}-custom-ca"
 {{- end }}
         - name: debugfs
           hostPath:
@@ -101,8 +100,12 @@ spec:
         - name: host
           hostPath:
             path: /
-    {{- with .Values.agent.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
+    {{- with .Values.agent.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
     {{- end }}
-
+    {{- with .Values.agent.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.agent.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+    {{- end }}
