@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args:  ['{{ include "sentinelone.fullname" . }}:{{ .Values.service.port }}']
+      args:  ['{{ include "sentinelone.fullname" . }}:80']
   restartPolicy: Never

@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.helper.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "sentinelone.helper.selector.labels" . | nindent 6 }}
@@ -14,10 +14,10 @@ spec:
       labels:
         {{- include "sentinelone.helper.labels" . | nindent 8 }}
     spec:
-    {{- with .Values.image.imagePullSecrets }}
+{{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        - name: {{ .Values.secrets.imagePullSecret }}
+{{- end }}
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       securityContext:
         runAsUser: 1000
@@ -26,23 +26,23 @@ spec:
         - name: helper
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.helper.image.repository }}:{{ .Values.helper.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ default "docker.pkg.github.com/s1-agents/cwpp_agent/s1helper" .Values.configuration.repositories.helper }}:{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}"
+          imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
           env:
           - name: CLUSTER_NAME
-            value: {{ .Values.helper.env.cluster }}
+            value: {{ required "You need to specify a cluster name" .Values.configuration.cluster.name }}
           - name: SERVER_PORT
-            value: "{{ .Values.service.targetPort }}"
+            value: "8080"
           - name: LOG_LEVEL
-            value: {{ .Values.helper.env.log_level }}
+            value: {{ .Values.configuration.log_level }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.targetPort }}
+              containerPort: 8080
               protocol: TCP
         {{- if .Values.probe }}
           livenessProbe:
             httpGet:
-              port: {{ .Values.service.targetPort }}
+              port: 8080
             initialDelaySeconds: 30
             periodSeconds: 5
         {{- end }}
@@ -60,3 +60,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+

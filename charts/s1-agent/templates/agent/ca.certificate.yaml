@@ -1,0 +1,16 @@
+{{ if .Values.configuration.custom_ca }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-custom-ca
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+type: Opaque
+data:
+{{ range $path, $_ := .Files.Glob "files/*.pem" }}
+  {{ base $path }}: |-
+    {{ $.Files.Get $path | b64enc | indent 4 }}
+
+{{ end }}
+{{- end }}
+
