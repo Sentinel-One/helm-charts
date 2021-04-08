@@ -16,5 +16,9 @@ helm search repo sentinelone -l
 
 ```
 # Install s1-agent from the online charts repository:
-helm install s1 --namespace=<namespace> --set image.imagePullSecrets[0].name=<secret> --set helper.image.repository=<helper-image-repository> --set helper.image.tag=<helper-image-tag> --set agent.image.repository=<agent-image-repository> --set agent.image.tag=<agent-image-tag> --set agent.env.site_key=<site-key> sentinelone/s1-agent
+helm upgrade --install <name> \
+    --namespace=<namespace> \
+    --set configuration.cluster.name=<your cluster name to report to console> \
+    --set secrets.imagePullSecret=<image pull secret name> \
+    --set secrets.site_key.value=<your site key> <path to helm chart, or helm chart name>
 ```
