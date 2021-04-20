@@ -34,7 +34,7 @@ spec:
           - name: SERVER_PORT
             value: "8080"
           - name: LOG_LEVEL
-            value: {{ .Values.configuration.log_level }}
+            value: {{ .Values.configuration.env.helper.log_level }}
           ports:
             - name: http
               containerPort: 8080

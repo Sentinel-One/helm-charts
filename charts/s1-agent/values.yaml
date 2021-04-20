@@ -10,12 +10,14 @@ configuration:
   tag:
     agent: "" # specify the agent tag. for example: ga-4.6.4
     helper: "" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
-  log_level: "" # info, error, warning, debug, trace (defaults to 'info')
   proxy: "" # specify a proxy server (in URL format), if needed
   env:
-    host_mount_path: # leave default unless host path is mounted elsewhere in your environment
-    heap_trimming_enable: false # to enable heap trimming, set to 'true'
-    heap_trimming_interval: 120 # help trimming default interval (s)
+    agent:
+      host_mount_path: # leave default unless host path is mounted elsewhere in your environment
+      heap_trimming_enable: false # to enable heap trimming, set to 'true'
+      heap_trimming_interval: 120 # help trimming default interval (s)
+    helper:
+      log_level: "" # info, error, warning, debug, trace (defaults to 'info')
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false

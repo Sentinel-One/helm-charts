@@ -10,12 +10,13 @@ _When using your own image registry:_
 
 In every case:
 
+* Create a namespace to deploy to; e.g. `kubectl create namespace sentinelone`
+
 * Create an image pull secret to pull the images from the registry, if the cluster does not have access to the repository already. This does apply when you are using S1's container registry.
   E.g., to create an image pull secret called `s1-github-access`:
   ```
   kubectl create secret --namespace sentinelone docker-registry s1-github-access --docker-username=s1customer --docker-password=<the Personal Access Token received from SentinelOne support> 
   ```
-* Create a namespace to deploy to; e.g. `kubectl create namespace sentinelone`
 
 ### Perform install
 

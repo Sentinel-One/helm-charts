@@ -49,13 +49,13 @@ spec:
         - name: S1_HELPER_PORT
           value: "80"
         - name: S1_AGENT_HOST_MOUNT_PATH
-          value: "{{ default "/host" .Values.configuration.env.host_mount_path }}"
+          value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_MANAGEMENT_PROXY
           value: "{{ default "" .Values.configuration.proxy }}"
         - name: S1_HEAP_TRIMMING_ENABLE
-          value: "{{ .Values.configuration.env.heap_trimming_enable }}"
+          value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
         - name: S1_HEAP_TRIMMING_INTERVAL
-          value: "{{ .Values.configuration.env.heap_trimming_interval }}"
+          value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- range $path, $_ := .Files.Glob "files/*.pem" }}
@@ -67,7 +67,7 @@ spec:
           - name: debugfs
             mountPath: /sys/kernel/debug/
           - name: host
-            mountPath: {{ default "/host" .Values.configuration.env.host_mount_path }}
+            mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
             mountPropagation: HostToContainer
         securityContext:
           capabilities:
