@@ -52,6 +52,8 @@ spec:
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_MANAGEMENT_PROXY
           value: "{{ default "" .Values.configuration.proxy }}"
+        - name: S1_DV_PROXY
+          value: "{{ default "" .Values.configuration.dv_proxy }}"
         - name: S1_HEAP_TRIMMING_ENABLE
           value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
         - name: S1_HEAP_TRIMMING_INTERVAL

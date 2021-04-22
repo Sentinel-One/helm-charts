@@ -11,6 +11,7 @@ configuration:
     agent: "" # specify the agent tag. for example: ga-4.6.4
     helper: "" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
   proxy: "" # specify a proxy server (in URL format), if needed
+  dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
     agent:
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
