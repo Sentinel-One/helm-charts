@@ -32,6 +32,11 @@ Configuration options used to deploy:
 {{- else }}
 * NO proxy will be used between AGENTS and MANAGEMENT.
 {{- end }}
+{{- if .Values.configuration.dv_proxy }}
+* A proxy will be used between AGENTS and DEEP-VISIBILITY: '{{ .Values.configuration.dv_proxy }}'
+{{- else }}
+* NO proxy will be used between AGENTS and DEEP-VISIBILITY.
+{{- end }}
 * The repositories that will be used to pull the images are:
   - Agent:  '{{ .Values.configuration.repositories.agent }}', tag: '{{ .Values.configuration.tag.agent }}'
   - Helper: '{{ .Values.configuration.repositories.helper }}', tag: '{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}'
