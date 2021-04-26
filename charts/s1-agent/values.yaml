@@ -8,8 +8,8 @@ configuration:
     agent: "docker.pkg.github.com/s1-agents/cwpp_agent/s1agent" # only edit if you want to use your own registry
     helper: "docker.pkg.github.com/s1-agents/cwpp_agent/s1helper" # only edit if you want to use your own registry
   tag:
-    agent: "" # specify the agent tag. for example: ga-4.6.4
-    helper: "" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+    agent: "ga-21.5.3" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
+    helper: "ga-21.5.3" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
   proxy: "" # specify a proxy server (in URL format), if needed
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
