@@ -29,8 +29,10 @@ spec:
           image: "{{ default "docker.pkg.github.com/s1-agents/cwpp_agent/s1helper" .Values.configuration.repositories.helper }}:{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}"
           imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
           env:
+{{- if .Values.configuration.cluster.name }}
           - name: CLUSTER_NAME
-            value: {{ required "You need to specify a cluster name" .Values.configuration.cluster.name }}
+            value: {{ .Values.configuration.cluster.name }}
+{{- end }}
           - name: SERVER_PORT
             value: "8080"
           - name: LOG_LEVEL
