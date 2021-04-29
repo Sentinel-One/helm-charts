@@ -130,3 +130,11 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "site_key.secret.name" -}}
+{{- if .Values.secrets.site_key.create }}
+{{- include "agent.fullname" . -}}
+{{- else -}}
+{{- .Values.secrets.site_key.name -}}
+{{- end -}}
+{{- end -}}
