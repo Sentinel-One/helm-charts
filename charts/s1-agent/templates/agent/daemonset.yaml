@@ -39,11 +39,13 @@ spec:
         resources:
 {{ toYaml .Values.agent.resources | indent 10 }}
         env:
+{{- if include "site_key.secret.name" . }}
         - name: SITE_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ if .Values.secrets.site_key.create }}{{ include "agent.fullname" . }}{{- else }}{{ .Values.secrets.site_key.name }}{{- end }}
+              name: {{ include "site_key.secret.name" . }}
               key: site-key
+{{- end }}
         - name: S1_HELPER_ADDRESS
           value: {{ include "helper.fullname" . }}
         - name: S1_HELPER_PORT
