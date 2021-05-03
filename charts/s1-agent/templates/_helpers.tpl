@@ -119,10 +119,10 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "helper.fullname" -}}
-{{- if .Values.agent.fullnameOverride -}}
-{{- .Values.agent.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.helper.fullnameOverride -}}
+{{- .Values.helper.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default "helper" .Values.agent.nameOverride -}}
+{{- $name := default "helper" .Values.helper.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
