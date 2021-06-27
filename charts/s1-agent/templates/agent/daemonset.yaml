@@ -92,6 +92,7 @@ spec:
               - SYS_RAWIO
               - SYS_RESOURCE
               - SYSLOG
+              - SYS_CHROOT
       volumes:
 {{- if .Values.configuration.custom_ca }}
         - name: ca-certs

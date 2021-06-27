@@ -28,6 +28,7 @@ allowedCapabilities:
   - SYS_RAWIO
   - SYS_RESOURCE
   - SYSLOG
+  - SYS_CHROOT
 fsGroup:
   type: RunAsAny
 groups: []
