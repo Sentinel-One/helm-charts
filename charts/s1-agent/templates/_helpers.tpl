@@ -15,6 +15,22 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "clusterRole.apiVersion" -}}
+{{- if semverCompare ">=1.17.0-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- print "rbac.authorization.k8s.io/v1" -}}
+{{- else -}}
+{{- print "rbac.authorization.k8s.io/v1beta1" -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "clusterRoleBindings.apiVersion" -}}
+{{- if semverCompare ">=1.17.0-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- print "rbac.authorization.k8s.io/v1" -}}
+{{- else -}}
+{{- print "rbac.authorization.k8s.io/v1beta1" -}}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Expand the name of the chart.
 */}}
