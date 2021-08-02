@@ -30,7 +30,11 @@ spec:
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
       - name: agent
+{{- if .Values.configuration.image.agent }}
+        image: "{{ .Values.configuration.image.agent }}"
+{{- else }}
         image: "{{ default "docker.pkg.github.com/s1-agents/cwpp_agent/s1agent" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for image pullling" .Values.configuration.tag.agent }}"
+{{- end }}
 {{- if .Values.configuration.custom_ca }}
         # run update-ca-certificates before starting agent in case a custom certificate is used
         command: ["/bin/sh", "-c", "sudo update-ca-certificates && /home/user/deployment.sh"]

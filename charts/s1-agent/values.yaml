@@ -10,6 +10,9 @@ configuration:
   tag:
     agent: "ea2-21.7.2" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
     helper: "ea2-21.7.2" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+  image:
+    agent: "" # Leave empty to use repositories and tags above, or enter a full image with repo:tag to override the above values
+    helper: "" # Leave empty to use repositories and tags above, or enter a full image with repo:tag to override the above values
   proxy: "" # specify a proxy server (in URL format), if needed
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
