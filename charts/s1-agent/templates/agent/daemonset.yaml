@@ -23,6 +23,7 @@ spec:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
       hostPID: true
+      hostNetwork: true
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
