@@ -24,6 +24,7 @@ spec:
 {{- end }}
       hostPID: true
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
