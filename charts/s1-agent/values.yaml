@@ -52,8 +52,20 @@ securityContext: {}
 helper:
   labels: {}
   nodeSelector: {}
-  tolerations: []
-  affinity: {}
+  tolerations: {}
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+            - linux
+          - key: kubernetes.io/arch
+            operator: NotIn
+            values:
+            - arm64
   probe: false
   resources:
     limits:
@@ -76,7 +88,19 @@ agent:
       operator: Exists
     - effect: NoSchedule
       operator: Exists
-  affinity: {}
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: In
+            values:
+            - linux
+          - key: kubernetes.io/arch
+            operator: NotIn
+            values:
+            - arm64
   resources:
     limits:
       cpu: 900m
