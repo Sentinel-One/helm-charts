@@ -36,9 +36,9 @@ configuration:
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)
   site_key:
-    create: true # set create to "false" if you want to use a secret created outside this helm chart, or for agent offline mode.
+    create: false # set create to "false" if you want to use a secret created outside this helm chart, or for agent offline mode.
     name: ""  # set secret name if you set 'create' to false, otherwise the agents will work in offline mode.
-    value: "" # set site token if you set 'create' to true.
+    value: "" # set 'create' to true if you set site token.
 
 # Most users will not want to make changes below this line.
 
