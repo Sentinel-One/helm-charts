@@ -17,6 +17,7 @@ configuration:
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       heap_trimming_enable: false # to enable heap trimming, set to 'true'
       heap_trimming_interval: 120 # help trimming default interval (s)
+      log_level: "" # info, error, warning, debug, trace (defaults to 'info')
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
