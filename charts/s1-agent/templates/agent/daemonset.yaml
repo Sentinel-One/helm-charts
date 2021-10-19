@@ -62,6 +62,8 @@ spec:
           value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
         - name: S1_HEAP_TRIMMING_INTERVAL
           value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
+        - name: S1_LOG_LEVEL
+          value: {{ .Values.configuration.env.agent.log_level }}
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- range $path, $_ := .Files.Glob "files/*.pem" }}
