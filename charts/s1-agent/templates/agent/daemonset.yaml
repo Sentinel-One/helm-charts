@@ -26,8 +26,8 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
+        runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
+        runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
       restartPolicy: Always
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
@@ -63,7 +63,7 @@ spec:
         - name: S1_HEAP_TRIMMING_INTERVAL
           value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
         - name: S1_LOG_LEVEL
-          value: {{ .Values.configuration.env.agent.log_level }}
+          value: "{{ .Values.configuration.env.agent.log_level }}"
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- range $path, $_ := .Files.Glob "files/*.pem" }}
