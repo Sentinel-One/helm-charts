@@ -64,6 +64,10 @@ spec:
           value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
         - name: S1_LOG_LEVEL
           value: "{{ .Values.configuration.env.agent.log_level }}"
+        - name: S1_POD_UID
+          value: "{{ .Values.configuration.env.agent.pod_uid }}"
+        - name: S1_POD_GID
+          value: "{{ .Values.configuration.env.agent.pod_gid }}"
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- range $path, $_ := .Files.Glob "files/*.pem" }}
