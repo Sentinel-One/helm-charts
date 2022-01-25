@@ -33,10 +33,6 @@ spec:
       containers:
       - name: agent
         image: "{{ default "docker.pkg.github.com/s1-agents/cwpp_agent/s1agent" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for image pullling" .Values.configuration.tag.agent }}"
-{{- if .Values.configuration.custom_ca }}
-        # run update-ca-certificates before starting agent in case a custom certificate is used
-        command: ["/bin/sh", "-c", "sudo update-ca-certificates && /home/user/deployment.sh"]
-{{- end }}
         imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
         resources:
 {{ toYaml .Values.agent.resources | indent 10 }}
@@ -48,6 +44,8 @@ spec:
               name: {{ include "site_key.secret.name" . }}
               key: site-key
 {{- end }}
+        - name: S1_USE_CUSTOM_CA
+          value: "{{ .Values.configuration.custom_ca }}"
         - name: S1_HELPER_ADDRESS
           value: {{ include "helper.fullname" . }}
         - name: S1_HELPER_PORT
