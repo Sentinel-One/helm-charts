@@ -1,7 +1,7 @@
 apiVersion: v1
-appVersion: "21.10.3"
-description: General Availability version of the SentinelOne Kubernetes Agent
+appVersion: "21.10.4"
+description: Service Pack version of the SentinelOne Kubernetes Agent
 name: s1-agent
 type: application
-version: 21.10.3
+version: 21.10.4
 
