@@ -99,6 +99,7 @@ spec:
               - SYS_RESOURCE
               - SYSLOG
               - SYS_CHROOT
+              - SYS_MODULE
       volumes:
 {{- if .Values.configuration.custom_ca }}
         - name: ca-certs
