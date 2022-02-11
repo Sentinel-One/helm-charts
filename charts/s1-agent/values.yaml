@@ -70,6 +70,7 @@ helper:
             values:
             - arm64
   probe: false
+  priorityClassName: ""
   resources:
     limits:
       cpu: 900m
@@ -104,6 +105,7 @@ agent:
             operator: NotIn
             values:
             - arm64
+  priorityClassName: ""
   resources:
     limits:
       cpu: 900m

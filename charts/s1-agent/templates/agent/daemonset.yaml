@@ -115,6 +115,9 @@ spec:
     {{- with .Values.agent.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if .Values.agent.priorityClassName }}
+      priorityClassName: {{ .Values.agent.priorityClassName }}
+    {{- end }}
     {{- with .Values.agent.affinity }}
       affinity: {{- toYaml . | nindent 8 }}
     {{- end }}
