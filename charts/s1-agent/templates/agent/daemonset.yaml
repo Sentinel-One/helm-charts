@@ -47,9 +47,9 @@ spec:
         - name: S1_USE_CUSTOM_CA
           value: "{{ .Values.configuration.custom_ca }}"
         - name: S1_HELPER_ADDRESS
-          value: {{ include "helper.fullname" . }}
+          value: {{ include "service.name" . }}
         - name: S1_HELPER_PORT
-          value: "80"
+          value: "{{ include "service.port" . }}"
         - name: S1_AGENT_HOST_MOUNT_PATH
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_AGENT_TYPE
