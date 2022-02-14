@@ -24,6 +24,7 @@ allowedCapabilities:
   - SETGID
   - SETUID
   - SYS_ADMIN
+  - SYS_MODULE
   - SYS_PTRACE
   - SYS_RAWIO
   - SYS_RESOURCE
