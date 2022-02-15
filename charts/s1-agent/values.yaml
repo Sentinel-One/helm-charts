@@ -110,7 +110,7 @@ agent:
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
     requests:
       cpu: 100m
-      memory: 100Mi
+      memory: 800Mi
 
 service:
   annotations: {}
