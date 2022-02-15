@@ -1,12 +1,12 @@
-# For the simplest of deployments, where you use S1's package registry and create all secrets in this deployment, all values
+# For the simplest of deployments, where you use your own package registry and create all secrets in this deployment, all values
 # that you typically need to edit are shown under "configuration"
 #
 configuration:
   cluster:
     name: "" # enter the name of your cluster
   repositories:
-    agent: "docker.pkg.github.com/s1-agents/cwpp_agent/s1agent" # only edit if you want to use your own registry
-    helper: "docker.pkg.github.com/s1-agents/cwpp_agent/s1helper" # only edit if you want to use your own registry
+    agent: "cwpp_agent/s1agent" # Edit and add your own registry paths
+    helper: "cwpp_agent/s1helper" # Edit and add your own registry paths
   tag:
     agent: "sp1-21.10.4" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
     helper: "sp1-21.10.4" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
