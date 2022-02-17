@@ -154,3 +154,15 @@ Create the name of the service account to use
 {{- .Values.secrets.site_key.name -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "service.name" -}}
+{{- print "s1-helper" -}}
+{{- end -}}
+
+{{- define "service.port" -}}
+{{- print 443 -}}
+{{- end -}}
+
+{{- define "service.target_port" -}}
+{{- print 6443 -}}
+{{- end -}}
