@@ -29,6 +29,7 @@ allowedCapabilities:
   - SYS_RESOURCE
   - SYSLOG
   - SYS_CHROOT
+  - SYS_MODULE
 fsGroup:
   type: RunAsAny
 groups: []
