@@ -52,6 +52,8 @@ spec:
           value: "80"
         - name: S1_AGENT_HOST_MOUNT_PATH
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
+        - name: S1_AGENT_TYPE
+          value: "k8s"
         - name: S1_MANAGEMENT_PROXY
           value: "{{ default "" .Values.configuration.proxy }}"
         - name: S1_DV_PROXY
