@@ -78,6 +78,8 @@ spec:
 {{- end }}
           - name: debugfs
             mountPath: /sys/kernel/debug/
+          - name: modules
+            mountPath: /lib/modules/
           - name: host
             mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
             mountPropagation: HostToContainer
@@ -111,6 +113,9 @@ spec:
         - name: debugfs
           hostPath:
             path: /sys/kernel/debug/
+        - name: modules
+          hostPath:
+            path: /lib/modules/
         - name: host
           hostPath:
             path: /
