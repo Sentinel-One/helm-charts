@@ -68,6 +68,8 @@ spec:
           value: "{{ .Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
           value: "{{ .Values.configuration.env.agent.pod_gid }}"
+        - name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
+          value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- range $path, $_ := .Files.Glob "files/*.pem" }}
