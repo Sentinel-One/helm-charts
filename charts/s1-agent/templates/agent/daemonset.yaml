@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
 {{- include "sentinelone.agent.labels" . | nindent 8 }}
-      {{- if .Values.agent.podAnnotations }}
       annotations:
+      {{- if .Values.agent.podAnnotations }}
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
+        {{ default "container.apparmor.security.beta.kubernetes.io/agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" .Values.agent.apparmorPolicy }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:

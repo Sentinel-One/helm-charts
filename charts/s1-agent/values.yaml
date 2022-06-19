@@ -85,8 +85,9 @@ helper:
 agent:
   labels: {}
   nodeSelector: {}
-  podAnnotations:
-    container.apparmor.security.beta.kubernetes.io/agent: unconfined
+  podAnnotations: ""
+  apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/agent
+  apparmorPolicy: unconfined
   tolerations:
     - effect: NoExecute
       operator: Exists
