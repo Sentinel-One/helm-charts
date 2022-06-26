@@ -4,6 +4,9 @@
 configuration:
   cluster:
     name: "" # enter the name of your cluster
+  image:
+    agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
+    helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
   repositories:
     agent: "cwpp_agent/s1agent" # Edit and add your own registry paths
     helper: "cwpp_agent/s1helper" # Edit and add your own registry paths
