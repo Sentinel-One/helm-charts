@@ -40,11 +40,22 @@ Configuration options used to deploy:
 {{- else }}
 * NO proxy will be used between AGENTS and DEEP-VISIBILITY.
 {{- end }}
-* The repositories that will be used to pull the images are:
-  - Agent:  '{{ .Values.configuration.repositories.agent }}', tag: '{{ .Values.configuration.tag.agent }}'
-  - Helper: '{{ .Values.configuration.repositories.helper }}', tag: '{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}'
-{{- if ne .Values.configuration.tag.agent (default .Values.configuration.tag.agent .Values.configuration.tag.helper) }}
-
+* The images will be pulled from:
+{{- $agentTag := .Values.configuration.tag.agent -}}
+{{- $helperTag := default .Values.configuration.tag.agent .Values.configuration.tag.helper -}}
+{{- if .Values.configuration.image.agent }}
+  - Agent:  location:   '{{ .Values.configuration.image.agent }}'
+  {{- $agentTag = last (regexSplit ":" .Values.configuration.image.agent -1) -}}
+{{- else }}
+  - Agent:  repository: '{{ .Values.configuration.repositories.agent }}', tag: '{{ $agentTag }}'
+{{- end }}
+{{- if .Values.configuration.image.helper }}
+  - Helper: location:   '{{ .Values.configuration.image.helper }}'
+  {{- $helperTag = last (regexSplit ":" .Values.configuration.image.helper -1) -}}
+{{- else }}
+  - Helper: repository: '{{ .Values.configuration.repositories.helper }}', tag: '{{ $helperTag }}'
+{{- end }}
+{{- if ne ($agentTag | toString) ($helperTag | toString) }}
   !!! Agent and helper tag are different; this is not normally desirable. Please use matching versions unless instructed otherwise by technical support. !!!
 {{- end }}
 
