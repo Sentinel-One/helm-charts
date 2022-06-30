@@ -66,6 +66,9 @@ If the pods do not start, please check if:
 * The images can be pulled. This requires that:
   - The image pull secret '{{ .Values.secrets.imagePullSecret }}' exists in the namespace of this chart
   - The registries for Agent and Helper images can be reached
+{{- if or .Values.agent.priorityClassName .Values.helper.priorityClassName }}
+  - The values specified for the priorityClassName fields are valid
+{{- end }}
 
 If the agents do not show up in the console, please check that:
 
