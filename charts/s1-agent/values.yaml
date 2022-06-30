@@ -58,6 +58,7 @@ securityContext: {}
 helper:
   labels: {}
   nodeSelector: {}
+  priorityClassName: ""
   tolerations: {}
   affinity:
     nodeAffinity:
@@ -87,6 +88,7 @@ helper:
 agent:
   labels: {}
   nodeSelector: {}
+  priorityClassName: ""
   podAnnotations: ""
   apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/agent
   apparmorPolicy: unconfined

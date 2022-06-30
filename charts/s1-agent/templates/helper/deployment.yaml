@@ -66,6 +66,9 @@ spec:
     {{- with .Values.helper.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if default .Values.agent.priorityClassName .Values.helper.priorityClassName }}
+      priorityClassName: {{ default .Values.agent.priorityClassName .Values.helper.priorityClassName }}
+    {{- end }}
     {{- with .Values.helper.affinity }}
       affinity: {{- toYaml . | nindent 8 }}
     {{- end }}
