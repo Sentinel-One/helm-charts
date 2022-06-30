@@ -16,10 +16,12 @@ Configuration options used to deploy:
   This will be reported as the "Cluster Name" in your console, in the details of every node of this cluster.
 * Platform support enabled for: '{{ .Values.configuration.platform.type }}'
 
-{{- if .Values.secrets.site_key.create }}
-* A site-key secret was CREATED (or overwritten if it already existed).
+{{- if include "site_key.secret.create" . }}
+* A site-key secret named '{{ include "site_key.secret.name" . }}' was CREATED (or overwritten if it already existed).
+{{- else if include "site_key.secret.name" . }}
+* The name of the PRE-EXISTING site-key secret to use is '{{ include "site_key.secret.name" . }}'
 {{- else }}
-* The name of the PRE-EXISTING site-key secret to use is '{{ .Values.secrets.site_key.name }}'
+* Neither a site-key secret name nor a value to create the secret with was provided. The agents will work in OFFLINE mode.
 {{- end }}
 {{- if .Values.configuration.custom_ca }}
 * A custom CA certificate will be loaded into the agent image. These files were loaded. If the list is empty, then you probably did not copy the certificate files to "files/*.pem"
@@ -71,6 +73,6 @@ If the agents do not show up in the console, please check that:
 * If an on-prem console with a certificate signed by a private CA is used, a CA certificate was supplied.
   If you supplied a CA certificate, check that it is stored in the namespace of this chart in your cluster as 'ca-certificate'
 * Agent pods can reach the console via HTTPS
-{{- if not .Values.secrets.site_key.create }}
-* You had opted to use an EXISTING site key. Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ .Values.secrets.site_key.name }}' ACTUALLY exists, or agents will be unable to register.
+{{- if not (include "site_key.secret.create" .) }}
+* You had opted to use an EXISTING site key. Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ include "site_key.secret.name" . }}' ACTUALLY exists, or agents will be unable to register.
 {{- end -}}
