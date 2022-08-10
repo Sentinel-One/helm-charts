@@ -69,10 +69,6 @@ helper:
             operator: In
             values:
             - linux
-          - key: kubernetes.io/arch
-            operator: NotIn
-            values:
-            - arm64
   probe: false
   resources:
     limits:
@@ -106,10 +102,6 @@ agent:
             operator: In
             values:
             - linux
-          - key: kubernetes.io/arch
-            operator: NotIn
-            values:
-            - arm64
   resources:
     limits:
       cpu: 900m
