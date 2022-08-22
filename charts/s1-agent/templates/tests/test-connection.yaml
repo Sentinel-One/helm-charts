@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "sentinelone.fullname" . }}-test-connection"
+  name: "{{ .Release.Name }}-test-connection"
   labels:
 {{ include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args:  ['{{ include "sentinelone.fullname" . }}:80']
+      args:  ['--no-check-certificate', 'https://{{ include "service.name" . }}:{{ include "service.port" . }}/health']
   restartPolicy: Never
