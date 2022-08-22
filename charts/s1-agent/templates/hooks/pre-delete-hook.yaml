@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-uninstall-agent-job"
+  labels:
+{{ include "sentinelone.helper.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        {{- include "sentinelone.helper.labels" . | nindent 8 }}
+      name: uninstall-agent
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      containers:
+        - name: uninstall-agent
+          image: "{{ include "helper.full_url" . }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >
+              /s1-helper/kubectl get pods --no-headers -o custom-columns=':metadata.name' |
+              grep {{ include "agent.fullname" . }} |
+              xargs -I _ sh -c 'echo; echo "Pod _:"; /s1-helper/kubectl exec _ -- sentinelctl control uninstall'
