@@ -56,6 +56,8 @@ serviceAccount:
 securityContext: {}
 
 helper:
+  fullnameOverride: ""
+  nameOverride: ""
   labels: {}
   nodeSelector: {}
   priorityClassName: ""
@@ -82,6 +84,9 @@ helper:
     create: true
 
 agent:
+  fullnameOverride: ""
+  nameOverride: ""
+  updateStrategy: ""
   labels: {}
   nodeSelector: {}
   priorityClassName: ""
@@ -112,3 +117,6 @@ agent:
 
 service:
   annotations: {}
+
+fullnameOverride: ""
+nameOverride: ""
