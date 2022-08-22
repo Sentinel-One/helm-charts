@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{- define "deployment.apiVersion" -}}
 {{- if semverCompare ">=1.9-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- print "apps/v1" -}}
@@ -115,9 +114,9 @@ Create the name of the service account to use
 */}}
 {{- define "sentinelone.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
-    {{ default (include "sentinelone.fullname" .) .Values.serviceAccount.name }}
+{{ default (include "sentinelone.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+{{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
@@ -169,4 +168,20 @@ Create the name of the service account to use
 
 {{- define "service.target_port" -}}
 {{- print 6443 -}}
+{{- end -}}
+
+{{- define "helper.full_url" -}}
+{{- if .Values.configuration.image.helper -}}
+{{ .Values.configuration.image.helper }}
+{{- else -}}
+{{ required "Must set the appropriate registry for agent helper pulling" .Values.configuration.repositories.helper }}:{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}
+{{- end -}}
+{{- end -}}
+
+{{- define "agent.full_url" -}}
+{{- if .Values.configuration.image.agent -}}
+{{ .Values.configuration.image.agent }}
+{{- else -}}
+{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for agent image pulling" .Values.configuration.tag.agent }}
+{{- end -}}
 {{- end -}}
