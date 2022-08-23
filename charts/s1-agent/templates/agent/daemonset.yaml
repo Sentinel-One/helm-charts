@@ -53,6 +53,8 @@ spec:
           value: "{{ include "service.port" . }}"
         - name: S1_AGENT_HOST_MOUNT_PATH
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
+        - name: S1_PERSISTENT_DIR
+          value: "{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}"
         - name: S1_AGENT_TYPE
           value: "k8s"
         - name: S1_MANAGEMENT_PROXY
