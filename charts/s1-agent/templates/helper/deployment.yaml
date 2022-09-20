@@ -40,7 +40,7 @@ spec:
           - name: SERVER_PORT
             value: "{{ include "service.target_port" . }}"
           - name: LOG_LEVEL
-            value: {{ .Values.configuration.env.helper.log_level }}
+            value: {{ default "info" .Values.configuration.env.helper.log_level }}
           ports:
             - name: https
               containerPort: {{ include "service.target_port" . }}

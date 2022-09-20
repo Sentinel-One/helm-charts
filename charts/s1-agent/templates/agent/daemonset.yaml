@@ -68,7 +68,7 @@ spec:
         - name: S1_HEAP_TRIMMING_INTERVAL
           value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
         - name: S1_LOG_LEVEL
-          value: "{{ .Values.configuration.env.agent.log_level }}"
+          value: "{{ default "info" .Values.configuration.env.agent.log_level }}"
         - name: S1_POD_UID
           value: "{{ .Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
