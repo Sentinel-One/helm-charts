@@ -1,6 +1,6 @@
 apiVersion: v2
 appVersion: "23.1.1"
-description: Early Availability version of the SentinelOne Kubernetes Agent
+description: SentinelOne Kubernetes Agent
 name: s1-agent
 type: application
 version: 23.1.1
