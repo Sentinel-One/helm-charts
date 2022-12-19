@@ -25,6 +25,7 @@ configuration:
       pod_uid: 1000 # uid of the default pod user
       pod_gid: 1000 # gid of the default pod group
       watchdog_healthcheck_timeout: 15 # watchdog healthcheck timeout before exiting the pod entrypoint. (seconds, 0=disabled)
+      fips_enabled: false # to enable FIPS mode, set to 'true'
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
