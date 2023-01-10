@@ -75,6 +75,14 @@ spec:
           value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
         - name: S1_FIPS_ENABLED
           value: "{{ .Values.configuration.env.agent.fips_enabled }}"
+        - name: S1_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: S1_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- range $path, $_ := .Files.Glob "files/*.pem" }}
