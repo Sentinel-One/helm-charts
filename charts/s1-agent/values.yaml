@@ -19,8 +19,8 @@ configuration:
     agent:
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc.)
-      heap_trimming_enable: false # to enable heap trimming, set to 'true'
-      heap_trimming_interval: 120 # help trimming default interval (s)
+      heap_trimming_enable: # to enable heap trimming, set to 'true'
+      heap_trimming_interval: # help trimming default interval (s)
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       pod_uid: 1000 # uid of the default pod user
       pod_gid: 1000 # gid of the default pod group
