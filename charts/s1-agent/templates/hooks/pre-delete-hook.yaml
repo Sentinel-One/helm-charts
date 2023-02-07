@@ -27,6 +27,6 @@ spec:
           command: [ "/bin/sh", "-c" ]
           args:
             - >
-              /s1-helper/kubectl get pods --no-headers -o custom-columns=':metadata.name' |
+              /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
               grep {{ include "agent.fullname" . }} |
-              xargs -I _ sh -c 'echo; echo "Pod _:"; /s1-helper/kubectl exec _ -- sudo sentinelctl control uninstall'
+              xargs -P 0 -I _ sh -c 'out=$(for i in {1..5}; do /s1-helper/kubectl exec _ -- sudo sentinelctl control uninstall 2>&1 && break || sleep 3; done) || rc=$? && echo -e "\nPod _:\n$out" && exit $rc; echo -e "\nPod _:\n$out"'
