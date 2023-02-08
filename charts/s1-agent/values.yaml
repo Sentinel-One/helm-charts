@@ -3,7 +3,7 @@
 #
 configuration:
   cluster:
-    name: "" # enter the name of your cluster
+    name: "" # set the name of your cluster
   image:
     agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
     helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
@@ -41,6 +41,7 @@ configuration:
 
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)
+  helper_certificate: "" # you need to specify the name of the helper signed certificate secret (created outside this chart)
   site_key: # if neither were supplied, the agent will work offline mode
     value: "" # set site token if you want a secret to be crated with that value.
     name: ""  # set the name of a pre-existing secret to use
