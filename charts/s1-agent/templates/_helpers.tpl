@@ -146,6 +146,10 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "agentInjection.name" -}}
+{{- ( printf "%s-%s" (include "agent.fullname" .) "injection" ) -}}
+{{- end -}}
+
 {{- define "site_key.secret.create" -}}
 {{- empty .Values.secrets.site_key.value | ternary "" "true" }}
 {{- end -}}
@@ -209,4 +213,27 @@ Generate certificates for helper secret
 {{- else -}}
 {{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for agent image pulling" .Values.configuration.tag.agent }}
 {{- end -}}
+{{- end -}}
+
+{{- define "agent.common_env" -}}
+- name: S1_USE_CUSTOM_CA
+  value: "{{ .Values.configuration.custom_ca }}"
+- name: S1_HELPER_PORT
+  value: "{{ include "service.port" . }}"
+- name: S1_AGENT_TYPE
+  value: "k8s"
+- name: S1_MANAGEMENT_PROXY
+  value: "{{ default "" .Values.configuration.proxy }}"
+- name: S1_DV_PROXY
+  value: "{{ default "" .Values.configuration.dv_proxy }}"
+- name: S1_HEAP_TRIMMING_ENABLE
+  value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
+- name: S1_HEAP_TRIMMING_INTERVAL
+  value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
+- name: S1_LOG_LEVEL
+  value: "{{ .Values.configuration.env.agent.log_level }}"
+- name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
+  value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
+- name: S1_FIPS_ENABLED
+  value: "{{ .Values.configuration.env.agent.fips_enabled }}"
 {{- end -}}
