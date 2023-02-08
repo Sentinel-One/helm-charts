@@ -51,6 +51,11 @@ spec:
           value: {{ include "service.name" . }}
         - name: S1_HELPER_PORT
           value: "{{ include "service.port" . }}"
+        - name: S1_HELPER_CRT
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "helper.secret.name" . }}
+              key: tls.crt
         - name: S1_AGENT_HOST_MOUNT_PATH
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_PERSISTENT_DIR
