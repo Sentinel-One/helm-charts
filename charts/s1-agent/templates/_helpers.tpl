@@ -146,6 +146,10 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "agentInjectionWebhook.name" -}}
+{{- ( printf "%s-%s-%s" (include "agent.fullname" .) "injection" "webhook" ) -}}
+{{- end -}}
+
 {{- define "site_key.secret.create" -}}
 {{- empty .Values.secrets.site_key.value | ternary "" "true" }}
 {{- end -}}
