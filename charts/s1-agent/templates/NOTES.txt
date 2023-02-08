@@ -67,6 +67,12 @@ If the pods do not start, please check if:
   - The values specified for the priorityClassName fields are valid
 {{- end }}
 
+* Agent pods and kubernetes API server can reach the helper via HTTPS
+{{- if not (include "helper.secret.create" .) }}
+* You had opted to use an EXISTING helper certificate signed by kubernetes CA.
+  Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ include "helper.secret.name" . }}' ACTUALLY exists, or agents and API server will be unable to reach the helper.
+{{- end -}}
+
 If the agents do not show up in the console, please check that:
 
 * If a proxy needs to be used, it is configured and reachable for the agent pods.
