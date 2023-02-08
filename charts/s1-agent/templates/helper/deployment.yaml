@@ -47,11 +47,24 @@ spec:
                 key: tls.key
           - name: LOG_LEVEL
             value: {{ .Values.configuration.env.helper.log_level }}
+          - name: AGENT_INJECTION_ENABLED
+            value: "{{ .Values.configuration.env.injection.enabled }}"
+{{- if .Values.configuration.env.injection.enabled }}
+          - name: AGENT_INJECTION_CONFIG_FILE
+            value: "/s1-helper/agent-injection/agentconfig.yaml"
+{{- if include "site_key.secret.name" . }}
+          - name: SITE_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "site_key.secret.name" . }}
+                key: site-key
+{{- end }}
+{{- end }}
           ports:
             - name: https
               containerPort: {{ include "service.target_port" . }}
               protocol: TCP
-        {{- if .Values.helper.probe }}
+{{- if .Values.helper.probe }}
           livenessProbe:
             httpGet:
               path: /health
@@ -66,15 +79,24 @@ spec:
               scheme: HTTPS
             initialDelaySeconds: 30
             periodSeconds: 5
-        {{- end }}
+{{- end }}
           resources:
             {{- toYaml .Values.helper.resources | nindent 12 }}
+{{- if .Values.configuration.env.injection.enabled }}
+          volumeMounts:
+          - name: agent-injection-config
+            mountPath: /s1-helper/agent-injection
+      volumes:
+        - name: agent-injection-config
+          configMap:
+            name: {{ include "agentInjection.name" . }}
+{{- end }}
     {{- with .Values.helper.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- if default .Values.agent.priorityClassName .Values.helper.priorityClassName }}
+{{- if default .Values.agent.priorityClassName .Values.helper.priorityClassName }}
       priorityClassName: {{ default .Values.agent.priorityClassName .Values.helper.priorityClassName }}
-    {{- end }}
+{{- end }}
     {{- with .Values.helper.affinity }}
       affinity: {{- toYaml . | nindent 8 }}
     {{- end }}
