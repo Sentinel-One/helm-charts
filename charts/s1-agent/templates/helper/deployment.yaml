@@ -47,6 +47,8 @@ spec:
                 key: tls.key
           - name: LOG_LEVEL
             value: {{ .Values.configuration.env.helper.log_level }}
+          - name: AGENT_INJECTION_ENABLED
+            value: "{{ .Values.configuration.env.helper.agent_injection_enabled }}"
           ports:
             - name: https
               containerPort: {{ include "service.target_port" . }}
