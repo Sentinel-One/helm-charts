@@ -1,0 +1,37 @@
+{{ if .Values.configuration.env.injection.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "agentInjection.name" . }}
+  annotations:
+    cert-manager.io/inject-ca-from-secret: {{ include "helper.secret.name" . }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+webhooks:
+- name: {{ include "agentInjection.name" . }}.{{ .Release.Namespace }}.svc
+  admissionReviewVersions:
+    - v1
+    - v1beta1
+  clientConfig:
+    service:
+      name: {{ include "service.name" . }}.{{ .Release.Namespace }}.svc
+      namespace: {{ .Release.Namespace }}
+      path: /agent/inject
+      port: {{ include "service.port" . }}
+  matchPolicy: Equivalent
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - pods
+    scope: '*'
+  {{- with .Values.agentInjection.selector }}
+    {{- toYaml . | nindent 2 }}
+  {{- end }}
+  sideEffects: None
+{{ end }}
