@@ -35,6 +35,16 @@ spec:
 {{- end }}
           - name: SERVER_PORT
             value: "{{ include "service.target_port" . }}"
+          - name: SERVER_CRT
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "helper.secret.name" . }}
+                key: tls.crt
+          - name: SERVER_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "helper.secret.name" . }}
+                key: tls.key
           - name: LOG_LEVEL
             value: {{ .Values.configuration.env.helper.log_level }}
           ports:
