@@ -14,4 +14,9 @@ rules:
 - apiGroups: ["batch", "apps"]
   resources: ["jobs", "deployments", "daemonsets", "replicasets", "statefulsets", "crontabs"]
   verbs: ["get", "watch", "list"]
+{{ if .Values.configuration.env.helper.agent_injection_enabled }}
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["mutatingwebhookconfigurations"]
+  verbs: ["create", "get", "delete", "list", "patch", "update", "watch"]
+{{ end }}
 {{ end }}
