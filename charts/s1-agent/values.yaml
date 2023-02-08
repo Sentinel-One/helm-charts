@@ -28,6 +28,7 @@ configuration:
       fips_enabled: false # to enable FIPS mode, set to 'true'
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
+      agent_injection_enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
@@ -57,6 +58,12 @@ serviceAccount:
 
 # Optional additional values for the helper security context. Not typically needed.
 securityContext: {}
+
+agentInjection:
+  selector:
+    namespaceSelector:
+      matchLabels:
+        agent-injection-enabled: "true"
 
 helper:
   fullnameOverride: ""
@@ -110,6 +117,10 @@ agent:
             operator: In
             values:
             - linux
+          - key: eks.amazonaws.com/compute-type
+            operator: NotIn
+            values:
+            - fargate
   resources:
     limits:
       cpu: 900m
