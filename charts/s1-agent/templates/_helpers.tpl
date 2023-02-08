@@ -158,8 +158,33 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "helper.secret.create" -}}
+{{- empty .Values.secrets.helper_certificate }}
+{{- end -}}
+
+{{- define "helper.secret.name" -}}
+{{- if include "helper.secret.create" . }}
+{{- include "helper.fullname" . -}}
+{{- else -}}
+{{- .Values.secrets.helper_certificate -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Generate certificates for helper secret
+*/}}
+{{- define "helper.certificates" -}}
+{{- $altNames := list ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace ) -}}
+{{- $helper_ca := genCA "helper-ca" 365 -}}
+{{- $helper_cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames 365 $helper_ca -}}
+{{- $ca_crt := $helper_ca.Cert | b64enc -}}
+{{- $tls_crt := $helper_cert.Cert | b64enc -}}
+{{- $tls_key := $helper_cert.Key | b64enc -}}
+{{- dict "tls.crt" $tls_crt "tls.key" $tls_key "ca.crt" $ca_crt | toYaml -}}
+{{- end -}}
+
 {{- define "service.name" -}}
-{{- print "s1-helper" -}}
+{{- include "helper.fullname" . -}}
 {{- end -}}
 
 {{- define "service.port" -}}
