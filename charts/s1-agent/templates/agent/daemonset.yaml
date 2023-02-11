@@ -45,12 +45,9 @@ spec:
               name: {{ include "site_key.secret.name" . }}
               key: site-key
 {{- end }}
-        - name: S1_USE_CUSTOM_CA
-          value: "{{ .Values.configuration.custom_ca }}"
+{{- include "agent.common_env" . | nindent 8 }}
         - name: S1_HELPER_ADDRESS
           value: {{ include "service.name" . }}
-        - name: S1_HELPER_PORT
-          value: "{{ include "service.port" . }}"
         - name: S1_HELPER_CRT
           valueFrom:
             secretKeyRef:
@@ -60,26 +57,10 @@ spec:
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_PERSISTENT_DIR
           value: "{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}"
-        - name: S1_AGENT_TYPE
-          value: "k8s"
-        - name: S1_MANAGEMENT_PROXY
-          value: "{{ default "" .Values.configuration.proxy }}"
-        - name: S1_DV_PROXY
-          value: "{{ default "" .Values.configuration.dv_proxy }}"
-        - name: S1_HEAP_TRIMMING_ENABLE
-          value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
-        - name: S1_HEAP_TRIMMING_INTERVAL
-          value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
-        - name: S1_LOG_LEVEL
-          value: "{{ .Values.configuration.env.agent.log_level }}"
         - name: S1_POD_UID
           value: "{{ .Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
           value: "{{ .Values.configuration.env.agent.pod_gid }}"
-        - name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
-          value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
-        - name: S1_FIPS_ENABLED
-          value: "{{ .Values.configuration.env.agent.fips_enabled }}"
         - name: S1_POD_NAME
           valueFrom:
             fieldRef:
