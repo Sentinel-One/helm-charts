@@ -1,0 +1,40 @@
+{{ if .Values.configuration.env.injection.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "agentInjection.name" . }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+data:
+  agentconfig.yaml: |
+    containers:
+    - name: agent
+{{- if .Values.secrets.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.secrets.imagePullSecret }}
+{{- end }}
+      image: "{{ include "agent.full_url" . }}"
+      imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        capabilities:
+          add:
+            - AUDIT_WRITE
+            - DAC_OVERRIDE
+            - FOWNER
+            - KILL
+            - NET_RAW
+            - SETGID
+            - SETUID
+            - SYS_CHROOT
+            - SYS_PTRACE
+      env:
+{{- include "agent.common_env" . | nindent 8 }}
+      - name: S1_POD_UID
+        value: "0"
+      - name: S1_POD_GID
+        value: "0"
+      - name: S1_HELPER_ADDRESS
+        value: {{ include "service.name" . }}.{{ .Release.Namespace }}.svc
+{{ end }}
