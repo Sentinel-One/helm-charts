@@ -163,7 +163,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "helper.secret.create" -}}
-{{- empty .Values.secrets.helper_certificate }}
+{{- empty .Values.secrets.helper_certificate | ternary "true" "" }}
 {{- end -}}
 
 {{- define "helper.secret.name" -}}
@@ -178,13 +178,13 @@ Create the name of the service account to use
 Generate certificates for helper secret
 */}}
 {{- define "helper.certificates" -}}
-{{- $altNames := list ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace ) -}}
-{{- $helper_ca := genCA "helper-ca" 365 -}}
-{{- $helper_cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames 365 $helper_ca -}}
-{{- $ca_crt := $helper_ca.Cert | b64enc -}}
-{{- $tls_crt := $helper_cert.Cert | b64enc -}}
-{{- $tls_key := $helper_cert.Key | b64enc -}}
-{{- dict "tls.crt" $tls_crt "tls.key" $tls_key "ca.crt" $ca_crt | toYaml -}}
+{{- $altNames := list ( printf "%s" "localhost" ) ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace ) -}}
+{{- $ca := genCA ( printf "%s ca" .Release.Namespace ) 365 -}}
+{{- $caCert := $ca.Cert | b64enc -}}
+{{- $cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames 365 $ca -}}
+{{- $tlsCert := $cert.Cert | b64enc -}}
+{{- $tlsKey := $cert.Key | b64enc -}}
+{{- dict "tls.crt" $tlsCert "tls.key" $tlsKey "ca.crt" $caCert | toYaml -}}
 {{- end -}}
 
 {{- define "service.name" -}}
@@ -220,8 +220,6 @@ Generate certificates for helper secret
   value: "{{ .Values.configuration.custom_ca }}"
 - name: S1_HELPER_PORT
   value: "{{ include "service.port" . }}"
-- name: S1_AGENT_TYPE
-  value: "k8s"
 - name: S1_MANAGEMENT_PROXY
   value: "{{ default "" .Values.configuration.proxy }}"
 - name: S1_DV_PROXY
