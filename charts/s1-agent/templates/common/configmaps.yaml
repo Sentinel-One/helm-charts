@@ -6,35 +6,38 @@ metadata:
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
 data:
-  agentconfig.yaml: |
-    containers:
-    - name: agent
-{{- if .Values.secrets.imagePullSecret }}
+  config.yaml: |
+    spec:
+  {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
-        - name: {{ .Values.secrets.imagePullSecret }}
-{{- end }}
-      image: "{{ include "agent.full_url" . }}"
-      imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        capabilities:
-          add:
-            - AUDIT_WRITE
-            - DAC_OVERRIDE
-            - FOWNER
-            - KILL
-            - NET_RAW
-            - SETGID
-            - SETUID
-            - SYS_CHROOT
-            - SYS_PTRACE
-      env:
+      - name: {{ .Values.secrets.imagePullSecret }}
+  {{- end }}
+      shareProcessNamespace: true
+      containers:
+      - name: agent
+        image: "{{ include "agent.full_url" . }}"
+        imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          capabilities:
+            add:
+              - AUDIT_WRITE
+              - DAC_OVERRIDE
+              - FOWNER
+              - KILL
+              - NET_RAW
+              - SETGID
+              - SETUID
+              - SYS_CHROOT
+        env:
 {{- include "agent.common_env" . | nindent 8 }}
-      - name: S1_POD_UID
-        value: "0"
-      - name: S1_POD_GID
-        value: "0"
-      - name: S1_HELPER_ADDRESS
-        value: {{ include "service.name" . }}.{{ .Release.Namespace }}.svc
+        - name: S1_AGENT_TYPE
+          value: "eks_fargate"
+        - name: S1_POD_UID
+          value: "0"
+        - name: S1_POD_GID
+          value: "0"
+        - name: S1_HELPER_ADDRESS
+          value: {{ include "service.name" . }}.{{ .Release.Namespace }}
 {{ end }}
