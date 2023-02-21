@@ -24,9 +24,25 @@ spec:
       containers:
         - name: uninstall-agent
           image: "{{ include "helper.full_url" . }}"
-          command: [ "/bin/sh", "-c" ]
+          command: [ "/bin/bash", "-c" ]
           args:
             - >
               /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
-              grep {{ include "agent.fullname" . }} |
-              xargs -P 0 -I _ sh -c 'out=$(for i in {1..5}; do /s1-helper/kubectl exec _ -- sudo sentinelctl control uninstall 2>&1 && break || sleep 3; done) || rc=$? && echo -e "\nPod _:\n$out" && exit $rc; echo -e "\nPod _:\n$out"'
+                grep {{ include "helper.fullname" . }} |
+                  xargs -I _ bash -c 'for i in {1..3}; do /s1-helper/kubectl exec _ -- touch /s1-helper/uninstall-started 2>&1 && exit 0 || sleep 1; done';
+              for i in {1..2}; do
+                /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+                  grep {{ include "agent.fullname" . }} |
+                    xargs -P 0 -I % bash -c '
+                      out=$(for i in {1..3}; do 
+                              timeout 10 /s1-helper/kubectl exec % -- bash -c "
+                                    sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
+                                " && exit 0 || sleep 2;
+                            done;
+                            exit 1
+                      ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
+                if [[ $? == 0 ]]; then break; fi
+                echo -e "\n----------------------------------\n";
+                sleep 1;
+              done;
+              echo "Done";
