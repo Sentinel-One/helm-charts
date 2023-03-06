@@ -88,25 +88,9 @@ spec:
             mountPropagation: HostToContainer
         securityContext:
           capabilities:
-            add:
-              - AUDIT_CONTROL
-              - AUDIT_WRITE
-              - DAC_OVERRIDE
-              - DAC_READ_SEARCH
-              - FOWNER
-              - IPC_LOCK
-              - KILL
-              - NET_ADMIN
-              - NET_RAW
-              - SETGID
-              - SETUID
-              - SYS_ADMIN
-              - SYS_PTRACE
-              - SYS_RAWIO
-              - SYS_RESOURCE
-              - SYSLOG
-              - SYS_CHROOT
-              - SYS_MODULE
+            drop:
+              - all
+            add: {{ toYaml .Values.agent.capabilities | nindent 14 }}
       volumes:
 {{- if .Values.configuration.custom_ca }}
         - name: ca-certs
