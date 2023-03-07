@@ -1,10 +1,34 @@
-{{ if .Values.configuration.env.injection.enabled }}
+{{- if .Values.configuration.env.injection.enabled }}
+{{- $certs := "" }}
+{{- $caBundle := "" }}
+{{- if include "helper.secret.create" . }}
+{{- $certs = include "helper.certificates" . -}}
+{{- $caBundle = index ($certs | fromYaml) "ca.crt" -}}
+{{- else }}
+{{- $secret := (lookup "v1" "Secret" .Release.Namespace (include "helper.secret.name" .)) }}
+{{- if $secret -}}
+{{- $caBundle = index $secret "data" "ca.crt" -}}
+{{- end }}
+{{- end }}
+
+---
+
+{{- if include "helper.secret.create" . }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "helper.secret.name" . }}
+  labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
+type: kubernetes.io/tls
+data: {{- $certs | nindent 2 }}
+{{- end }}
+
+---
+
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ include "agentInjection.name" . }}
-  annotations:
-    cert-manager.io/inject-ca-from-secret: {{ include "helper.secret.name" . }}
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
 webhooks:
@@ -13,8 +37,9 @@ webhooks:
     - v1
     - v1beta1
   clientConfig:
+    caBundle: {{ $caBundle }}
     service:
-      name: {{ include "service.name" . }}.{{ .Release.Namespace }}.svc
+      name: {{ include "service.name" . }}
       namespace: {{ .Release.Namespace }}
       path: /agent/inject
       port: {{ include "service.port" . }}
