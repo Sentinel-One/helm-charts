@@ -38,6 +38,7 @@ spec:
         resources:
 {{ toYaml .Values.agent.resources | indent 10 }}
         env:
+{{- include "agent.common_env" . | nindent 8 }}
 {{- if include "site_key.secret.name" . }}
         - name: SITE_TOKEN
           valueFrom:
@@ -45,14 +46,15 @@ spec:
               name: {{ include "site_key.secret.name" . }}
               key: site-key
 {{- end }}
-{{- include "agent.common_env" . | nindent 8 }}
-        - name: S1_HELPER_ADDRESS
-          value: {{ include "service.name" . }}
+        - name: S1_AGENT_TYPE
+          value: "k8s"
         - name: S1_HELPER_CRT
           valueFrom:
             secretKeyRef:
               name: {{ include "helper.secret.name" . }}
               key: tls.crt
+        - name: S1_HELPER_ADDRESS
+          value: {{ include "service.name" . }}
         - name: S1_AGENT_HOST_MOUNT_PATH
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_PERSISTENT_DIR
