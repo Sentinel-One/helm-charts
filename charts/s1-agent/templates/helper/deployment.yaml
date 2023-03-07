@@ -51,7 +51,7 @@ spec:
             value: "{{ .Values.configuration.env.injection.enabled }}"
 {{- if .Values.configuration.env.injection.enabled }}
           - name: AGENT_INJECTION_CONFIG_FILE
-            value: "/s1-helper/agent-injection/agentconfig.yaml"
+            value: "/s1-helper/agent-injection/config.yaml"
 {{- if include "site_key.secret.name" . }}
           - name: SITE_TOKEN
             valueFrom:
