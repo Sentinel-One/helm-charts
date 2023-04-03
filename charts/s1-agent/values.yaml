@@ -111,6 +111,7 @@ agent:
     - KILL
     - NET_ADMIN
     - NET_RAW
+    - AUDIT_WRITE
   fullnameOverride: ""
   nameOverride: ""
   updateStrategy: ""
