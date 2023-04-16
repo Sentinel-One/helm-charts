@@ -12,24 +12,21 @@ allowHostNetwork: true
 allowHostPID: true
 allowHostPorts: false
 allowedCapabilities:
-  - AUDIT_CONTROL
-  - AUDIT_WRITE
   - DAC_OVERRIDE
   - DAC_READ_SEARCH
   - FOWNER
-  - IPC_LOCK
-  - KILL
-  - NET_ADMIN
-  - NET_RAW
   - SETGID
   - SETUID
   - SYS_ADMIN
   - SYS_PTRACE
-  - SYS_RAWIO
   - SYS_RESOURCE
   - SYSLOG
   - SYS_CHROOT
+  - CHOWN
   - SYS_MODULE
+  - KILL
+  - NET_ADMIN
+  - NET_RAW
 fsGroup:
   type: RunAsAny
 groups: []
