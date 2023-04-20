@@ -7,10 +7,13 @@ metadata:
 type: Opaque
 data:
 {{- if .Values.configuration.custom_ca_path -}}
-{{ range $index, $content := .Values.configuration.custom_ca_path }}
-  {{- print "custom_cert_" $index }}: |-
-    {{ print $content | b64enc | indent 4 }}
-
+{{ range $secretName, $secret := .Values.configuration.custom_ca_path }}
+  {{- if gt (len (toString $secretName)) 2 }}
+  {{print $secretName ".pem" }}: |-
+  {{- else }}
+  {{print "custom_cert_" $secretName ".pem" }}: |-
+  {{- end }}
+    {{ print $secret | b64enc | indent 4 }}
 {{ end }}
 {{- else -}}
 {{ range $path, $_ := .Files.Glob "files/*.pem" }}
