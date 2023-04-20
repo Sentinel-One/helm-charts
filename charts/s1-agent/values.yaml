@@ -33,6 +33,7 @@ configuration:
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
+  custom_ca_path:
   imagePullPolicy: "" # defaults to IfNotPresent
   platform:
     type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, openshift
@@ -46,7 +47,7 @@ secrets:
   helper_certificate: "" # you need to specify the name of the helper signed certificate secret (created outside this chart)
   site_key: # if neither were supplied, the agent will work offline mode
     value: "" # set site token if you want a secret to be crated with that value.
-    name: ""  # set the name of a pre-existing secret to use
+    name: "" # set the name of a pre-existing secret to use
 
 # Most users will not want to make changes below this line.
 
@@ -86,7 +87,7 @@ helper:
   resources:
     limits:
       cpu: 900m
-      memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional 
+      memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
     requests:
       cpu: 100m
       memory: 100Mi
@@ -95,7 +96,7 @@ helper:
     create: true
 
 agent:
-  capabilities: 
+  capabilities:
     - DAC_OVERRIDE
     - DAC_READ_SEARCH
     - FOWNER
