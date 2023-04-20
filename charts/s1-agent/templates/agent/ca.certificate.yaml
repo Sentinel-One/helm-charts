@@ -5,11 +5,9 @@ metadata:
   name: {{ include "agent.fullname" . }}-custom-ca
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
 type: Opaque
+{{- $agentCerts := fromYaml (include "agent.certificates" .) }}
 data:
-{{ range $path, $_ := .Files.Glob "files/*.pem" }}
-  {{ base $path }}: |-
-    {{ $.Files.Get $path | b64enc | indent 4 }}
-
-{{ end }}
-{{- end }}
-
+{{- range $cert := $agentCerts.certificates }}
+  {{- $cert.name | nindent 2 }}: {{ $cert.data }}
+{{- end -}}
+{{- end -}}
