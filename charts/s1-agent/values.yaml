@@ -19,13 +19,13 @@ configuration:
     agent:
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc.)
-      heap_trimming_enable: # to enable heap trimming, set to 'true'
-      heap_trimming_interval: # help trimming default interval (s)
+      heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
+      heap_trimming_interval: # heap trimming default interval (s)
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       pod_uid: 1000 # uid of the default pod user
       pod_gid: 1000 # gid of the default pod group
       watchdog_healthcheck_timeout: 15 # watchdog healthcheck timeout before exiting the pod entrypoint. (seconds, 0=disabled)
-      fips_enabled: false # to enable FIPS mode, set to 'true'
+      fips_enabled: # to enable/disable FIPS mode, set to 'true'/'false'
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
     injection:
