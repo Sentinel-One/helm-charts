@@ -215,6 +215,142 @@ Generate certificates for helper secret
 {{- end -}}
 {{- end -}}
 
+{{/*
+Get certificates for custom ca
+*/}}
+{{- define "custom_certs1" -}}
+{{- $ca_paths := .Values.configuration.custom_ca_path -}}
+{{- range $index, $path := $ca_paths -}}
+{{- printf "cert_%s.pem: %s" $index ($path |b64enc) | toYaml | nindent 2 -}}
+{{- end }}
+{{- end }}
+
+
+{{/*
+  Helper template to loop through Values.configuration.custom_ca_path and create a list of certificates with their names and data.
+  */}}
+{{- define "certificates_yaml" -}}
+{{ print "certificates:" | nindent 2 }}
+{{- range $index, $path := .Values.configuration.custom_ca_path }}
+{{- $name := print "cert_" $index ".pem" -}}
+  {{ printf "- %s: %s" $name ($path | b64enc) | nindent 4 -}}
+  {{/*
+  {{ printf "- %s: %s" $name ($path | b64enc) }}
+  {{ printf "- %s: |-" $name | nindent 2}}
+  {{ $path | nindent 4}}
+  */}}
+{{- end -}}
+{{- end }}
+
+
+{{/*
+{{- define "certificates" -}}
+{{- $certificates := .Values.configuration.custom_ca_path -}}
+{{- $certificatesMap := dict -}}
+{{- range $index, $certificatePath := $certificates }}
+{{- $certificatesMap.Set (toString $index) (dict "name" $index "path" $certificatePath) }}
+{{- end }}
+{{- $certificatesMap }}
+{{- end }}
+*/}}
+
+{{/*
+	Helper function to create a map of certificate data from a list of file paths
+	*/}}
+{{/*
+	{{- define "certificates" -}}
+	  {{- $certificatesMap := dict -}}
+	  {{- range $index, $path := .Values.configuration.custom_ca_path }}
+		{{- $certificatesMap = $certificatesMap | merge (dict (printf "cert-%d" $index) (dict "name" $index "path" $path)) }}
+	  {{- end }}
+	  {{- $certificatesMap -}}
+	{{- end }}
+*/}}
+
+{{/*
+	Helper template to loop through Values.configuration.custom_ca_path and create a list of certificates with their names and data.
+*/}}
+
+{{- define "certificates3" -}}
+{{- $certificatesMap := dict -}}
+{{- range $index, $path := .Values.configuration.custom_ca_path }}
+{{- $name := print "cert_" $index ".pem" -}}
+{{- $data := $path | b64enc -}}
+{{- $certificatesMap = $certificatesMap | merge (dict "name" $name "data" $data) -}}
+{{- end }}
+{{- $certificatesMap -}}
+{{- end }}
+
+{{- define "ca-certs" }}
+{{- $ca_list := list }}
+{{- $ca_paths := .Values.configuration.custom_ca_path }}
+{{- range $index, $path := $ca_paths }}
+{{- $ca_list := append $ca_list (dict "certName" $index "data" (print $path | b64enc)) -}}
+{{/*}}
+{{- $name := printf "cert_%d" $index }}
+{{- $data := $path }}
+{{- $ca_list = append $ca_list (dict "name" $name "data" $data) }}
+{{- end }}
+{{- end }}
+{{- $ca_list }} */}}
+{{- end}}
+{{- $ca_list -}}
+{{- end }}
+
+{{/*
+  Get certificates for custom ca
+*/}}
+{{- define "custom_certs" -}}
+{{- if .Values.configuration.custom_ca }}
+{{- if .Values.configuration.custom_ca_path -}}
+{{- range $secretName, $secret := .Values.configuration.custom_ca_path -}}
+{{- $certFileName := "" -}}
+{{- if gt (len (toString $secretName)) 2 -}}
+{{- $certFileName = (print $secretName ".pem") -}}
+{{- else -}}
+{{- $certFileName = (print "custom_cert_" (toString $secretName) ".pem") -}}
+{{- end -}}
+- name: {{$certFileName}}
+  value: {{ $secret | b64enc}}
+{{- end -}}
+{{- else -}}
+{{- range $path, $_ := .Files.Glob "files/*.pem" -}}
+- name: {{base $path}}
+  value: {{ $.Files.Get $path | b64enc}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "certificates" -}}
+{{- if .Values.configuration.custom_ca }}
+{{- $ca_paths := .Values.configuration.custom_ca_path -}}
+{{- range $index, $path := $ca_paths -}}
+{{- $name := print $index -}}
+{{- if not (hasSuffix $name ".pem") -}}
+  {{- $name = print "custom_ca_" $name ".pem" -}}
+{{- end -}}
+  {{ $name }}: |-
+    {{ $path | b64enc }}
+{{ end }}
+{{- end -}}
+{{- end -}}
+
+
+{{- define "certificates_names" -}}
+{{- if .Values.configuration.custom_ca }}
+{{- $ca_paths := .Values.configuration.custom_ca_path -}}
+{{- range $index, $path := $ca_paths -}}
+{{- $name := print $index -}}
+{{- if not (hasSuffix $name ".pem") -}}
+  {{- $name = print "custom_ca_" $name ".pem" -}}
+{{- end -}}
+  {{ $name }}: |-
+    {{ $path | b64enc }}
+{{ end }}
+{{- end -}}
+{{- end -}}
+
 {{- define "agent.common_env" -}}
 - name: S1_USE_CUSTOM_CA
   value: "{{ .Values.configuration.custom_ca }}"
