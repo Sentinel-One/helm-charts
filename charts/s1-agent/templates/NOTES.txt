@@ -24,11 +24,16 @@ Configuration options used to deploy:
 * Neither a site-key secret name nor a value to create the secret with was provided. The agents will work in OFFLINE mode.
 {{- end }}
 {{- if .Values.configuration.custom_ca }}
-* A custom CA certificate will be loaded into the agent image. These files were loaded. If the list is empty, then you probably did not copy the certificate files to "files/*.pem"
-{{- range $path, $_ := .Files.Glob "files/*.pem" }}
-  -> {{ base $path }}
+{{- if .Values.configuration.custom_ca_path }}
+* A custom CA certificate will be loaded into the agent image. These certificates were loaded with "--set-files". If the list is empty, check your arguments.
+{{- else -}}
+* A custom CA certificate will be loaded into the agent image. These files were loaded. If the list is empty, then you probably did not copy the certificate files to "files/*.pem".
+{{- end -}}
+{{- $certs := fromYaml (include "agent.certificate_names" .) }}
+{{- range $cert := $certs.certificates }}
+  -> {{ base $cert }}
 {{- end }}
-{{- end }}
+{{- end -}}
 {{- if .Values.configuration.proxy }}
 * A proxy will be used between AGENTS and MANAGEMENT: '{{ .Values.configuration.proxy }}'
 {{- else }}

@@ -5,20 +5,6 @@ metadata:
   name: {{ include "agent.fullname" . }}-custom-ca
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
 type: Opaque
-data:
-{{- if .Values.configuration.custom_ca_path -}}
-{{ range $secretName, $secret := .Values.configuration.custom_ca_path }}
-  {{- if gt (len (toString $secretName)) 2 }}
-  {{print $secretName ".pem" }}: |-
-  {{- else }}
-  {{print "custom_cert_" $secretName ".pem" }}: |-
-  {{- end }}
-    {{ print $secret | b64enc | indent 4 }}
-{{ end }}
-{{- else -}}
-{{ range $path, $_ := .Files.Glob "files/*.pem" }}
-  {{ base $path }}: |-
-    {{ $.Files.Get $path | b64enc | indent 4 }}
-{{ end }}
-{{- end}}
-{{- end }}
+data: {{- include "agent.certificates" . | nindent 2 -}}
+{{- end -}}
+

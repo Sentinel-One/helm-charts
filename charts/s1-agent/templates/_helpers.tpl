@@ -218,7 +218,7 @@ Generate certificates for helper secret
 {{/*
   Helper template to loop through Values.configuration.custom_ca_path and create a list of certificates with their names and data.
 */}}
-{{- define "certificates" -}}
+{{- define "agent.certificates" -}}
 {{- if .Values.configuration.custom_ca }}
 {{- if .Values.configuration.custom_ca_path -}}
 {{- $ca_paths := .Values.configuration.custom_ca_path -}}
@@ -234,6 +234,26 @@ Generate certificates for helper secret
 {{- range $path, $_ := .Files.Glob "files/*.pem" -}}
   {{ base $path }}: |-
     {{ $.Files.Get $path | b64enc }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "agent.certificate_names" -}}
+{{- if .Values.configuration.custom_ca -}}
+certificates:
+{{- if .Values.configuration.custom_ca_path -}}
+{{- $ca_paths := .Values.configuration.custom_ca_path -}}
+{{- range $index, $path := $ca_paths -}}
+{{- $name := print $index -}}
+{{- if not (hasSuffix ".pem" $name) -}}
+{{- $name = print "custom_ca_" $name ".pem" -}}
+{{- end }}
+- {{ $name }}
+{{- end -}}
+{{- else -}}
+{{- range $path, $_ := .Files.Glob "files/*.pem" -}}
+- {{ base $path }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
