@@ -5,6 +5,11 @@ metadata:
   name: {{ include "agent.fullname" . }}-custom-ca
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
 type: Opaque
-data: {{- include "agent.certificates" . | nindent 2 -}}
+{{/*data: {{- include "agent.certificates" . | nindent 2 -}}*/}}
+{{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
+data:
+{{- range $cert := $agentCerts.certificates }}
+  {{- $cert.name | nindent 2 }}: |-
+    {{- $cert.data | nindent 4 }}
+{{ end }}
 {{- end -}}
-

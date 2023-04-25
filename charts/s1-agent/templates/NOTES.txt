@@ -25,15 +25,16 @@ Configuration options used to deploy:
 {{- end }}
 {{- if .Values.configuration.custom_ca }}
 {{- if .Values.configuration.custom_ca_path }}
+data: |-
 * A custom CA certificate will be loaded into the agent image. These certificates were loaded with "--set-files". If the list is empty, check your arguments.
 {{- else -}}
 * A custom CA certificate will be loaded into the agent image. These files were loaded. If the list is empty, then you probably did not copy the certificate files to "files/*.pem".
 {{- end -}}
-{{- $certs := fromYaml (include "agent.certificate_names" .) }}
-{{- range $cert := $certs.certificates }}
-  -> {{ base $cert }}
+{{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
+{{- range $cert := $agentCerts.certificates }}
+  -> {{ $cert.name }}
 {{- end }}
-{{- end -}}
+{{- end }}
 {{- if .Values.configuration.proxy }}
 * A proxy will be used between AGENTS and MANAGEMENT: '{{ .Values.configuration.proxy }}'
 {{- else }}

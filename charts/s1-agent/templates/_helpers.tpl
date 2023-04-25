@@ -219,21 +219,27 @@ Generate certificates for helper secret
   Helper template to loop through Values.configuration.custom_ca_path and create a list of certificates with their names and data.
 */}}
 {{- define "agent.certificates" -}}
-{{- if .Values.configuration.custom_ca }}
+{{- if .Values.configuration.custom_ca -}}
+certificates:
 {{- if .Values.configuration.custom_ca_path -}}
 {{- $ca_paths := .Values.configuration.custom_ca_path -}}
 {{- range $index, $path := $ca_paths -}}
-{{- $name := print $index -}}
-{{- if not (hasSuffix ".pem" $name) -}}
+{{- $name := $index -}}
+{{- if (kindIs "int" $index) -}}
 {{- $name = print "custom_ca_" $name ".pem" -}}
+{{- else -}}
+{{- $name := print $index -}}
 {{- end -}}
-  {{ $name }}: |-
-    {{ $path | b64enc }}
+{{- if not (hasSuffix ".pem" $name) -}}
+{{- $name = print $name ".pem" -}}
+{{- end }}
+- name: {{ $name }}
+  data: {{ $path | b64enc }}
 {{ end }}
 {{- else -}}
-{{- range $path, $_ := .Files.Glob "files/*.pem" -}}
-  {{ base $path }}: |-
-    {{ $.Files.Get $path | b64enc }}
+{{- range $path, $_ := .Files.Glob "files/*.pem" }}
+- name: {{ base $path }}
+  data: {{ $.Files.Get $path | b64enc }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
