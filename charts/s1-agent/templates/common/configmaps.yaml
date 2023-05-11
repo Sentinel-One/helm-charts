@@ -33,7 +33,7 @@ data:
         env:
 {{- include "agent.common_env" . | nindent 8 }}
         - name: S1_AGENT_TYPE
-          value: "eks_fargate"
+          value: "k8s_serverless"
         - name: S1_POD_UID
           value: "0"
         - name: S1_POD_GID

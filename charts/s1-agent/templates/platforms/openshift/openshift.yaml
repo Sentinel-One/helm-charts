@@ -11,22 +11,7 @@ allowHostIPC: false
 allowHostNetwork: true
 allowHostPID: true
 allowHostPorts: false
-allowedCapabilities:
-  - DAC_OVERRIDE
-  - DAC_READ_SEARCH
-  - FOWNER
-  - SETGID
-  - SETUID
-  - SYS_ADMIN
-  - SYS_PTRACE
-  - SYS_RESOURCE
-  - SYSLOG
-  - SYS_CHROOT
-  - CHOWN
-  - SYS_MODULE
-  - KILL
-  - NET_ADMIN
-  - NET_RAW
+allowedCapabilities: {{ toYaml .Values.agent.capabilities | nindent 2 }}
 fsGroup:
   type: RunAsAny
 groups: []
