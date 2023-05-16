@@ -17,7 +17,7 @@ rules:
 {{ if .Values.configuration.env.injection.enabled }}
 - apiGroups: [""]
   resources: ["secrets", "configmaps"]
-  verbs: ["get", "watch", "list", "update", "create"]
+  verbs: ["get", "watch", "list", "update", "create", "delete"]
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["mutatingwebhookconfigurations"]
   verbs: ["create", "get", "delete", "list", "patch", "update", "watch"]
