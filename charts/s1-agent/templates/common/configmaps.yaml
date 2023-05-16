@@ -32,6 +32,21 @@ data:
               - SYS_CHROOT
         env:
 {{- include "agent.common_env" . | nindent 8 }}
+{{- if include "site_key.secret.name" . }}
+        - name: SITE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "site_key.secret.name" . }}
+              key: site-key
+{{- end }}
+        - name: S1_HELPER_CRT
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "helper.secret.name" . }}
+              key: tls.crt
+{{- if include "helper.secret.create" . }}
+              optional: true
+{{- end }}              
         - name: S1_AGENT_TYPE
           value: "k8s_serverless"
         - name: S1_POD_UID
