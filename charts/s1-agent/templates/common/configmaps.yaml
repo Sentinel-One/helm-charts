@@ -55,4 +55,13 @@ data:
           value: "0"
         - name: S1_HELPER_HOST
           value: {{ include "service.name" . }}.{{ .Release.Namespace }}
+        - name: S1_AGENT_CONFIG_FILE
+          value: "/{{ include "agent.fullname" . }}/config.yaml"
 {{ end }}
+        volumeMounts:
+        - name: {{ include "agent.fullname" . }}
+          mountPath: /{{ include "agent.fullname" . }}
+      volumes:
+        - name: {{ include "agent.fullname" . }}
+          configMap:
+            name: {{ include "agent.fullname" . }}
