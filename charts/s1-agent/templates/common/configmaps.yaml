@@ -46,7 +46,15 @@ data:
               key: tls.crt
 {{- if include "helper.secret.create" . }}
               optional: true
-{{- end }}              
+{{- end }}
+        - name: S1_HELPER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "helper_token.secret.name" . }}
+              key: helper.token
+{{- if include "helper_token.secret.create" . }}
+              optional: true
+{{- end }}
         - name: S1_AGENT_TYPE
           value: "k8s_serverless"
         - name: S1_POD_UID

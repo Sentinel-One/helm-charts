@@ -45,6 +45,11 @@ spec:
               secretKeyRef:
                 name: {{ include "helper.secret.name" . }}
                 key: tls.key
+          - name: SERVER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "helper_token.secret.name" . }}
+                key: server-token
           - name: LOG_LEVEL
             value: {{ .Values.configuration.env.helper.log_level }}
           - name: AGENT_INJECTION_ENABLED

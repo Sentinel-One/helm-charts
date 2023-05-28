@@ -53,6 +53,11 @@ spec:
             secretKeyRef:
               name: {{ include "helper.secret.name" . }}
               key: tls.crt
+        - name: S1_HELPER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "helper_token.secret.name" . }}
+              key: server-token
         - name: S1_HELPER_HOST
           value: {{ include "service.name" . }}
         - name: S1_AGENT_HOST_MOUNT_PATH
