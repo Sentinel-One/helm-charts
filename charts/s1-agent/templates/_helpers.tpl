@@ -187,6 +187,26 @@ Generate certificates for helper secret
 {{- dict "tls.crt" $tlsCert "tls.key" $tlsKey "ca.crt" $caCert | toYaml -}}
 {{- end -}}
 
+{{- define "helper_token.secret.create" -}}
+{{- empty .Values.secrets.helper_token | ternary "true" "" }}
+{{- end -}}
+
+{{- define "helper_token.secret.name" -}}
+{{- if include "helper_token.secret.create" . }}
+{{- include "helper.fullname" . -}}
+{{- ( printf "%s-%s" (include "helper.fullname" .) "token" ) -}}
+{{- else -}}
+{{- .Values.secrets.helper_token -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Generate server token for helper secret
+*/}}
+{{- define "helper.token" -}}
+{{- randAlphaNum 24 | nospace -}}
+{{- end -}}
+
 {{- define "service.name" -}}
 {{- include "helper.fullname" . -}}
 {{- end -}}
