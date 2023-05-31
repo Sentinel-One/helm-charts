@@ -30,6 +30,8 @@ data:
               - SETGID
               - SETUID
               - SYS_CHROOT
+        resources:
+{{ toYaml .Values.agentInjection.resources | indent 10 }}
         env:
 {{- include "agent.common_env" . | nindent 8 }}
 {{- if include "site_key.secret.name" . }}
