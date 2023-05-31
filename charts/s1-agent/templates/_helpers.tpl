@@ -193,7 +193,6 @@ Generate certificates for helper secret
 
 {{- define "helper_token.secret.name" -}}
 {{- if include "helper_token.secret.create" . }}
-{{- include "helper.fullname" . -}}
 {{- ( printf "%s-%s" (include "helper.fullname" .) "token" ) -}}
 {{- else -}}
 {{- .Values.secrets.helper_token -}}
@@ -204,7 +203,7 @@ Generate certificates for helper secret
 Generate server token for helper secret
 */}}
 {{- define "helper.token" -}}
-{{- randAlphaNum 24 | nospace -}}
+{{- randAlphaNum 24 | b64enc | quote -}}
 {{- end -}}
 
 {{- define "service.name" -}}
