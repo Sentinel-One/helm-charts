@@ -146,6 +146,10 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "agentUninstallJob.name" -}}
+{{- ( printf "%s-%s" .Release.Name "uninstall-agent-job" ) -}}
+{{- end -}}
+
 {{- define "agentInjection.name" -}}
 {{- ( printf "%s-%s" (include "agent.fullname" .) "injection" ) -}}
 {{- end -}}
@@ -275,4 +279,89 @@ certificates:
   value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
 - name: S1_FIPS_ENABLED
   value: "{{ .Values.configuration.env.agent.fips_enabled }}"
+- name: S1_POD_NAME
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.name
+- name: S1_POD_NAMESPACE
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.namespace
+- name: S1_HELPER_CRT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "helper.secret.name" . }}
+      key: tls.crt
+    {{- if include "helper.secret.create" . }}
+      optional: true
+    {{- end }}
+- name: S1_HELPER_TOKEN
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "helper_token.secret.name" . }}
+      key: server-token
+    {{- if include "helper_token.secret.create" . }}
+      optional: true
+    {{- end }}
 {{- end -}}
+
+{{- define "serverlessOnlyMode" -}}
+{{- if (eq .Values.configuration.platform.type "serverless") }}
+{{- true }}
+{{- else }}
+{{- $nodes_counter := 0 }}
+{{- $fargate_nodes_counter := 0 }}
+{{- $is_fargate_node := false }}
+{{- range $index, $node := (lookup "v1" "Node" "" "").items }}
+{{- $is_fargate_node = false }}
+{{- range $k, $v := $node.metadata.labels }}
+{{- if and (eq $k "eks.amazonaws.com/compute-type") (eq $v "fargate") }}
+{{- $is_fargate_node = true }}
+{{- end -}}
+{{- end -}}
+{{- $nodes_counter = add $nodes_counter 1 }}
+{{- if eq $is_fargate_node true }}
+{{- $fargate_nodes_counter = add $fargate_nodes_counter 1 }}
+{{- $is_fargate_node = false }}
+{{- end -}}
+{{- end -}}
+{{- eq $nodes_counter $fargate_nodes_counter -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "serverlessAgentContainer" -}}
+- name: agent
+  image: "{{ include "agent.full_url" . }}"
+  imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    capabilities:
+      add:
+        - AUDIT_WRITE
+        - DAC_OVERRIDE
+        - FOWNER
+        - KILL
+        - NET_RAW
+        - SETGID
+        - SETUID
+        - SYS_CHROOT
+  resources:
+{{ toYaml .Values.agentInjection.resources | indent 4 }}
+  env:
+{{- include "agent.common_env" . | nindent 2 }}
+{{- if include "site_key.secret.name" . }}
+  - name: SITE_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "site_key.secret.name" . }}
+        key: site-key
+{{- end }}
+  - name: S1_AGENT_TYPE
+    value: "k8s_serverless"
+  - name: S1_POD_UID
+    value: "0"
+  - name: S1_POD_GID
+    value: "0"
+{{- end -}}
+

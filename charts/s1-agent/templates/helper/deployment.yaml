@@ -19,13 +19,10 @@ spec:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
       containers:
         - name: helper
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.helper.securityContext | nindent 12 }}
           image: "{{ include "helper.full_url" . }}"
           imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
           env:
@@ -91,6 +88,12 @@ spec:
           volumeMounts:
           - name: agent-injection-config
             mountPath: /s1-helper/agent-injection
+    {{- if eq (include "serverlessOnlyMode" .) "true" }}
+        {{- include "serverlessAgentContainer" . | nindent 8 }}
+          - name: S1_HELPER_HOST
+            value: {{ include "service.name" . }}
+      shareProcessNamespace: true
+    {{- end }}
       volumes:
         - name: agent-injection-config
           configMap:

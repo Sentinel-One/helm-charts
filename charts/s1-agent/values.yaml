@@ -36,7 +36,9 @@ configuration:
   custom_ca_path:
   imagePullPolicy: "" # defaults to IfNotPresent
   platform:
-    type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, openshift
+    type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, openshift and
+                     # serverless for kubernetes cluster without nodes (currently Fargate only). For serverless
+                     # cluster with nodes as well, use kubernetes type.
     # optional settings, used with OpenShift only:
     openshift:
       scc:
@@ -58,9 +60,6 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: sentinelone
-
-# Optional additional values for the helper security context. Not typically needed.
-securityContext: {}
 
 agentInjection:
   selector:
@@ -92,6 +91,10 @@ helper:
             values:
             - linux
   probe: false
+  # Default values for the helper security context
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
   resources:
     limits:
       cpu: 900m

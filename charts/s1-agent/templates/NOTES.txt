@@ -1,5 +1,5 @@
-{{- if not (mustRegexMatch "^(kubernetes|openshift)$" .Values.configuration.platform.type) -}}
-{{ fail "configuration.platform.type must be one of: kubernetes, openshift" }}
+{{- if not (mustRegexMatch "^(kubernetes|openshift|serverless)$" .Values.configuration.platform.type) -}}
+{{ fail "configuration.platform.type must be one of: kubernetes, openshift, serverless" }}
 {{- end -}}
 {{- if not (mustRegexMatch "^(info|error|warning|debug|trace|)$" .Values.configuration.env.helper.log_level) -}}
 {{ fail "configuration.env.helper.log_level must be one of: info, error, warning, debug, trace [or empty to default to 'info']" }}

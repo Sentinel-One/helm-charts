@@ -1,7 +1,8 @@
+{{ if eq (include "serverlessOnlyMode" .) "false" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-uninstall-agent-job"
+  name: {{ include "agentUninstallJob.name" . }}
   labels:
 {{ include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
@@ -13,7 +14,7 @@ spec:
     metadata:
       labels:
         {{- include "sentinelone.helper.labels" . | nindent 8 }}
-      name: uninstall-agent
+      name: {{ include "agentUninstallJob.name" . }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
@@ -22,7 +23,7 @@ spec:
       restartPolicy: Never
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
-        - name: uninstall-agent
+        - name: {{ include "agentUninstallJob.name" . }}
           image: "{{ include "helper.full_url" . }}"
           command: [ "/bin/bash", "-c" ]
           args:
@@ -46,3 +47,4 @@ spec:
                 sleep 1;
               done;
               echo "Done";
+{{ end }}
