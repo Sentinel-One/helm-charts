@@ -14,64 +14,16 @@ data:
   {{- end }}
       shareProcessNamespace: true
       containers:
-      - name: agent
-        image: "{{ include "agent.full_url" . }}"
-        imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
-        securityContext:
-          runAsUser: 0
-          runAsGroup: 0
-          capabilities:
-            add:
-              - AUDIT_WRITE
-              - DAC_OVERRIDE
-              - FOWNER
-              - KILL
-              - NET_RAW
-              - SETGID
-              - SETUID
-              - SYS_CHROOT
-        resources:
-{{ toYaml .Values.agentInjection.resources | indent 10 }}
-        env:
-{{- include "agent.common_env" . | nindent 8 }}
-{{- if include "site_key.secret.name" . }}
-        - name: SITE_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "site_key.secret.name" . }}
-              key: site-key
-{{- end }}
-        - name: S1_HELPER_CRT
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "helper.secret.name" . }}
-              key: tls.crt
-{{- if include "helper.secret.create" . }}
-              optional: true
-{{- end }}
-        - name: S1_HELPER_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "helper_token.secret.name" . }}
-              key: helper.token
-{{- if include "helper_token.secret.create" . }}
-              optional: true
-{{- end }}
-        - name: S1_AGENT_TYPE
-          value: "k8s_serverless"
-        - name: S1_POD_UID
-          value: "0"
-        - name: S1_POD_GID
-          value: "0"
-        - name: S1_HELPER_HOST
-          value: {{ include "service.name" . }}.{{ .Release.Namespace }}
-        - name: S1_AGENT_CONFIG_FILE
-          value: "/{{ include "agent.fullname" . }}/config.yaml"
-        volumeMounts:
-        - name: {{ include "agent.fullname" . }}
-          mountPath: /{{ include "agent.fullname" . }}
+        {{- include "serverlessAgentContainer" . | nindent 8 }}
+          - name: S1_HELPER_HOST
+            value: {{ include "service.name" . }}.{{ .Release.Namespace }}
+          - name: S1_AGENT_CONFIG_FILE
+            value: "/{{ include "agent.fullname" . }}/config.yaml"
+          volumeMounts:
+          - name: {{ include "agent.fullname" . }}
+            mountPath: /{{ include "agent.fullname" . }}
       volumes:
-        - name: {{ include "agent.fullname" . }}
-          configMap:
-            name: {{ include "agent.fullname" . }}
+      - name: {{ include "agent.fullname" . }}
+        configMap:
+          name: {{ include "agent.fullname" . }}
 {{ end }}

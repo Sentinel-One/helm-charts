@@ -1,3 +1,4 @@
+{{ if eq (include "serverlessOnlyMode" .) "false" }}
 apiVersion: {{ template "daemonset.apiVersion" . }}
 kind: DaemonSet
 metadata:
@@ -48,16 +49,6 @@ spec:
 {{- end }}
         - name: S1_AGENT_TYPE
           value: "k8s"
-        - name: S1_HELPER_CRT
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "helper.secret.name" . }}
-              key: tls.crt
-        - name: S1_HELPER_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "helper_token.secret.name" . }}
-              key: server-token
         - name: S1_HELPER_HOST
           value: {{ include "service.name" . }}
         - name: S1_AGENT_HOST_MOUNT_PATH
@@ -68,14 +59,6 @@ spec:
           value: "{{ .Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
           value: "{{ .Values.configuration.env.agent.pod_gid }}"
-        - name: S1_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: S1_POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
@@ -124,3 +107,4 @@ spec:
     {{- with .Values.agent.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
     {{- end }}
+{{ end }}

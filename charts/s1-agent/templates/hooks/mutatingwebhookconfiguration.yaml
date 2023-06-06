@@ -55,8 +55,6 @@ webhooks:
     resources:
     - pods
     scope: '*'
-  {{- with .Values.agentInjection.selector }}
-    {{- toYaml . | nindent 2 }}
-  {{- end }}
+{{- toYaml .Values.agentInjection.selector | nindent 2 }}
   sideEffects: None
 {{ end }}
