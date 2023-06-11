@@ -369,3 +369,8 @@ certificates:
     value: "0"
 {{- end -}}
 
+{{- define "helper.rbac.annotations" -}}
+{{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
+"helm.sh/resource-policy": keep
+{{- end -}}
+{{- end -}}
