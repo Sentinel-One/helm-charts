@@ -18,7 +18,7 @@ spec:
       {{- if .Values.agent.podAnnotations }}
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
-        {{ default "container.apparmor.security.beta.kubernetes.io/agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" .Values.agent.apparmorPolicy }}
+        {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" .Values.agent.apparmorPolicy }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
@@ -33,7 +33,7 @@ spec:
       restartPolicy: Always
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
-      - name: agent
+      - name: "{{ include "agent.container_name" . }}"
         image: "{{ include "agent.full_url" . }}"
         imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
         resources:

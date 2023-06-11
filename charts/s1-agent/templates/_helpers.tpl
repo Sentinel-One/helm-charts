@@ -238,6 +238,10 @@ Generate server token for helper secret
 {{- end -}}
 {{- end -}}
 
+{{- define "agent.container_name" -}}
+{{- print "s1-agent" -}}
+{{- end -}}
+
 {{/*
 Collect a list of all custom certificates to be passed to the agent.
 Start with certificates passed with the --set-file option to .Values.configuration.custom_ca_path and continue to check for certificates in files/*.pem.
@@ -330,7 +334,7 @@ certificates:
 {{- end -}}
 
 {{- define "serverlessAgentContainer" -}}
-- name: agent
+- name: "{{ include "agent.container_name" . }}"
   image: "{{ include "agent.full_url" . }}"
   imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
   securityContext:
