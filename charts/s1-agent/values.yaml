@@ -130,7 +130,7 @@ agent:
   nodeSelector: {}
   priorityClassName: ""
   podAnnotations: ""
-  apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/agent
+  apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/s1-agent
   apparmorPolicy: unconfined
   tolerations:
     - effect: NoExecute
