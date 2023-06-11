@@ -215,6 +215,10 @@ Generate certificates for helper secret
 {{- end -}}
 {{- end -}}
 
+{{- define "agent.container_name" -}}
+{{- print "s1-agent" -}}
+{{- end -}}
+
 {{/*
 Collect a list of all custom certificates to be passed to the agent.
 Start with certificates passed with the --set-file option to .Values.configuration.custom_ca_path and continue to check for certificates in files/*.pem.
@@ -260,4 +264,4 @@ certificates:
   value: "{{ .Values.configuration.env.agent.helper_healthcheck_interval }}"
 - name: S1_FIPS_ENABLED
   value: "{{ .Values.configuration.env.agent.fips_enabled }}"
-{{- end -}}
+-{{- end -}}
