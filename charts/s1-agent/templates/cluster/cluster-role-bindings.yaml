@@ -2,13 +2,13 @@
 apiVersion: {{ template "clusterRoleBindings.apiVersion" . }}
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "helper.fullname" . }}
+  name: {{ include "helper.rbac.name" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
   annotations: {{- include "helper.rbac.annotations" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "helper.fullname" . }}
+  name: {{ include "helper.rbac.name" . }}
 subjects:
 - kind: ServiceAccount
   name: {{ include "sentinelone.serviceAccountName" . }}

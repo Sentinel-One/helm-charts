@@ -178,6 +178,12 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "helper.rbac.name" -}}
+{{ if .Values.helper.rbac.create }}
+{{- include "helper.fullname" . -}}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Generate certificates for helper secret
 */}}
