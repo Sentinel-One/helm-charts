@@ -76,6 +76,13 @@ spec:
             mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
             mountPropagation: HostToContainer
         securityContext:
+{{- if include "bottlerocketNode" . }}
+          seLinuxOptions:
+            user: system_u
+            role: system_r
+            type: control_t
+            level: "s0"
+{{- end }}
           capabilities:
             drop:
               - all
