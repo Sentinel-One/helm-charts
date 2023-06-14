@@ -339,6 +339,16 @@ certificates:
 {{- end -}}
 {{- end -}}
 
+{{- define "bottlerocketNode" -}}
+{{- $is_bottlerocket_node := false }}
+{{- range $index, $node := (lookup "v1" "Node" "" "").items }}
+{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage  }}
+{{- $is_bottlerocket_node = true }}
+{{- end -}}
+{{- end -}}
+{{ ternary "true" "" $is_bottlerocket_node }}
+{{- end -}}
+
 {{- define "serverlessAgentContainer" -}}
 - name: "{{ include "agent.container_name" . }}"
   image: "{{ include "agent.full_url" . }}"
