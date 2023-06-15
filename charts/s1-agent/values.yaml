@@ -25,6 +25,8 @@ configuration:
       pod_uid: 1000 # uid of the default pod user
       pod_gid: 1000 # gid of the default pod group
       watchdog_healthcheck_timeout: 15 # watchdog healthcheck timeout before exiting the pod entrypoint. (seconds, 0=disabled)
+      helper_healthcheck_retry: 60 # amount of tries to verify the helper service is running before starting the agent.
+      helper_healthcheck_interval: 5 # time to wait between each try. (seconds)
       fips_enabled: # to enable/disable FIPS mode, set to 'true'/'false'
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
