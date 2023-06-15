@@ -287,6 +287,10 @@ certificates:
   value: "{{ .Values.configuration.env.agent.log_level }}"
 - name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
   value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
+- name: S1_HELPER_HEALTHCHECK_RETRY
+  value: "{{ .Values.configuration.env.agent.helper_healthcheck_retry }}"
+- name: S1_HELPER_HEALTHCHECK_INTERVAL
+  value: "{{ .Values.configuration.env.agent.helper_healthcheck_interval }}"
 - name: S1_FIPS_ENABLED
   value: "{{ .Values.configuration.env.agent.fips_enabled }}"
 - name: S1_POD_NAME
