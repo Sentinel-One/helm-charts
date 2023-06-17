@@ -360,6 +360,7 @@ certificates:
   securityContext:
     runAsUser: 0
     runAsGroup: 0
+    runAsNonRoot: false
     capabilities:
       add:
         - AUDIT_WRITE
