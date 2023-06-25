@@ -353,14 +353,18 @@ certificates:
 {{ ternary "true" "" $is_bottlerocket_node }}
 {{- end -}}
 
+{{- define "serverlessAgentContainerOwner" -}}
+runAsUser: 0
+runAsGroup: 0
+runAsNonRoot: false
+{{- end -}}
+
 {{- define "serverlessAgentContainer" -}}
 - name: "{{ include "agent.container_name" . }}"
   image: "{{ include "agent.full_url" . }}"
   imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
   securityContext:
-    runAsUser: 0
-    runAsGroup: 0
-    runAsNonRoot: false
+    {{- include "serverlessAgentContainerOwner" . | nindent 4 }}
     capabilities:
       add:
         - AUDIT_WRITE

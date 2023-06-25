@@ -22,7 +22,11 @@ spec:
       containers:
         - name: helper
           securityContext:
+          {{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
+            {{- include "serverlessAgentContainerOwner" . | nindent 12 }}
+          {{- else }}
             {{- toYaml .Values.helper.securityContext | nindent 12 }}
+          {{- end }}
           image: "{{ include "helper.full_url" . }}"
           imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
           env:
