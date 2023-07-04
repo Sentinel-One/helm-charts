@@ -392,8 +392,6 @@ runAsNonRoot: false
     value: "0"
   - name: S1_POD_GID
     value: "0"
-  - name: S1_RESTART_POLICY
-    value: Always
 {{- end -}}
 
 {{- define "helper.rbac.annotations" -}}
