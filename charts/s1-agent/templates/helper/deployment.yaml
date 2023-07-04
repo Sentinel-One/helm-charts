@@ -110,6 +110,8 @@ spec:
         {{- include "serverlessAgentContainer" . | nindent 8 }}
           - name: S1_HELPER_HOST
             value: {{ include "service.name" . }}
+          - name: S1_RESTART_POLICY
+            value: Always
       shareProcessNamespace: true
     {{- end }}
       volumes:
