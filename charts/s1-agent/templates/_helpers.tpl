@@ -399,3 +399,12 @@ runAsNonRoot: false
 "helm.sh/resource-policy": keep
 {{- end -}}
 {{- end -}}
+
+{{- define "agentInjection.selector" -}}
+{{ toYaml .Values.agentInjection.selector }}
+{{- if eq (include "serverlessOnlyMode" .) "true" }}
+objectSelector:
+  matchExpressions:
+    - {key: app, operator: NotIn, values: [{{ include "sentinelone.name" . }}]}
+{{- end }}
+{{- end -}}
