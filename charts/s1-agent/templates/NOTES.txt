@@ -86,11 +86,5 @@ If the agents do not show up in the console, please check that:
 * Agent pods can reach the console via HTTPS
 {{- if not (include "site_key.secret.create" .) }}
 * You had opted to use an EXISTING site key. Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ include "site_key.secret.name" . }}' ACTUALLY exists, or agents will be unable to register.
-{{- end }}
-
-* Helper pod on serverless cluster should be excluded from injection. Exclusion can be achieved either by deploying the helper
-  in a namespace which doesn't contain 'agent-injection-enabled: "true"' label (the default selector settings) or by using
-  an object selector which excludes the helper pod label.
-{{- if and (eq (include "serverlessOnlyMode" .) "true") .Values.agentInjection.selector.objectSelector }}
-* You had opted to use an object selector in serverless mode. It will be overriden by "agentInjection.selector".
 {{- end -}}
+
