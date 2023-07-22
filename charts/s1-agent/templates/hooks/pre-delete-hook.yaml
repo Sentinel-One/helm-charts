@@ -30,7 +30,8 @@ spec:
             - >
               /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
                 grep {{ include "helper.fullname" . }} |
-                  xargs -I _ bash -c 'for i in {1..3}; do /s1-helper/kubectl exec _ -- touch /s1-helper/uninstall-started 2>&1 && exit 0 || sleep 1; done';
+                  xargs -I _ bash -c 'for i in {1..3}; do
+                    /s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
               for i in {1..2}; do
                 /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
                   grep {{ include "agent.fullname" . }} |
