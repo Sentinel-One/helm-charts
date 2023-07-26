@@ -7,6 +7,9 @@ metadata:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
 data:
   config.yaml: |
+    metadata:
+      labels:
+        {{- include "sentinelone.agent.selector.labels" . | nindent 8 }}
     spec:
   {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
