@@ -82,6 +82,7 @@ helper:
   fullnameOverride: ""
   nameOverride: ""
   labels: {}
+  podAnnotations: ""
   nodeSelector: {}
   priorityClassName: ""
   tolerations: {}

@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         {{- include "sentinelone.helper.labels" . | nindent 8 }}
+      {{- if .Values.helper.podAnnotations }}
+      annotations:
+{{ toYaml .Values.helper.podAnnotations | indent 8 }}
+      {{- end }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
