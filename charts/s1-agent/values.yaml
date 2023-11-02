@@ -45,6 +45,8 @@ configuration:
     openshift:
       scc:
         create: true # enable only if you are using OpenShift; this enables creation of a SecurityContextConstraint required to run on OpenShift
+    gke:
+      autopilot: false # enable if you are using gke autopilot.
 
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)
@@ -101,7 +103,7 @@ helper:
     limits:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
-    requests:
+    requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
       cpu: 100m
       memory: 100Mi
   # Specifies whether cluster role and cluster role bindings should be created
@@ -156,7 +158,7 @@ agent:
     limits:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
-    requests:
+    requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
       cpu: 100m
       memory: 800Mi
 
