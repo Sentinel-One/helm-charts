@@ -101,7 +101,7 @@ spec:
             periodSeconds: 5
 {{- end }}
           resources:
-            {{- toYaml .Values.helper.resources | nindent 12 }}
+            {{- include "helperResources" . | nindent 12 }}
 {{- if .Values.configuration.env.injection.enabled }}
           volumeMounts:
           - name: agent-injection-config
