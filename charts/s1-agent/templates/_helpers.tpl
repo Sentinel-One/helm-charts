@@ -400,3 +400,24 @@ runAsNonRoot: false
 {{- end -}}
 {{- end -}}
 
+{{- define "helperResources" -}}
+limits:
+{{ toYaml .Values.helper.resources.limits | indent 2 }}
+requests:
+{{- if .Values.configuration.platform.gke.autopilot }}
+{{ toYaml .Values.helper.resources.limits | indent 2 }}
+{{- else }}
+{{ toYaml .Values.helper.resources.requests | indent 2 }}
+{{- end -}}
+{{- end -}}
+
+{{- define "agentResources" -}}
+limits:
+{{ toYaml .Values.agent.resources.limits | indent 2 }}
+requests:
+{{- if .Values.configuration.platform.gke.autopilot }}
+{{ toYaml .Values.agent.resources.limits | indent 2 }}
+{{- else }}
+{{ toYaml .Values.agent.resources.requests | indent 2 }}
+{{- end -}}
+{{- end -}}
