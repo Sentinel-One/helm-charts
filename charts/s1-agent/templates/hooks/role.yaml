@@ -1,0 +1,11 @@
+{{ if include "preDeleteHook.enabled" . }}
+apiVersion: {{ template "clusterRole.apiVersion" . }}
+kind: Role
+metadata:
+  name: {{ include "preDeleteHook.name" . }}
+  labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+{{ end }}
