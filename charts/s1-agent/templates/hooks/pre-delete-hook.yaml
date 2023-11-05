@@ -1,8 +1,8 @@
-{{ if or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+{{ if eq (include "preDeleteHook.enabled" .) "true" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "agentUninstallJob.name" . }}
+  name: {{ include "preDeleteHook.name" . }}
   labels:
 {{ include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         {{- include "sentinelone.helper.labels" . | nindent 8 }}
-      name: {{ include "agentUninstallJob.name" . }}
+      name: {{ include "preDeleteHook.name" . }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
@@ -23,7 +23,7 @@ spec:
       restartPolicy: Never
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
-        - name: {{ include "agentUninstallJob.name" . }}
+        - name: {{ include "preDeleteHook.name" . }}
           image: "{{ include "helper.full_url" . }}"
           command: [ "/bin/bash", "-c" ]
           args:
