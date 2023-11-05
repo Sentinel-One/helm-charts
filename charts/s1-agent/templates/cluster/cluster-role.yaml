@@ -3,15 +3,12 @@ apiVersion: {{ template "clusterRole.apiVersion" . }}
 kind: ClusterRole
 metadata:
   name: {{ include "helper.rbac.name" . }}
-  labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
   annotations: {{- include "helper.rbac.annotations" . | nindent 4 }}
 rules:
 - apiGroups: [""]
   resources: ["nodes", "pods", "namespaces", "replicationcontrollers"]
   verbs: ["get", "watch", "list"]
-- apiGroups: [""]
-  resources: ["pods/exec"]
-  verbs: ["create"]
 - apiGroups: ["batch", "apps"]
   resources: ["jobs", "deployments", "daemonsets", "replicasets", "statefulsets", "crontabs"]
   verbs: ["get", "watch", "list"]

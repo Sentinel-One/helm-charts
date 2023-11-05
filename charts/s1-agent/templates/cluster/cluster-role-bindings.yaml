@@ -3,7 +3,7 @@ apiVersion: {{ template "clusterRoleBindings.apiVersion" . }}
 kind: ClusterRoleBinding
 metadata:
   name: {{ include "helper.rbac.name" . }}
-  labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
   annotations: {{- include "helper.rbac.annotations" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
