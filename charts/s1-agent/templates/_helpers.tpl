@@ -146,8 +146,18 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
-{{- define "agentUninstallJob.name" -}}
+{{- define "preDeleteHook.name" -}}
 {{- ( printf "%s-%s" .Release.Name "uninstall-agent-job" ) -}}
+{{- end -}}
+
+{{- define "preDeleteHook.enabled" -}}
+{{- or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+{{- end -}}
+
+{{- define "preDeleteHook.rbac.name" -}}
+{{ if eq (include "preDeleteHook.enabled" .) "true" }}
+{{- include "preDeleteHook.name" . -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "agentInjection.name" -}}
