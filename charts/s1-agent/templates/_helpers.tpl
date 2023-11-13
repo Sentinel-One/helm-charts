@@ -431,3 +431,11 @@ requests:
 {{ toYaml .Values.agent.resources.requests | indent 2 }}
 {{- end -}}
 {{- end -}}
+
+{{- define "persistentDir" -}}
+{{- if .Values.configuration.platform.gke.autopilot }}
+{{- "/var/lib/sentinelone" }}
+{{- else }}
+{{- default "/host" .Values.configuration.env.agent.host_mount_path }}{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}
+{{- end }}
+{{- end -}}
