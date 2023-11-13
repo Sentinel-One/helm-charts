@@ -54,7 +54,7 @@ spec:
         - name: S1_AGENT_HOST_MOUNT_PATH
           value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
         - name: S1_PERSISTENT_DIR
-          value: "{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}"
+          value: "/var/lib/sentinelone"
         - name: S1_POD_UID
           value: "{{ .Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
@@ -68,13 +68,14 @@ spec:
             subPath: "{{ $cert.name }}"
 {{- end }}
 {{- end }}
-          - name: debugfs
-            mountPath: /sys/kernel/debug/
-          - name: modules
-            mountPath: /lib/modules/
           - name: host
             mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
             mountPropagation: HostToContainer
+{{- if .Values.configuration.platform.gke.autopilot }}
+            readOnly: true
+{{- end }}
+          - name: persistence
+            mountPath: "/var/lib/sentinelone"
         securityContext:
 {{- if include "bottlerocketNode" . }}
           seLinuxOptions:
@@ -93,15 +94,16 @@ spec:
           secret:
             secretName: "{{ include "agent.fullname" . }}-custom-ca"
 {{- end }}
-        - name: debugfs
-          hostPath:
-            path: /sys/kernel/debug/
-        - name: modules
-          hostPath:
-            path: /lib/modules/
         - name: host
           hostPath:
             path: /
+        - name: persistence
+          hostPath:
+{{- if .Values.configuration.platform.gke.autopilot }}
+            path: /opt/sentinelone
+{{- else }}
+            path: "{{ default "/opt/sentinelone" .Values.configuration.env.agent.persistent_dir }}"
+{{- end }}
     {{- with .Values.agent.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
     {{- end }}

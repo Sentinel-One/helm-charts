@@ -44,6 +44,9 @@ Configuration options used to deploy:
 {{- else }}
 * NO proxy will be used between AGENTS and DEEP-VISIBILITY.
 {{- end }}
+{{- if and .Values.configuration.platform.gke.autopilot .Values.configuration.env.agent.persistent_dir }}
+* Custom persistent directory is unsupported in GKE autopilot and will be overridden by a default path.
+{{- end }}
 * The images will be pulled from:
 {{- $agentTag := .Values.configuration.tag.agent -}}
 {{- $helperTag := default .Values.configuration.tag.agent .Values.configuration.tag.helper -}}
