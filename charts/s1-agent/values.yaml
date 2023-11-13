@@ -18,7 +18,7 @@ configuration:
   env:
     agent:
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
-      persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc.)
+      persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc. Unsupported in GKE autopilot)
       heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
       heap_trimming_interval: # heap trimming default interval (s)
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
@@ -46,7 +46,7 @@ configuration:
       scc:
         create: true # enable only if you are using OpenShift; this enables creation of a SecurityContextConstraint required to run on OpenShift
     gke:
-      autopilot: false # enable if you are using gke autopilot.
+      autopilot: false # enable if you are using GKE autopilot.
 
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)
