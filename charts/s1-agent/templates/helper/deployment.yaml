@@ -108,6 +108,8 @@ spec:
             mountPath: /s1-helper/agent-injection
     {{- if eq (include "serverlessOnlyMode" .) "true" }}
         {{- include "serverlessAgentContainer" . | nindent 8 }}
+          - name: S1_AGENT_CONTAINER_NAME
+            value: "{{ include "agent.container_name" . }}"
           - name: S1_HELPER_HOST
             value: {{ include "service.name" . }}
           - name: S1_RESTART_POLICY
