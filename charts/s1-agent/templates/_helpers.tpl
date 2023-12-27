@@ -387,7 +387,7 @@ runAsNonRoot: false
         key: site-key
 {{- end }}
   - name: S1_AGENT_TYPE
-    value: "k8s_serverless"
+    value: "k8s_pod"
   - name: S1_POD_UID
     value: "0"
   - name: S1_POD_GID
