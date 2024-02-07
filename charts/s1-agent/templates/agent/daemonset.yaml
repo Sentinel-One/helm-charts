@@ -48,7 +48,7 @@ spec:
               key: site-key
 {{- end }}
         - name: S1_AGENT_TYPE
-          value: "k8s"
+          value: {{ if .Values.configuration.platform.gke.autopilot }}"k8s-gk3"{{- else }}"k8s"{{- end }}
         - name: S1_HELPER_HOST
           value: {{ include "service.name" . }}
         - name: S1_AGENT_HOST_MOUNT_PATH
