@@ -48,7 +48,7 @@ spec:
               key: site-key
 {{- end }}
         - name: S1_AGENT_TYPE
-          value: {{ if .Values.configuration.platform.gke.autopilot }}"k8s-gk3"{{- else }}"k8s"{{- end }}
+          value: "k8s"
         - name: S1_HELPER_HOST
           value: {{ include "service.name" . }}
         - name: S1_AGENT_HOST_MOUNT_PATH
@@ -61,6 +61,10 @@ spec:
           value: "{{ .Values.configuration.env.agent.pod_gid }}"
         - name: S1_AGENT_CONFIG_PATH
           value: "/opt/configmaps/config"
+{{- if .Values.configuration.platform.gke.autopilot }}
+        - name: S1_GKE_AUTOPILOT
+          value: "true"
+{{- end }}
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
