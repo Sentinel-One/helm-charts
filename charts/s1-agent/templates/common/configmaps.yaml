@@ -30,3 +30,23 @@ data:
         configMap:
           name: {{ include "agent.fullname" . }}
 {{ end }}
+
+---
+
+{{ if or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "agent.fullname" . }}-config
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+data:
+  # config1.conf: |-
+  #       content
+
+  # config2.conf: |-
+  #       content
+
+  # config3.conf: |-
+  #       content
+{{- end }}
