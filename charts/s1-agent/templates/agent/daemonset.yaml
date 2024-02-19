@@ -59,6 +59,8 @@ spec:
           value: "{{ .Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
           value: "{{ .Values.configuration.env.agent.pod_gid }}"
+        - name: S1_AGENT_CONFIG_PATH
+          value: "/opt/configmaps/config"
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
 {{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
@@ -76,6 +78,9 @@ spec:
           - name: persistence
             mountPath: {{ include "persistentDir" . }}
 {{- end }}
+          - name: config
+            mountPath: /opt/configmaps/config
+            readOnly: true
         securityContext:
 {{- if include "bottlerocketNode" . }}
           seLinuxOptions:
@@ -102,6 +107,9 @@ spec:
           hostPath:
             path: {{ include "persistentDir" . }}
 {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "agent.fullname" . }}-config
     {{- with .Values.agent.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
     {{- end }}
