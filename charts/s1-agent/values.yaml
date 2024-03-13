@@ -71,6 +71,11 @@ agentInjection:
     namespaceSelector:
       matchLabels:
         agent-injection-enabled: "true"
+    objectSelector:
+      matchExpressions:
+        - key: agent-injection-enabled
+          operator: NotIn
+          values: ["false"]
   resources:
     limits:
       cpu: 900m
