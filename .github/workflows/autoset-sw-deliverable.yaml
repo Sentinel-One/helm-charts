@@ -1,0 +1,54 @@
+---
+name: Autoset SW Deliverable
+# add "K8s Agent" (id 13345) value to "SW Deliverable" custom field list
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+      - release/*
+
+env:
+  JIRA_UPDATE: |
+    {
+        "update": {
+            "customfield_11085": [{
+                "add": { "id": "13345" }
+            }]
+        }
+    }
+
+jobs:
+  set-deliverable:
+    if: github.event.pull_request.merged == true
+    runs-on: sentinel-general-use-runner
+    steps:
+      - name: Configure AWS Credentials
+        uses: sentinel-one/devops-github-actions/local-repos/configure-aws-credentials@master
+        with:
+          aws-region: us-east-1
+      - name: Export Jira Credentials
+        uses: sentinel-one/devops-github-actions/local-repos/aws-secretsmanager-get-secrets@master
+        with:
+          secret-ids: |
+            JIRA, test-automation-jira
+          parse-json-secrets: true
+      - name: Get affected issues
+        id: get_issues
+        run: >
+          echo 'issues<<EOF' >> "${GITHUB_OUTPUT}"
+
+          curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}"
+          ${{ github.event.repository.url }}/pulls/${{ github.event.pull_request.number }} |
+          jq -r '.title' | rev | cut -d"]" -f2- | rev | cut -d"[" -f2- | sed 's/]\[/\n/g' >> "${GITHUB_OUTPUT}"
+
+          echo EOF >> "${GITHUB_OUTPUT}"
+      - name: Process issues
+        run: |
+          echo "${{ steps.get_issues.outputs.issues }}" | while read issue ; do
+            echo Updating issue ${issue}
+            curl --fail-with-body -u "$JIRA_USERNAME:$JIRA_APIKEY" -X PUT -d '${{ env.JIRA_UPDATE }}' -H "Content-Type: application/json" https://sentinelone.atlassian.net/rest/api/2/issue/${issue} \
+              || echo "Failed to update issue ${issue}"
+          done
