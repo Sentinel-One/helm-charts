@@ -31,5 +31,6 @@ users:
 volumes:
   - hostPath
   - secret
+  - configMap
 {{- end }}
 
