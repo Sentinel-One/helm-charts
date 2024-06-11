@@ -41,12 +41,16 @@ metadata:
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
 data:
-  # config1.conf: |-
-  #       content
-
-  # config2.conf: |-
-  #       content
-
-  # config3.conf: |-
-  #       content
+{{- with .Values.configuration }}
+{{- range $name, $conf := dict "local.conf" .localConf "override.conf" .overrideConf }}
+{{- if $conf }}
+  {{ $name }}: |
+  {{- if kindIs "map" $conf }}
+    {{- mustToPrettyJson $conf | nindent 4 }}
+  {{ else }}
+    {{- $conf | nindent 4 }}
+  {{ end }}
 {{- end }}
+{{- end }}
+{{ end }}
+{{ end }}
