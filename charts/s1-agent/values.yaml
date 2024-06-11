@@ -48,6 +48,8 @@ configuration:
         create: true # enable only if you are using OpenShift; this enables creation of a SecurityContextConstraint required to run on OpenShift
     gke:
       autopilot: false # enable if you are using GKE autopilot.
+  localConf: # set Agent's initial local.conf configuration.
+  overrideConf: # set Agent's initial override.conf configuration.
 
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)
