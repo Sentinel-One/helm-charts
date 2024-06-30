@@ -54,3 +54,14 @@ data:
 {{- end }}
 {{ end }}
 {{ end }}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "helper.fullname" . }}-config
+  labels:
+    {{- include "sentinelone.helper.labels" . | nindent 4 }}
+data:
+  {{- include "helper.uuid" . | nindent 2 }}

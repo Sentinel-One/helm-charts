@@ -33,6 +33,9 @@ spec:
           {{- end }}
           image: "{{ include "helper.full_url" . }}"
           imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "helper.config.name" .}}
           env:
           - name: S1_POD_NAME
             valueFrom:
