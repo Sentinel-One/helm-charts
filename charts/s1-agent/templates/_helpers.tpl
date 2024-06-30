@@ -447,3 +447,20 @@ requests:
 {{- default "/host" .Values.configuration.env.agent.host_mount_path }}{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}
 {{- end }}
 {{- end -}}
+
+{{- define "helper.config.name" -}}
+{{- printf "%s-%s" (include "helper.fullname" .) "config" -}}
+{{- end -}}
+
+{{- define "helper.uuid" -}}
+{{- $persistent_uuid := "" -}}
+{{- $uuid := uuidv4 -}}
+{{- $configmap := (lookup "v1" "ConfigMap" .Release.Namespace (include "helper.config.name" .)) }}
+{{- if $configmap }}
+{{- $persistent_uuid = index $configmap "data" "S1_HELPER_UUID" -}}
+{{- end }}
+{{- if $persistent_uuid }}
+{{- $uuid = $persistent_uuid -}}
+{{- end }}
+{{- dict "S1_HELPER_UUID" $uuid | toYaml -}}
+{{- end -}}
