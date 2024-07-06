@@ -303,6 +303,8 @@ certificates:
   value: "{{ .Values.configuration.env.agent.helper_healthcheck_interval }}"
 - name: S1_FIPS_ENABLED
   value: "{{ .Values.configuration.env.agent.fips_enabled }}"
+- name: S1_AGENT_ENABLED
+  value: "{{ .Values.configuration.env.agent.enabled }}"
 - name: S1_POD_NAME
   valueFrom:
     fieldRef:
