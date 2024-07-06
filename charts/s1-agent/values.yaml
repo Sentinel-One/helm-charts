@@ -17,6 +17,7 @@ configuration:
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
     agent:
+      enabled: # to disable the agent, set to 'false'
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc. Unsupported in GKE autopilot)
       heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
@@ -28,6 +29,7 @@ configuration:
       helper_healthcheck_retry: 60 # amount of tries to verify the helper service is running before starting the agent.
       helper_healthcheck_interval: 5 # time to wait between each try. (seconds)
       fips_enabled: # to enable/disable FIPS mode, set to 'true'/'false'
+      ebpf_enabled: # to disable EBPF mode, set to 'false' (Unsupported in EKS Fargate)
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       client_timeout: # client timeout. (seconds, default=120)
