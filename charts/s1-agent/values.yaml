@@ -170,7 +170,7 @@ agent:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
     requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
-      cpu: 100m
+      cpu: 500m
       memory: 800Mi
 
 service:
