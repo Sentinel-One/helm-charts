@@ -64,4 +64,4 @@ metadata:
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
 data:
-  {{- include "helper.uuid" . | nindent 2 }}
+  {{- include "helper.config" . | nindent 2 }}

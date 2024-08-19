@@ -33,6 +33,7 @@ configuration:
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       client_timeout: # client timeout. (seconds, default=120)
+      inventory_enabled: true
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA

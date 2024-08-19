@@ -452,7 +452,7 @@ requests:
 {{- printf "%s-%s" (include "helper.fullname" .) "config" -}}
 {{- end -}}
 
-{{- define "helper.uuid" -}}
+{{- define "helper.config" -}}
 {{- $persistent_uuid := "" -}}
 {{- $uuid := uuidv4 -}}
 {{- $configmap := (lookup "v1" "ConfigMap" .Release.Namespace (include "helper.config.name" .)) }}
@@ -462,5 +462,5 @@ requests:
 {{- if $persistent_uuid }}
 {{- $uuid = $persistent_uuid -}}
 {{- end }}
-{{- dict "S1_HELPER_UUID" $uuid | toYaml -}}
+{{- dict "S1_HELPER_UUID" $uuid "S1_INVENTORY_ENABLED" (printf "%t" .Values.configuration.env.helper.inventory_enabled) | toYaml -}}
 {{- end -}}
