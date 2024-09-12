@@ -49,6 +49,10 @@ spec:
           - name: CLUSTER_NAME
             value: {{ .Values.configuration.cluster.name }}
 {{- end }}
+{{- if .Values.configuration.cluster.uid }}
+          - name: S1_CLUSTER_UID
+            value: {{ .Values.configuration.cluster.uid }}
+{{- end }}
           - name: SERVER_PORT
             value: "{{ include "service.target_port" . }}"
           - name: SERVER_CRT
