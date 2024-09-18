@@ -84,6 +84,8 @@ spec:
           - name: S1_HELPER_RBAC_NAME
             value: {{ include "helper.rbac.name" . }}
         {{- end }}
+{{- end }}
+{{- if or .Values.configuration.env.injection.enabled .Values.configuration.env.helper.communicator_enabled }}
         {{- if and (include "site_key.secret.create" .)  (include "site_key.secret.name" .) }}
           - name: SITE_TOKEN
             valueFrom:
