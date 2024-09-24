@@ -1,4 +1,4 @@
-{{ if or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+{{ if and (or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false")) (not .Values.configuration.inventory_only) }}
 apiVersion: {{ template "daemonset.apiVersion" . }}
 kind: DaemonSet
 metadata:
