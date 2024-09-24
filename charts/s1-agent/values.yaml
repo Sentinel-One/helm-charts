@@ -54,6 +54,7 @@ configuration:
       autopilot: false # enable if you are using GKE autopilot.
   localConf: # set Agent's initial local.conf configuration.
   overrideConf: # set Agent's initial override.conf configuration.
+  inventory_only: false # enable to deploy only inventory collector
 
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)

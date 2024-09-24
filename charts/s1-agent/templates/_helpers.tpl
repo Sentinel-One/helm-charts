@@ -462,5 +462,8 @@ requests:
 {{- if $persistent_uuid }}
 {{- $uuid = $persistent_uuid -}}
 {{- end }}
-{{- dict "S1_HELPER_UUID" $uuid "S1_INVENTORY_ENABLED" (printf "%t" .Values.configuration.env.helper.inventory_enabled) | toYaml -}}
+{{- $helperConfig := dict "S1_HELPER_UUID" $uuid -}}
+{{- $_ := set $helperConfig "S1_INVENTORY_ENABLED" (printf "%t" .Values.configuration.env.helper.inventory_enabled) -}}
+{{- $_ := set $helperConfig "S1_INVENTORY_ONLY" (printf "%t" .Values.configuration.inventory_only) -}}
+{{- $helperConfig | toYaml -}}
 {{- end -}}
