@@ -17,7 +17,7 @@ configuration:
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
     agent:
-      enabled: # to disable the agent, set to 'false'
+      enabled: true # to disable the agent, set to 'false'
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc. Unsupported in GKE autopilot)
       heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
