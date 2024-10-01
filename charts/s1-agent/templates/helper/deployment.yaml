@@ -13,8 +13,9 @@ spec:
     metadata:
       labels:
         {{- include "sentinelone.helper.labels" . | nindent 8 }}
-      {{- if .Values.helper.podAnnotations }}
       annotations:
+        timestamp: {{ now | quote }}
+      {{- if .Values.helper.podAnnotations }}
 {{ toYaml .Values.helper.podAnnotations | indent 8 }}
       {{- end }}
     spec:
