@@ -29,8 +29,8 @@ users:
   - system:serviceaccount:{{ .Release.Namespace }}
   - system:serviceaccount:{{ .Release.Namespace }}:{{ include "sentinelone.serviceAccountName" . }}
 volumes:
+  - configMap
   - hostPath
   - secret
-  - configMap
 {{- end }}
 
