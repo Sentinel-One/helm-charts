@@ -33,6 +33,7 @@ configuration:
       ebpf_enabled: # to disable EBPF mode, set to 'false' (Unsupported in EKS Fargate)
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
+      log_size: ""  # helper log file size in MBs. (defaults to 10)
       client_timeout: # client timeout. (seconds, default=120)
       inventory_enabled: true
       communicator_enabled: true
