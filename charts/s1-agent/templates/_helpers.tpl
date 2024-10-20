@@ -465,6 +465,7 @@ requests:
 {{- $helperConfig := dict "S1_HELPER_UUID" $uuid -}}
 {{- $_ := set $helperConfig "S1_INVENTORY_ENABLED" (printf "%t" .Values.configuration.env.helper.inventory_enabled) -}}
 {{- $_ := set $helperConfig "S1_INVENTORY_ONLY" (printf "%t" .Values.configuration.inventory_only) -}}
+{{- $_ := set $helperConfig "S1_HELPER_LOG_SIZE" (.Values.configuration.env.helper.log_size | toString) -}}
 {{- $_ := set $helperConfig "COMMUNICATOR_ENABLED" (printf "%t" .Values.configuration.env.helper.communicator_enabled) -}}
 {{- if .Values.configuration.env.helper.communicator_enabled -}}
 {{- $_ := set $helperConfig "S1_MANAGEMENT_PROXY" (default "" .Values.configuration.proxy) -}}
