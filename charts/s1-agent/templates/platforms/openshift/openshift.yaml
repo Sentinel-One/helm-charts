@@ -28,6 +28,7 @@ supplementalGroups:
 users:
   - system:serviceaccount:{{ .Release.Namespace }}
   - system:serviceaccount:{{ .Release.Namespace }}:{{ include "sentinelone.serviceAccountName" . }}
+# Volumes must be added in alphabetic order to avoid sync issues with gitops tools
 volumes:
   - configMap
   - hostPath
