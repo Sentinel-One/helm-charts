@@ -2,7 +2,7 @@
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
-  name: s1 
+  name: s1
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
 allowPrivilegedContainer: false
@@ -26,8 +26,8 @@ seccompProfiles:
 supplementalGroups:
   type: RunAsAny
 users:
-  - system:serviceaccount:{{ .Release.Namespace }}
-  - system:serviceaccount:{{ .Release.Namespace }}:{{ include "sentinelone.serviceAccountName" . }}
+  - system:serviceaccount:{{ include "namespace" . }}
+  - system:serviceaccount:{{ include "namespace" . }}:{{ include "sentinelone.serviceAccountName" . }}
 # Volumes must be added in alphabetic order to avoid sync issues with gitops tools
 volumes:
   - configMap

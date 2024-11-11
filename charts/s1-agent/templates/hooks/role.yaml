@@ -4,6 +4,7 @@ kind: Role
 metadata:
   name: {{ include "preDeleteHook.name" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 rules:
 - apiGroups: [""]
   resources: ["pods/exec"]

@@ -78,7 +78,7 @@ If the pods do not start, please check if:
 * Agent pods and kubernetes API server can reach the helper via HTTPS
 {{- if not (include "helper.secret.create" .) }}
 * You had opted to use an EXISTING helper certificate signed by kubernetes CA.
-  Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ include "helper.secret.name" . }}' ACTUALLY exists, or agents and API server will be unable to reach the helper.
+  Make sure that in namespace '{{ include "namespace" . }}', the secret '{{ include "helper.secret.name" . }}' ACTUALLY exists, or agents and API server will be unable to reach the helper.
 {{- end }}
 
 If the agents do not show up in the console, please check that:
@@ -88,6 +88,6 @@ If the agents do not show up in the console, please check that:
   If you supplied a CA certificate, check that it is stored in the namespace of this chart in your cluster as 'ca-certificate'
 * Agent pods can reach the console via HTTPS
 {{- if not (include "site_key.secret.create" .) }}
-* You had opted to use an EXISTING site key. Make sure that in namespace '{{ .Release.Namespace }}', the secret '{{ include "site_key.secret.name" . }}' ACTUALLY exists, or agents will be unable to register.
+* You had opted to use an EXISTING site key. Make sure that in namespace '{{ include "namespace" . }}', the secret '{{ include "site_key.secret.name" . }}' ACTUALLY exists, or agents will be unable to register.
 {{- end -}}
 

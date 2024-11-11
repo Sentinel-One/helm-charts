@@ -195,11 +195,22 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Create chart namespace based on override value.
+*/}}
+{{- define "namespace" -}}
+{{- if .Values.namespaceOverride -}}
+{{- .Values.namespaceOverride -}}
+{{- else -}}
+{{- .Release.Namespace -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Generate certificates for helper secret
 */}}
 {{- define "helper.certificates" -}}
-{{- $altNames := list ( printf "%s" "localhost" ) ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace ) -}}
-{{- $ca := genCA ( printf "%s ca" .Release.Namespace ) 365 -}}
+{{- $altNames := list ( printf "%s" "localhost" ) ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) (include "namespace" .) ) ( printf "%s.%s.svc" (include "helper.fullname" .) (include "namespace" .) ) -}}
+{{- $ca := genCA ( printf "%s ca" (include "namespace" .) ) 365 -}}
 {{- $caCert := $ca.Cert | b64enc -}}
 {{- $cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames 365 $ca -}}
 {{- $tlsCert := $cert.Cert | b64enc -}}
@@ -455,7 +466,7 @@ requests:
 {{- define "helper.config" -}}
 {{- $persistent_uuid := "" -}}
 {{- $uuid := uuidv4 -}}
-{{- $configmap := (lookup "v1" "ConfigMap" .Release.Namespace (include "helper.config.name" .)) }}
+{{- $configmap := (lookup "v1" "ConfigMap" (include "namespace" .) (include "helper.config.name" .)) }}
 {{- if $configmap }}
 {{- $persistent_uuid = index $configmap "data" "S1_HELPER_UUID" -}}
 {{- end }}

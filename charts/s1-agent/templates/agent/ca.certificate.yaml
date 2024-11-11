@@ -4,6 +4,7 @@ kind: Secret
 metadata:
   name: {{ include "agent.fullname" . }}-custom-ca
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 type: Opaque
 {{- $agentCerts := fromYaml (include "agent.certificates" .) }}
 data:

@@ -5,6 +5,7 @@ metadata:
   name: {{ include "agentInjection.name" . }}
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 data:
   config.yaml: |
     metadata:
@@ -19,7 +20,7 @@ data:
       containers:
         {{- include "serverlessAgentContainer" . | nindent 8 }}
           - name: S1_HELPER_HOST
-            value: {{ include "service.name" . }}.{{ .Release.Namespace }}
+            value: {{ include "service.name" . }}.{{ include "namespace" . }}
           - name: S1_AGENT_CONFIG_FILE
             value: "/{{ include "agent.fullname" . }}/config.yaml"
           volumeMounts:
@@ -40,6 +41,7 @@ metadata:
   name: {{ include "agent.fullname" . }}-config
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 data:
 {{- with .Values.configuration }}
 {{- range $name, $conf := dict "local.conf" .localConf "override.conf" .overrideConf }}
@@ -63,5 +65,6 @@ metadata:
   name: {{ include "helper.fullname" . }}-config
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 data:
   {{- include "helper.config" . | nindent 2 }}

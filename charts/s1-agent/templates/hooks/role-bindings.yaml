@@ -4,6 +4,7 @@ kind: RoleBinding
 metadata:
   name: {{ include "preDeleteHook.name" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -11,5 +12,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "sentinelone.serviceAccountName" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "namespace" . }}
 {{ end }}

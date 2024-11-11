@@ -6,6 +6,7 @@ metadata:
 {{ include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test-success
+  namespace: {{ include "namespace" . }}
 spec:
   containers:
     - name: wget
