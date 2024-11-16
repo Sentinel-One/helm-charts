@@ -92,6 +92,16 @@ spec:
             readOnly: true
           - name: persistence
             mountPath: {{ include "persistentDir" . }}
+{{- else }}
+          - name: containerd
+            mountPath: /run/containerd/containerd.sock
+            readOnly: true
+          - name: crio
+            mountPath: /run/crio/crio.sock
+            readOnly: true
+          - name: dockerd
+            mountPath: /var/run/cri-dockerd.sock
+            readOnly: true
 {{- end }}
           - name: config
             mountPath: /opt/configmaps/config
@@ -121,6 +131,16 @@ spec:
         - name: persistence
           hostPath:
             path: {{ include "persistentDir" . }}
+{{- else }}
+        - name: containerd
+          hostPath:
+            path: /run/containerd/containerd.sock
+        - name: crio
+          hostPath:
+            path: /run/crio/crio.sock
+        - name: dockerd
+          hostPath:
+            path: /var/run/cri-dockerd.sock
 {{- end }}
         - name: config
           configMap:
