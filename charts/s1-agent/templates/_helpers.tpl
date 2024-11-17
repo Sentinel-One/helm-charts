@@ -470,5 +470,8 @@ requests:
 {{- if .Values.configuration.env.helper.communicator_enabled -}}
 {{- $_ := set $helperConfig "S1_MANAGEMENT_PROXY" (default "" .Values.configuration.proxy) -}}
 {{- end -}}
+{{- if .Values.configuration.env.injection.enabled -}}
+{{- $_ := set $helperConfig "S1_NAMESPACE_INJECTION_SELECTORS" (default "" (toJson .Values.agentInjection.selector.namespaceSelector.matchLabels)) -}}
+{{- end -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
