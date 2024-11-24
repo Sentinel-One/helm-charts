@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: persistent-dir-cleaner
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        command: ['sh', '-c', 'if [ -d "/host/var/lib/sentinelone" ]; then echo "deleting persistent dir" && rm -rf /host/var/lib/sentinelone; else echo "persistent dir already deleted"; fi && sleep infinity']
+        volumeMounts:
+        - name: host
+          mountPath: /host
+          mountPropagation: HostToContainer
+        securityContext:
+          privileged: true
+      volumes:
+      - name: host
+        hostPath:
+          path: /
