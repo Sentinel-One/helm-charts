@@ -8,6 +8,7 @@ metadata:
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation
+  namespace: {{ include "namespace" . }}
 spec:
   backoffLimit: 0
   template:
@@ -37,7 +38,7 @@ spec:
                 /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
                   grep {{ include "agent.fullname" . }} |
                     xargs -P 0 -I % bash -c '
-                      out=$(for i in {1..3}; do 
+                      out=$(for i in {1..3}; do
                               timeout 10 /s1-helper/kubectl exec % -- bash -c "
                                     sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
                                 " && exit 0 || sleep 2;

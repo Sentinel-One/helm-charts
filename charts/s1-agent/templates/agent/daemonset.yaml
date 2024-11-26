@@ -4,6 +4,7 @@ kind: DaemonSet
 metadata:
   name: {{ include "agent.fullname" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 spec:
   updateStrategy:
     type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}

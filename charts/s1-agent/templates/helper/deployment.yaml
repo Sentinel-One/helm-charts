@@ -4,6 +4,7 @@ metadata:
   name: {{ include "helper.fullname" . }}
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 spec:
   replicas: 1
   selector:

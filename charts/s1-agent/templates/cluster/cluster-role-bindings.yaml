@@ -12,5 +12,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "sentinelone.serviceAccountName" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "namespace" . }}
 {{ end }}

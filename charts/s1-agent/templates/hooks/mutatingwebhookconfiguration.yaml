@@ -5,7 +5,7 @@
 {{- $certs = include "helper.certificates" . -}}
 {{- $caBundle = index ($certs | fromYaml) "ca.crt" -}}
 {{- else }}
-{{- $secret := (lookup "v1" "Secret" .Release.Namespace (include "helper.secret.name" .)) }}
+{{- $secret := (lookup "v1" "Secret" (include "namespace" .) (include "helper.secret.name" .)) }}
 {{- if $secret -}}
 {{- $caBundle = index $secret "data" "ca.crt" -}}
 {{- end }}
@@ -19,6 +19,7 @@ kind: Secret
 metadata:
   name: {{ include "helper.secret.name" . }}
   labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  namespace: {{ include "namespace" . }}
 type: kubernetes.io/tls
 data: {{- $certs | nindent 2 }}
 {{- end }}
@@ -32,7 +33,7 @@ metadata:
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
 webhooks:
-- name: {{ include "agentInjection.name" . }}.{{ .Release.Namespace }}.svc
+- name: {{ include "agentInjection.name" . }}.{{ include "namespace" . }}.svc
   admissionReviewVersions:
     - v1
     - v1beta1
@@ -40,7 +41,7 @@ webhooks:
     caBundle: {{ $caBundle }}
     service:
       name: {{ include "service.name" . }}
-      namespace: {{ .Release.Namespace }}
+      namespace: {{ include "namespace" . }}
       path: /agent/inject
       port: {{ include "service.port" . }}
   matchPolicy: Equivalent
