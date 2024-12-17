@@ -12,10 +12,12 @@ rules:
 - apiGroups: ["batch", "apps"]
   resources: ["jobs", "deployments", "daemonsets", "replicasets", "statefulsets", "crontabs"]
   verbs: ["get", "watch", "list"]
+- apiGroups: ["*"]
+  resources: ["clusterroles", "clusterrolebindings", "roles", "rolebindings"]
+  verbs: ["get", "watch", "list"]
 {{ if .Values.configuration.env.helper.inventory_enabled }}
 - apiGroups: ["*"]
-  resources: ["cronjobs", "configmaps", "clusterroles", "clusterrolebindings", "roles", "rolebindings",
-              "networkpolicies", "services", "serviceaccounts"]
+  resources: ["cronjobs", "configmaps", "networkpolicies", "services", "serviceaccounts"]
   verbs: ["get", "watch", "list"]
 {{ end }}
 {{ if .Values.configuration.env.injection.enabled }}
