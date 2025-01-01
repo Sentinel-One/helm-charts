@@ -329,6 +329,10 @@ certificates:
     {{- if include "helper_token.secret.create" . }}
       optional: true
     {{- end }}
+- name: S1_DEPLOYMENT_TIMESTAMP
+  value: {{ now | quote }}
+- name: S1_DEPLOYMENT_REVISION
+  value: "{{ .Release.Revision }}"
 {{- end -}}
 
 {{- define "serverlessOnlyMode" -}}
