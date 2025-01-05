@@ -1,5 +1,5 @@
-apiVersion: {{ template "deployment.apiVersion" . }}
-kind: Deployment
+apiVersion: {{ template "statefulset.apiVersion" . }}
+kind: StatefulSet
 metadata:
   name: {{ include "helper.fullname" . }}
   labels:
