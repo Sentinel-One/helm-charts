@@ -1,8 +1,8 @@
-{{- define "deployment.apiVersion" -}}
+{{- define "statefulset.apiVersion" -}}
 {{- if semverCompare ">=1.9-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- print "apps/v1" -}}
 {{- else -}}
-{{- print "extensions/v1beta1" -}}
+{{- print "apps/v1beta1" -}}
 {{- end -}}
 {{- end -}}
 
