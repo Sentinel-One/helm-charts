@@ -183,3 +183,4 @@ service:
 
 fullnameOverride: ""
 nameOverride: ""
+namespaceOverride: ""
