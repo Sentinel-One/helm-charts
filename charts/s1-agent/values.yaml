@@ -39,6 +39,11 @@ configuration:
       communicator_enabled: true
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
+    admissionControl:
+      validatingWebhook:
+        enabled: false # to enable validatingWebhook, set to 'true'
+      mutatingWebhook:
+        enabled: false # to enable mutatingWebhook, set to 'true'
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
@@ -92,6 +97,16 @@ agentInjection:
     requests:
       cpu: 100m
       memory: 800Mi
+
+admissionControl:
+  validatingWebhook:
+    selector:
+      namespaceSelector:
+        matchLabels:
+  mutatingWebhook:
+    selector:
+      namespaceSelector:
+        matchLabels:
 
 helper:
   fullnameOverride: ""

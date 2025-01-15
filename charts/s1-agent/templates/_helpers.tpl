@@ -164,6 +164,14 @@ Create the name of the service account to use
 {{- ( printf "%s-%s" (include "agent.fullname" .) "injection" ) -}}
 {{- end -}}
 
+{{- define "admissionControl.validatingWebhook.name" -}}
+{{- ( printf "%s-%s" .Release.Name "admissioncontrol-validatingwebhook" ) -}}
+{{- end -}}
+
+{{- define "admissionControl.mutatingWebhook.name" -}}
+{{- ( printf "%s-%s" .Release.Name "admissioncontrol-mutatingwebhook" ) -}}
+{{- end -}}
+
 {{- define "site_key.secret.create" -}}
 {{- empty .Values.secrets.site_key.value | ternary "" "true" }}
 {{- end -}}
@@ -178,6 +186,12 @@ Create the name of the service account to use
 
 {{- define "helper.secret.create" -}}
 {{- empty .Values.secrets.helper_certificate | ternary "true" "" }}
+{{- end -}}
+
+{{- define "webhooks.enabled" -}}
+{{- or .Values.configuration.env.injection.enabled
+       .Values.configuration.env.admissionControl.validatingWebhook.enabled
+       .Values.configuration.env.admissionControl.mutatingWebhook.enabled }}
 {{- end -}}
 
 {{- define "helper.secret.name" -}}

@@ -78,6 +78,10 @@ spec:
             value: "{{ .Values.configuration.env.helper.client_timeout }}"
           - name: AGENT_INJECTION_ENABLED
             value: "{{ .Values.configuration.env.injection.enabled }}"
+          - name: ADMISSION_CONTROL_VALIDATING_ENABLED
+            value: "{{ .Values.configuration.env.admissionControl.validatingWebhook.enabled }}"
+          - name: ADMISSION_CONTROL_MUTATING_ENABLED
+            value: "{{ .Values.configuration.env.admissionControl.mutatingWebhook.enabled }}"
 {{- if .Values.configuration.env.injection.enabled }}
           - name: AGENT_INJECTION_CONFIG_FILE
             value: "/s1-helper/agent-injection/config.yaml"

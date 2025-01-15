@@ -30,5 +30,15 @@ rules:
   resources: ["clusterroles", "clusterrolebindings"]
   verbs: ["get", "watch", "list", "delete"]
 {{ end }}
+{{ if .Values.configuration.env.admissionControl.validatingWebhook.enabled }}
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations"]
+  verbs: ["create", "update"]
+{{ end }}
+{{ if .Values.configuration.env.admissionControl.mutatingWebhook.enabled }}
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["mutatingwebhookconfigurations"]
+  verbs: ["create", "update"]
+{{ end }}
 {{ end }}
 {{ end }}
