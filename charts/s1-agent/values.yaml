@@ -166,6 +166,10 @@ agent:
             operator: In
             values:
             - linux
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - ''
           - key: eks.amazonaws.com/compute-type
             operator: NotIn
             values:
