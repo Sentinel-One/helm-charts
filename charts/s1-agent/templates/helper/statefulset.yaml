@@ -6,6 +6,7 @@ metadata:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  serviceName: {{ include "service.name" . }}
   selector:
     matchLabels:
       {{- include "sentinelone.helper.selector.labels" . | nindent 6 }}
