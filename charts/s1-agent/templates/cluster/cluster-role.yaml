@@ -23,7 +23,7 @@ rules:
   resources: ["secrets", "configmaps"]
   verbs: ["get", "watch", "list", "update", "create", "delete"]
 - apiGroups: ["admissionregistration.k8s.io"]
-  resources: ["mutatingwebhookconfigurations"]
+  resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
   verbs: ["create", "get", "delete", "list", "patch", "update", "watch"]
 {{ if eq (include "serverlessOnlyMode" .) "true" }}
 - apiGroups: ["*"]
