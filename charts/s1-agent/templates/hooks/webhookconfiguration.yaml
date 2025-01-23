@@ -125,7 +125,7 @@ webhooks:
     - CREATE
     - UPDATE
     resources:
-    - pods
+    - '*'
     scope: '*'
 {{- toYaml .Values.admissionControl.validatingWebhook.selector | nindent 2 }}
   sideEffects: None
