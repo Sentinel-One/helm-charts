@@ -40,6 +40,11 @@ configuration:
       communicator_enabled: false # to enable communicator mode, set to 'true' (Unsupported)
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
+    admission_controllers:
+      validating:
+        enabled: false # to enable validating admission controller, set to 'true'
+      mutating:
+        enabled: false # to enable mutating admission controller, set to 'true' (mutating is not supported)
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
@@ -93,6 +98,16 @@ agentInjection:
     requests:
       cpu: 100m
       memory: 800Mi
+
+admissionControllers:
+  validating:
+    selector:
+      namespaceSelector:
+        matchLabels:
+  mutating:
+    selector:
+      namespaceSelector:
+        matchLabels:
 
 helper:
   fullnameOverride: ""
