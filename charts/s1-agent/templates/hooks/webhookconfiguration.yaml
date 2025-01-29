@@ -1,0 +1,138 @@
+{{ if eq (include "webhooks.enabled" .) "true" }}
+{{- $certs := "" }}
+{{- $caBundle := "" }}
+{{- if include "helper.secret.create" . }}
+{{- $certs = include "helper.certificates" . -}}
+{{- $caBundle = index ($certs | fromYaml) "ca.crt" -}}
+{{- else }}
+{{- $secret := (lookup "v1" "Secret" .Release.Namespace (include "helper.secret.name" .)) }}
+{{- if $secret -}}
+{{- $caBundle = index $secret "data" "ca.crt" -}}
+{{- end }}
+{{- end }}
+
+---
+
+{{- if include "helper.secret.create" . }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "helper.secret.name" . }}
+  labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
+type: kubernetes.io/tls
+data: {{- $certs | nindent 2 }}
+{{- end }}
+
+---
+
+{{ if .Values.configuration.env.injection.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "agentInjection.name" . }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+webhooks:
+- name: {{ include "agentInjection.name" . }}.{{ .Release.Namespace }}.svc
+  admissionReviewVersions:
+    - v1
+    - v1beta1
+  clientConfig:
+    caBundle: {{ $caBundle }}
+    service:
+      name: {{ include "service.name" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /agent/inject
+      port: {{ include "service.port" . }}
+  matchPolicy: Equivalent
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - pods
+    scope: '*'
+{{- toYaml .Values.agentInjection.selector | nindent 2 }}
+  sideEffects: None
+{{- end }}
+
+---
+
+{{ if .Values.configuration.env.admission_controllers.mutating.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "admissionControllers.mutating.name" . }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+webhooks:
+- name: {{ include "admissionControllers.mutating.name" . }}.{{ .Release.Namespace }}.svc
+  admissionReviewVersions:
+    - v1
+    - v1beta1
+  clientConfig:
+    caBundle: {{ $caBundle }}
+    service:
+      name: {{ include "service.name" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /admissioncontrollers/mutate
+      port: {{ include "service.port" . }}
+  matchPolicy: Equivalent
+  failurePolicy: Ignore
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - '*'
+    scope: '*'
+{{- toYaml .Values.admissionControllers.mutating.selector | nindent 2 }}
+  sideEffects: None
+{{- end }}
+
+---
+
+{{ if .Values.configuration.env.admission_controllers.validating.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "admissionControllers.validating.name" . }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+webhooks:
+- name: {{ include "admissionControllers.validating.name" . }}.{{ .Release.Namespace }}.svc
+  admissionReviewVersions:
+    - v1
+    - v1beta1
+  clientConfig:
+    caBundle: {{ $caBundle }}
+    service:
+      name: {{ include "service.name" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /admissioncontrollers/validate
+      port: {{ include "service.port" . }}
+  matchPolicy: Equivalent
+  failurePolicy: Ignore
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - '*'
+    scope: '*'
+{{- toYaml .Values.admissionControllers.validating.selector | nindent 2 }}
+  sideEffects: None
+{{- end }}
+{{ end }}
