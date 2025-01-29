@@ -164,6 +164,10 @@ Create the name of the service account to use
 {{- ( printf "%s-%s" (include "agent.fullname" .) "injection" ) -}}
 {{- end -}}
 
+{{- define "admissionControllers.validating.name" -}}
+{{- ( printf "%s-%s" .Release.Name "validating-admission-controller" ) -}}
+{{- end -}}
+
 {{- define "site_key.secret.create" -}}
 {{- empty .Values.secrets.site_key.value | ternary "" "true" }}
 {{- end -}}
@@ -178,6 +182,11 @@ Create the name of the service account to use
 
 {{- define "helper.secret.create" -}}
 {{- empty .Values.secrets.helper_certificate | ternary "true" "" }}
+{{- end -}}
+
+{{- define "webhooks.enabled" -}}
+{{- or .Values.configuration.env.injection.enabled
+       .Values.configuration.env.admission_controllers.validating.enabled}}
 {{- end -}}
 
 {{- define "helper.secret.name" -}}
@@ -470,5 +479,7 @@ requests:
 {{- if .Values.configuration.env.injection.enabled -}}
 {{- $_ := set $helperConfig "S1_NAMESPACE_INJECTION_SELECTORS" (default "" (toJson .Values.agentInjection.selector.namespaceSelector.matchLabels)) -}}
 {{- end -}}
+{{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
+{{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
