@@ -40,6 +40,9 @@ configuration:
       communicator_enabled: true
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
+    admission_controllers:
+      validating:
+        enabled: false # to enable validating admission controller, set to 'true'
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
@@ -93,6 +96,29 @@ agentInjection:
     requests:
       cpu: 100m
       memory: 800Mi
+
+admissionControllers:
+  validating:
+    selector:
+      namespaceSelector:
+        matchExpressions:
+          - key: kubernetes.io/metadata.name
+            operator: NotIn
+            values:
+              - kube-system
+              - kube-public
+    rules:
+    - apiGroups:
+      - '*'
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      - CONNECT
+      resources:
+      - '*'
+      scope: '*'
 
 helper:
   fullnameOverride: ""
