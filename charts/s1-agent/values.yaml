@@ -21,6 +21,7 @@ configuration:
       enabled: # to disable the agent, set to 'false'
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc. Unsupported in GKE autopilot)
+      persistent_dir_removal_upon_installation: false # removes an existing persistent dir upon installation if uninstall hook failed in last uninstall operation (Unsupported with GitOps deployments)
       heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
       heap_trimming_interval: # heap trimming default interval (s)
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
