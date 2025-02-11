@@ -329,8 +329,10 @@ certificates:
     {{- if include "helper_token.secret.create" . }}
       optional: true
     {{- end }}
+{{- if .Values.configuration.env.agent.persistent_dir_removal_upon_installation }}
 - name: S1_DEPLOYMENT_TIMESTAMP
   value: {{ now | quote }}
+{{- end }}
 - name: S1_DEPLOYMENT_REVISION
   value: "{{ .Release.Revision }}"
 {{- end -}}
