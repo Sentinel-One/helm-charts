@@ -15,7 +15,9 @@ spec:
       labels:
         {{- include "sentinelone.helper.labels" . | nindent 8 }}
       annotations:
+      {{- if .Values.configuration.env.helper.inventory_enabled }}
         timestamp: {{ now | quote }}
+      {{- end }}
       {{- if .Values.helper.podAnnotations }}
 {{ toYaml .Values.helper.podAnnotations | indent 8 }}
       {{- end }}
