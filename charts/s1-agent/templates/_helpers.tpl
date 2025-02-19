@@ -463,16 +463,6 @@ requests:
 {{- $_ := set $helperConfig "S1_HELPER_LOG_SIZE" (.Values.configuration.env.helper.log_size | toString) -}}
 {{- $_ := set $helperConfig "S1_COMMUNICATOR_ENABLED" (printf "%t" .Values.configuration.env.helper.communicator_enabled) -}}
 {{- if .Values.configuration.env.helper.communicator_enabled -}}
-{{- $persistent_uuid := "" -}}
-{{- $uuid := uuidv4 -}}
-{{- $configmap := (lookup "v1" "ConfigMap" .Release.Namespace (include "helper.config.name" .)) }}
-{{- if $configmap }}
-{{- $persistent_uuid = index $configmap "data" "S1_HELPER_UUID" -}}
-{{- end }}
-{{- if $persistent_uuid }}
-{{- $uuid = $persistent_uuid -}}
-{{- end }}
-{{- $_ := set $helperConfig "S1_HELPER_UUID" $uuid -}}
 {{- $_ := set $helperConfig "S1_INVENTORY_ENABLED" (printf "%t" .Values.configuration.env.helper.inventory_enabled) -}}
 {{- $_ := set $helperConfig "S1_INVENTORY_ONLY" (printf "%t" .Values.configuration.inventory_only) -}}
 {{- $_ := set $helperConfig "S1_MANAGEMENT_PROXY" (default "" .Values.configuration.proxy) -}}
