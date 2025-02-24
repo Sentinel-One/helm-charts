@@ -147,6 +147,7 @@ agent:
   fullnameOverride: ""
   nameOverride: ""
   updateStrategy: ""
+  rollingUpdateMaxUnavailable: 1
   labels: {}
   nodeSelector: {}
   priorityClassName: ""
