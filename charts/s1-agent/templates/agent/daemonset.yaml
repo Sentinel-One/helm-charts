@@ -7,6 +7,8 @@ metadata:
 spec:
   updateStrategy:
     type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}
+    rollingUpdate:
+      maxUnavailable: {{ default 1 .Values.agent.rollingUpdateMaxUnavailable }}
   selector:
     matchLabels:
 {{- include "sentinelone.agent.selector.labels" . | nindent 6 }}
