@@ -1,4 +1,4 @@
-{{- if .Values.configuration.env.injection.enabled }}
+{{ if eq (include "webhooks.enabled" .) "true" }}
 {{- $certs := "" }}
 {{- $caBundle := "" }}
 {{- if include "helper.secret.create" . }}
@@ -25,6 +25,7 @@ data: {{- $certs | nindent 2 }}
 
 ---
 
+{{ if .Values.configuration.env.injection.enabled }}
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -57,4 +58,34 @@ webhooks:
     scope: '*'
 {{- toYaml .Values.agentInjection.selector | nindent 2 }}
   sideEffects: None
+{{- end }}
+
+---
+
+{{ if .Values.configuration.env.admission_controllers.validating.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "admissionControllers.validating.name" . }}
+  labels:
+    {{- include "sentinelone.agent.labels" . | nindent 4 }}
+webhooks:
+- name: {{ include "admissionControllers.validating.name" . }}.{{ .Release.Namespace }}.svc
+  admissionReviewVersions:
+    - v1
+    - v1beta1
+  clientConfig:
+    caBundle: {{ $caBundle }}
+    service:
+      name: {{ include "service.name" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /admissioncontrollers/validate
+      port: {{ include "service.port" . }}
+  matchPolicy: Equivalent
+  failurePolicy: Ignore
+  sideEffects: None
+  rules:
+    {{- toYaml .Values.admissionControllers.validating.rules | nindent 4 }}
+{{- toYaml .Values.admissionControllers.validating.selector | nindent 2 }}
+{{- end }}
 {{ end }}
