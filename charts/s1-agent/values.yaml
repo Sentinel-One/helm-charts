@@ -36,8 +36,8 @@ configuration:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       log_size: ""  # helper log file size in MBs. (defaults to 10)
       client_timeout: # client timeout. (seconds, default=120)
-      inventory_enabled: false # to enable inventory mode, set to 'true' (Unsupported)
-      communicator_enabled: false # to enable communicator mode, set to 'true' (Unsupported)
+      inventory_enabled: true
+      communicator_enabled: true
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
