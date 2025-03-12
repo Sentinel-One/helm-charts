@@ -119,7 +119,7 @@ helper:
   resources:
     limits:
       cpu: 900m
-      memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
+      memory: 5835Mi # Almost equals to 1.9Gi but isn't fractional
     requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
       cpu: 100m
       memory: 100Mi
