@@ -101,12 +101,6 @@ admissionControllers:
   validating:
     selector:
       namespaceSelector:
-        matchExpressions:
-          - key: kubernetes.io/metadata.name
-            operator: NotIn
-            values:
-              - kube-system
-              - kube-public
     rules:
     - apiGroups:
       - '*'
