@@ -108,3 +108,9 @@ variable "watchdog_healthcheck_timeout" {
   type        = string
   default     = "15"
 }
+
+variable "parallel_cleanups" {
+  description = "Number of parallel cleanups to run"
+  type        = number
+  default     = 1
+}
