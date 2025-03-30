@@ -1,0 +1,204 @@
+Parameters:
+  ClusterName:
+    Type: String
+    Description: "The name of the ECS cluster"
+
+  ClusterRegion:
+    Type: String
+    Default: "us-east-1"
+    Description: "The region of the ECS cluster (default us-east-1)"
+
+  S1AgentImage:
+    Type: String
+    Default: "containers.sentinelone.net/cws-agent/s1agent:25.1.1-ea"
+    Description: "The s1 agent full image path (repo:tag)"
+
+  ImagePullSecret:
+    Type: String
+    Description: "Specify the name of the image pull secret (created outside this form)"
+
+  TaskRoleArn:
+    Type: String
+    Description: "Specify the task role ARN (created outside this form)"
+
+  ExecutionRoleArn:
+    Type: String
+    Description: "Specify the execution role ARN (created outside this form)"
+
+  SiteToken:
+    Type: String
+    Default: ""
+    Description: "Set site token to connect to the console."
+
+  LogLevel:
+    Type: String
+    Default: "info"
+    AllowedValues:
+      - "info"
+      - "error"
+      - "warning"
+      - "debug"
+      - "trace"
+    Description: "Agent log level - info, error, warning, debug, trace (defaults to 'info')"
+
+  DebuggingEnabled:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "To enable debugging, set to 'true'"
+
+  TaskUid:
+    Type: Number
+    Default: 1000
+    Description: "User id of the default task user"
+
+  TaskGid:
+    Type: Number
+    Default: 1000
+    Description: "Group id of the default task user"
+
+  HostMountPath:
+    Type: String
+    Default: "/host"
+    Description: "Host mount path. Leave default unless host path is mounted elsewhere in your environment"
+
+  AgentEnabled:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "To disable the agent, set to 'false'"
+
+  EbpfEnabled:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "To disable EBPF, set to 'false'"
+
+  FipsEnabled:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "To disable FIPS, set to 'false'"
+
+  AgentTaskCPU:
+    Type: Number
+    Default: 1024
+    Description: "Agent task CPU limitation"
+
+  AgentTaskMemory:
+    Type: Number
+    Default: 3072
+    Description: "Agent task memory limitation"
+
+  WatchdogHealthcheckTimeout:
+    Type: String
+    Default: "15"
+    Description: "Timeout for s1 agent watchdog in seconds (default 15 seconds)"
+
+Conditions:
+  IsDebuggingEnabled: !Equals [ !Ref DebuggingEnabled, "true" ]
+
+Resources:
+  S1AgentTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: "s1-agent-task-definition"
+      RequiresCompatibilities: ["EC2"]
+      NetworkMode: "host"
+      TaskRoleArn: !Ref TaskRoleArn
+      ExecutionRoleArn: !Ref ExecutionRoleArn
+      Cpu: !Ref AgentTaskCPU
+      Memory: !Ref AgentTaskMemory
+      PidMode: "host"
+      ContainerDefinitions:
+        - Name: "s1-agent"
+          Image: !Ref S1AgentImage
+          RepositoryCredentials:
+            CredentialsParameter: !Ref ImagePullSecret
+          Essential: true
+          Command: ["/opt/deployment.sh"]
+          Environment:
+            - Name: "S1_AGENT_HOST_MOUNT_PATH"
+              Value: !Ref HostMountPath
+            - Name: "SITE_TOKEN"
+              Value: !Ref SiteToken
+            - Name: "S1_LOG_LEVEL"
+              Value: !Ref LogLevel
+            - Name: "S1_AGENT_TYPE"
+              Value: "ecs_ec2"
+            - Name: "S1_WATCHDOG_HEALTHCHECK_TIMEOUT"
+              Value: !Ref WatchdogHealthcheckTimeout
+            - Name: "S1_CONTAINER_NAME"
+              Value: "s1-agent"
+            - Name: "S1_PERSISTENT_DIR"
+              Value: "/var/lib/sentinelone"
+            - Name: "S1_AGENT_ENABLED"
+              Value: !Ref AgentEnabled
+            - Name: "S1_FIPS_ENABLED"
+              Value: !Ref FipsEnabled
+            - Name: "S1_EBPF_ENABLED"
+              Value: !Ref EbpfEnabled
+          MountPoints:
+            - SourceVolume: "host"
+              ContainerPath: !Ref HostMountPath
+              ReadOnly: false
+            - SourceVolume: "docker"
+              ContainerPath: "/var/run/docker.sock"
+              ReadOnly: false
+          LinuxParameters:
+            Capabilities:
+              Add:
+                - "DAC_OVERRIDE"
+                - "DAC_READ_SEARCH"
+                - "FOWNER"
+                - "SETGID"
+                - "SETUID"
+                - "SYS_ADMIN"
+                - "SYS_PTRACE"
+                - "SYS_RESOURCE"
+                - "SYSLOG"
+                - "SYS_CHROOT"
+                - "CHOWN"
+                - "SYS_MODULE"
+                - "KILL"
+                - "NET_ADMIN"
+                - "NET_RAW"
+            InitProcessEnabled: true
+          User: !Sub "${TaskUid}:${TaskGid}"
+          LogConfiguration:
+            Fn::If:
+              - IsDebuggingEnabled
+              - LogDriver: "awslogs"
+                Options:
+                  awslogs-group: "/ecs/s1-service-logs"
+                  awslogs-region: !Ref ClusterRegion
+                  awslogs-stream-prefix: "s1-agent"
+              - !Ref "AWS::NoValue"
+      Volumes:
+        - Name: "host"
+          Host:
+            SourcePath: "/"
+        - Name: "docker"
+          Host:
+            SourcePath: "/var/run/docker.sock"
+
+  S1AgentDaemonService:
+    Type: "AWS::ECS::Service"
+    Properties:
+      ServiceName: "s1-agent-daemon-service"
+      Cluster: !Ref ClusterName
+      TaskDefinition: !Ref S1AgentTaskDefinition
+      LaunchType: "EC2"
+      SchedulingStrategy: "DAEMON"
+      EnableExecuteCommand: !If
+        - IsDebuggingEnabled
+        - true
+        - false
