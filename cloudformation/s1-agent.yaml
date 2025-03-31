@@ -202,3 +202,142 @@ Resources:
         - IsDebuggingEnabled
         - true
         - false
+
+  S1AgentCleanupTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: s1-agent-cleanup-task-definition
+      RequiresCompatibilities:
+        - EC2
+      ExecutionRoleArn: !Ref ExecutionRoleArn
+      ContainerDefinitions:
+        - Name: s1-agent-cleanup
+          Image: !Ref S1AgentImage
+          RepositoryCredentials:
+            CredentialsParameter: !Ref ImagePullSecret
+          Memory: 128
+          Command:
+            - "sh"
+            - "-c"
+            - !Sub "mkdir -p ${HostMountPath}/var/lib/sentinelone/tmp && touch ${HostMountPath}/var/lib/sentinelone/tmp/uninstall_started"
+          MountPoints:
+            - SourceVolume: host-volume
+              ContainerPath: /host
+              ReadOnly: false
+      Volumes:
+        - Name: host-volume
+          Host:
+            SourcePath: "/"
+
+  S1AgentCleanupLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: S1AgentCleanup
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Role: !GetAtt S1AgentCleanupLambdaRole.Arn
+      Timeout: 120
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import urllib3
+          
+          ecs_client = boto3.client('ecs')
+          http = urllib3.PoolManager()
+          
+          def send_response(event, context, status, reason=""):
+            """Send response to CloudFormation to signal success or failure."""
+            response_body = {
+              "Status": status,
+              "Reason": reason,
+              "PhysicalResourceId": context.log_stream_name if context else "cleanup-task",
+              "StackId": event["StackId"],
+              "RequestId": event["RequestId"],
+              "LogicalResourceId": event["LogicalResourceId"]
+            }
+          
+            encoded_body = json.dumps(response_body)
+            print("Sending response to CloudFormation:", encoded_body)
+          
+            try:
+              req = http.request("PUT", event["ResponseURL"], body=encoded_body, headers={"Content-Type": ""})
+              print(f"CloudFormation response status: {req.status}")
+            except Exception as e:
+              print(f"Failed to send response: {e}")
+          
+          def lambda_handler(event, context):
+            print("Received event: " + json.dumps(event, indent=2))
+          
+            if event['RequestType'] != 'Delete':
+              send_response(event, context, "SUCCESS")
+              return
+          
+            cluster_name = event['ResourceProperties']['ClusterName']
+            task_definition_arn = event['ResourceProperties']['TaskDefinitionArn']
+            
+            try:
+              container_instances = ecs_client.list_container_instances(cluster=cluster_name)['containerInstanceArns']
+              if not container_instances:
+                send_response(event, context, "SUCCESS")
+                return
+
+              container_details = ecs_client.describe_container_instances(
+                cluster=cluster_name,
+                containerInstances=container_instances
+              )['containerInstances']
+              ec2_instance_ids = [container['ec2InstanceId'] for container in container_details]
+
+              for ec2_instance_id in ec2_instance_ids:
+                ecs_client.run_task(
+                  cluster=cluster_name,
+                  taskDefinition=task_definition_arn,
+                  launchType='EC2',
+                  placementConstraints=[
+                    {
+                      'expression': f"ec2InstanceId == {ec2_instance_id}",
+                      'type': 'memberOf'
+                    }
+                  ]
+                )
+              send_response(event, context, "SUCCESS")
+
+            except Exception as e:
+              print(f"Error: {str(e)}")
+              send_response(event, context, "FAILED", str(e))
+
+  S1AgentCleanupLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: S1AgentCleanupLambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S1AgentCleanupLambda
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:RunTask
+                  - ecs:DescribeTasks
+                  - ecs:ListContainerInstances
+                  - ecs:DescribeContainerInstances
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: "*"
+
+  S1AgentCleanup:
+    Type: Custom::S1AgentCleanup
+    Properties:
+      ServiceToken: !GetAtt S1AgentCleanupLambdaFunction.Arn
+      ClusterName: !Ref ClusterName
+      TaskDefinitionArn: !Ref S1AgentCleanupTaskDefinition
+    DependsOn: S1AgentDaemonService
