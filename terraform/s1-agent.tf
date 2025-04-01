@@ -93,6 +93,7 @@ resource "aws_ecs_task_definition" "s1_agent_task_definition" {
       }
       initProcessEnabled = true
     }
+    user = "${var.task_uid}:${var.task_gid}"
 
     logConfiguration = var.debugging_enabled ? {
       logDriver = "awslogs"

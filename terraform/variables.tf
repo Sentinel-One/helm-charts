@@ -61,6 +61,18 @@ variable "host_mount_path" {
   default     = "/host"
 }
 
+variable "task_uid" {
+  description = "User id of the default task user"
+  type        = number
+  default     = 1000
+}
+
+variable "task_gid" {
+  description = "Group of the default task user"
+  type        = number
+  default     = 1000
+}
+
 variable "agent_enabled" {
   description = "To disable the agent, set to 'false'"
   type        = bool
