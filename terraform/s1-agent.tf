@@ -56,6 +56,10 @@ resource "aws_ecs_task_definition" "s1_agent_task_definition" {
       {
         "name" : "S1_EBPF_ENABLED",
         "value" : tostring(var.ebpf_enabled)
+      },
+      {
+        "name" : "S1_HELPER_ADDRESS",
+        "value" : "http://localhost:/var/run/docker.sock"
       }
     ]
     mountPoints = [
