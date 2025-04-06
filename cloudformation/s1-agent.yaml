@@ -146,6 +146,8 @@ Resources:
               Value: !Ref FipsEnabled
             - Name: "S1_EBPF_ENABLED"
               Value: !Ref EbpfEnabled
+            - Name: "S1_HELPER_ADDRESS"
+              Value: "http://localhost:/var/run/docker.sock"
           MountPoints:
             - SourceVolume: "host"
               ContainerPath: !Ref HostMountPath
