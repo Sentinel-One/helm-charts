@@ -27,6 +27,7 @@ spec:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      hostNetwork: true
       containers:
         - name: helper
           securityContext:
