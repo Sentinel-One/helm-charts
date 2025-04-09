@@ -332,9 +332,9 @@ certificates:
 {{- if .Values.configuration.env.agent.persistent_dir_removal_upon_installation }}
 - name: S1_DEPLOYMENT_TIMESTAMP
   value: {{ now | quote }}
-{{- end }}
 - name: S1_DEPLOYMENT_REVISION
   value: "{{ .Release.Revision }}"
+{{- end }}
 {{- end -}}
 
 {{- define "serverlessOnlyMode" -}}
