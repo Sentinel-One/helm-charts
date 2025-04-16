@@ -110,7 +110,7 @@ Resources:
   S1AgentTaskDefinition:
     Type: "AWS::ECS::TaskDefinition"
     Properties:
-      Family: "s1-agent-task-definition"
+      Family: !Sub "s1-agent-task-definition-${ClusterName}"
       RequiresCompatibilities: ["EC2"]
       NetworkMode: "host"
       TaskRoleArn: !Ref TaskRoleArn
@@ -208,7 +208,7 @@ Resources:
   S1AgentCleanupTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: s1-agent-cleanup-task-definition
+      Family: !Sub "s1-agent-cleanup-task-definition-${ClusterName}"
       RequiresCompatibilities:
         - EC2
       ExecutionRoleArn: !Ref ExecutionRoleArn
@@ -234,7 +234,7 @@ Resources:
   S1AgentCleanupLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: S1AgentCleanup
+      FunctionName: !Sub "s1-agent-cleanup-lambda-${ClusterName}"
       Runtime: python3.8
       Handler: index.lambda_handler
       Role: !GetAtt S1AgentCleanupLambdaRole.Arn
@@ -311,7 +311,7 @@ Resources:
   S1AgentCleanupLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: S1AgentCleanupLambdaExecutionRole
+      RoleName: !Sub "s1-agent-cleanup-lambda-role-${ClusterName}"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:

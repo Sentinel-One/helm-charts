@@ -4,7 +4,7 @@ provider "aws" {
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "s1_agent_task_definition" {
-  family                   = "s1-agent-task-definition"
+  family                   = "s1-agent-task-definition-${var.cluster_name}"
   requires_compatibilities = ["EC2"]
   container_definitions = jsonencode([{
     name  = "s1-agent"
@@ -126,7 +126,7 @@ resource "aws_ecs_task_definition" "s1_agent_task_definition" {
 
 # ECS Cleanup Task Definition
 resource "aws_ecs_task_definition" "s1_agent_cleanup_task_definition" {
-  family                   = "s1-agent-cleanup-task-definition"
+  family                   = "s1-agent-cleanup-task-definition-${var.cluster_name}"
   requires_compatibilities = ["EC2"]
   execution_role_arn       = var.execution_role_arn
   container_definitions = jsonencode([{
