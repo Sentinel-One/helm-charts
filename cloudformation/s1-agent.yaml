@@ -2,6 +2,7 @@ Parameters:
   ClusterName:
     Type: String
     Description: "The name of the ECS cluster"
+    Default: "moshef-ecs-cluster-cloudformation"
 
   ClusterRegion:
     Type: String
@@ -10,29 +11,32 @@ Parameters:
 
   S1AgentImage:
     Type: String
-    Default: "containers.sentinelone.net/cws-agent/s1agent:25.1.1-ea"
+    Default: "artifactory.eng.sentinelone.tech/docker-dev/cws-agents/moshef-ecs-debug/release/s1agent:25.2.1.14"
     Description: "The s1 agent full image path (repo:tag)"
 
   ImagePullSecret:
     Type: String
+    Default: "arn:aws:secretsmanager:us-east-1:324348519142:secret:artifactory-creds-oded-19-Jan-25-3wjBGH"
     Description: "Specify the name of the image pull secret (created outside this form)"
 
   TaskRoleArn:
     Type: String
+    Default: "arn:aws:iam::324348519142:role/ecs-task-execution-oded"
     Description: "Specify the task role ARN (created outside this form)"
 
   ExecutionRoleArn:
     Type: String
+    Default: "arn:aws:iam::324348519142:role/ecs-task-execution-oded"
     Description: "Specify the execution role ARN (created outside this form)"
 
   SiteToken:
     Type: String
-    Default: ""
+    Default: "eyJ1cmwiOiAiaHR0cHM6Ly91c2VhMS1zMS1pbnQtbm0taWNubWdwLnNlbnRpbmVsb25lLm5ldCIsICJzaXRlX2tleSI6ICI1ZTM2OTlkOTMwMGNiOGE2In0="
     Description: "Set site token to connect to the console."
 
   LogLevel:
     Type: String
-    Default: "info"
+    Default: "trace"
     AllowedValues:
       - "info"
       - "error"
@@ -146,6 +150,8 @@ Resources:
               Value: !Ref FipsEnabled
             - Name: "S1_EBPF_ENABLED"
               Value: !Ref EbpfEnabled
+            - Name: "S1_HELPER_ADDRESS"
+              Value: "http://localhost:/var/run/docker.sock"
           MountPoints:
             - SourceVolume: "host"
               ContainerPath: !Ref HostMountPath
@@ -219,7 +225,7 @@ Resources:
           Command:
             - "sh"
             - "-c"
-            - "mkdir -p /host/var/lib/sentinelone/tmp && touch /host/var/lib/sentinelone/tmp/uninstall_started"
+            - !Sub "mkdir -p ${HostMountPath}/var/lib/sentinelone/tmp && touch ${HostMountPath}/var/lib/sentinelone/tmp/uninstall_started"
           MountPoints:
             - SourceVolume: host-volume
               ContainerPath: /host
@@ -309,7 +315,6 @@ Resources:
   S1AgentCleanupLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: S1AgentCleanupLambdaExecutionRole
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
