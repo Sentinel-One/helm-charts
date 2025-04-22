@@ -3,17 +3,17 @@
 #
 configuration:
   cluster:
-    name: "" # set the name of your cluster
-    uid: "" # set the cluster uid
+    name: "microk8s-argocd" # set the name of your cluster
+    uid: "maspsvrlpapoprhhbcfgxvkhnpzmujebdoaj" # set the cluster uid
   image:
     agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
     helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
   repositories:
-    agent: "cwpp_agent/s1agent" # Edit and add your own registry paths
-    helper: "cwpp_agent/s1helper" # Edit and add your own registry paths
+    agent: "artifactory.eng.sentinelone.tech/docker-dev/cws-agents/master/release/s1agent" # Edit and add your own registry paths
+    helper: "artifactory.eng.sentinelone.tech/docker-dev/cws-agents/master/release/s1helper" # Edit and add your own registry paths
   tag:
-    agent: "25.2.1" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
-    helper: "25.2.1" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+    agent: "25.2.1.3876" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
+    helper: "25.2.1.3876" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
   proxy: "" # specify a proxy server (in URL format), if needed
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
@@ -21,19 +21,19 @@ configuration:
       enabled: # to disable the agent, set to 'false'
       host_mount_path: # leave default unless host path is mounted elsewhere in your environment
       persistent_dir: # path on the node to a directory that will be used for persistent storage (logs, configuration, etc. Unsupported in GKE autopilot)
-      persistent_dir_removal_upon_installation: false # removes an existing persistent dir upon installation if uninstall hook failed in last uninstall operation (Unsupported with GitOps deployments)
+      persistent_dir_removal_upon_installation: true # removes an existing persistent dir upon installation if uninstall hook failed in last uninstall operation (Unsupported with GitOps deployments)
       heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
       heap_trimming_interval: # heap trimming default interval (s)
-      log_level: "" # info, error, warning, debug, trace (defaults to 'info')
-      pod_uid: 1000 # uid of the default pod user
-      pod_gid: 1000 # gid of the default pod group
+      log_level: "debug" # info, error, warning, debug, trace (defaults to 'info')
+      pod_uid: 0 # uid of the default pod user
+      pod_gid: 0 # gid of the default pod group
       watchdog_healthcheck_timeout: 15 # watchdog healthcheck timeout before exiting the pod entrypoint. (seconds, 0=disabled)
       helper_healthcheck_retry: 60 # amount of tries to verify the helper service is running before starting the agent.
       helper_healthcheck_interval: 5 # time to wait between each try. (seconds)
       fips_enabled: # to enable/disable FIPS mode, set to 'true'/'false'
       ebpf_enabled: # to disable EBPF mode, set to 'false' (Unsupported in EKS Fargate)
     helper:
-      log_level: "" # info, error, warning, debug, trace (defaults to 'info')
+      log_level: "debug" # info, error, warning, debug, trace (defaults to 'info')
       log_size: ""  # helper log file size in MBs. (defaults to 10)
       client_timeout: # client timeout. (seconds, default=120)
       inventory_enabled: true
@@ -63,7 +63,7 @@ configuration:
   inventory_only: false # enable to deploy only inventory collector
 
 secrets:
-  imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)
+  imagePullSecret: "art-ha-secret" # you need to specify the name of the image pull secret (created outside this chart)
   helper_certificate: "" # you need to specify the name of the helper signed certificate secret (created outside this chart)
   helper_token: "" # you need to specify the name of the helper token secret (created outside this chart)
   site_key: # if neither were supplied, the agent will work offline mode
