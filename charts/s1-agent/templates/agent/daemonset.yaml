@@ -134,7 +134,16 @@ spec:
           capabilities:
             drop:
               - all
-            add: {{ toYaml .Values.agent.capabilities | nindent 14 }}
+            add:
+{{- if eq .Values.configuration.platform.type "talos" }}
+{{- range .Values.agent.capabilities }}
+{{- if ne . "SYS_MODULE" }}
+{{ printf "- %s" . | indent 14 }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{- toYaml .Values.agent.capabilities | nindent 14 }}
+{{- end }}
       volumes:
 {{- if .Values.configuration.custom_ca }}
         - name: ca-certs
