@@ -49,7 +49,7 @@ configuration:
   custom_ca_path:
   imagePullPolicy: "" # defaults to IfNotPresent
   platform:
-    type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, openshift and
+    type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, talos, openshift and
                      # serverless for kubernetes cluster without nodes (currently Fargate only). For serverless
                      # cluster with nodes as well, use kubernetes type.
     # optional settings, used with OpenShift only:
