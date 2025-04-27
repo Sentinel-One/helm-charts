@@ -458,6 +458,8 @@ requests:
 {{- define "persistentDir" -}}
 {{- if .Values.configuration.platform.gke.autopilot }}
 {{- "/var/lib/sentinelone" }}
+{{- else if eq .Values.configuration.platform.type "talos" }}
+{{- default "/host" .Values.configuration.env.agent.host_mount_path }}{{ default "/var/sentinelone" .Values.configuration.env.agent.persistent_dir }}
 {{- else }}
 {{- default "/host" .Values.configuration.env.agent.host_mount_path }}{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}
 {{- end }}

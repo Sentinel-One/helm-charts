@@ -1,4 +1,4 @@
-{{- if not (mustRegexMatch "^(kubernetes|openshift|serverless)$" .Values.configuration.platform.type) -}}
+{{- if not (mustRegexMatch "^(kubernetes|openshift|talos|serverless)$" .Values.configuration.platform.type) -}}
 {{ fail "configuration.platform.type must be one of: kubernetes, openshift, serverless" }}
 {{- end -}}
 {{- if not (mustRegexMatch "^(info|error|warning|debug|trace|)$" .Values.configuration.env.helper.log_level) -}}
