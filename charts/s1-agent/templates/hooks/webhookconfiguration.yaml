@@ -87,5 +87,7 @@ webhooks:
   rules:
     {{- toYaml .Values.admissionControllers.validating.rules | nindent 4 }}
 {{- toYaml .Values.admissionControllers.validating.selector | nindent 2 }}
+  matchConditions:
+    {{- toYaml .Values.admissionControllers.validating.matchConditions | nindent 4 }}
 {{- end }}
 {{ end }}

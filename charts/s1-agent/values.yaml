@@ -113,6 +113,9 @@ admissionControllers:
       resources:
       - '*'
       scope: '*'
+    matchConditions:
+      - name: 'exclude-leases'
+        expression: '!(request.resource.group == "coordination.k8s.io" && request.resource.resource == "leases")' # Match non-lease resources.
 
 helper:
   fullnameOverride: ""
