@@ -314,6 +314,8 @@ certificates:
   value: "{{ .Values.configuration.env.agent.fips_enabled }}"
 - name: S1_AGENT_ENABLED
   value: "{{ .Values.configuration.env.agent.enabled }}"
+- name: S1_DV_ENABLED
+  value: "{{ .Values.configuration.env.agent.dv_enabled }}"
 - name: S1_POD_NAME
   valueFrom:
     fieldRef:
