@@ -471,6 +471,7 @@ requests:
 
 {{- define "helper.config" -}}
 {{- $helperConfig := dict }}
+{{- $_ := set $helperConfig "S1_PLATFORM_TYPE" (.Values.configuration.platform.type | toString) -}}
 {{- $_ := set $helperConfig "S1_HELPER_LOG_SIZE" (.Values.configuration.env.helper.log_size | toString) -}}
 {{- $_ := set $helperConfig "S1_COMMUNICATOR_ENABLED" (printf "%t" .Values.configuration.env.helper.communicator_enabled) -}}
 {{- if .Values.configuration.env.helper.communicator_enabled -}}
