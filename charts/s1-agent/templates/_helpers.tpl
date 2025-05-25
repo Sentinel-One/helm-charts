@@ -160,6 +160,17 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "argocdPostDeleteHook.enabled" -}}
+{{- and
+  (eq .Values.configuration.deployment_type "argocd")
+  (eq .Values.configuration.argocd.post_delete_hook_enabled "true")
+}}
+{{- end -}}
+
+{{- define "argocdPostDeleteHook.name" -}}
+{{- ( printf "%s-%s" .Release.Name "post-uninstall-agent-job" ) -}}
+{{- end -}}
+
 {{- define "agentInjection.name" -}}
 {{- ( printf "%s-%s" (include "agent.fullname" .) "injection" ) -}}
 {{- end -}}
@@ -425,6 +436,9 @@ runAsNonRoot: false
 {{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
 "helm.sh/resource-policy": keep
 {{- end -}}
+{{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+"argocd.argoproj.io/sync-options": Delete=false
+{{- end -}}
 {{- end -}}
 
 {{- define "helperResources" -}}
@@ -485,4 +499,27 @@ requests:
 {{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
 {{- $helperConfig | toYaml -}}
+{{- end -}}
+
+{{- define "hooks.uninstallScript" -}}
+tar xzf /s1-helper/kubectl.tar.gz -C /;
+/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+grep {{ include "helper.fullname" . }} |
+  xargs -I _ bash -c 'for i in {1..3}; do
+    /s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
+for i in {1..2}; do
+/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+  grep {{ include "agent.fullname" . }} |
+    xargs -P 0 -I % bash -c '
+      out=$(for i in {1..3}; do
+              timeout 10 /s1-helper/kubectl exec % -- bash -c "
+                    sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
+                " && exit 0 || sleep 2;
+            done;
+            exit 1
+      ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
+if [[ $? == 0 ]]; then break; fi
+echo -e "\n----------------------------------\n";
+sleep 1;
+done;
 {{- end -}}

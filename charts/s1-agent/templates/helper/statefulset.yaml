@@ -4,6 +4,10 @@ metadata:
   name: {{ include "helper.fullname" . }}
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  annotations:
+    {{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+    argocd.argoproj.io/sync-options: Delete=false
+    {{- end }}
 spec:
   replicas: 1
   serviceName: {{ include "service.name" . }}
