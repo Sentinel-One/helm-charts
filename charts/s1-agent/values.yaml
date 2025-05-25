@@ -2,6 +2,7 @@
 # that you typically need to edit are shown under "configuration"
 #
 configuration:
+  deployment_type: "helm"  # Default, could be "argocd" if using Argo CD
   cluster:
     name: "" # set the name of your cluster
     uid: "" # set the cluster uid
