@@ -6,86 +6,56 @@
   (not .Values.configuration.inventory_only)
   (eq .Values.configuration.deployment_type "argocd")
 }}
-{{- $cleanupTag := default (now | unixEpoch) .Values.cleanupLabel }}
-{{- $valuesAffinity := .Values.agent.affinity | default dict }}
-{{- $argocdNodeAffinity := dict "requiredDuringSchedulingIgnoredDuringExecution" (dict "nodeSelectorTerms" (list (dict "matchExpressions" (list (dict "key" "k8s.amazee.io/node-cleanup-id" "operator" "NotIn" "values" (list (printf "%s" $cleanupTag))))))) }}
-{{- $mergedNodeAffinity := mergeOverwrite (get $valuesAffinity "nodeAffinity" | default dict) $argocdNodeAffinity }}
-{{- $finalAffinity := dict "nodeAffinity" $mergedNodeAffinity }}
-
-apiVersion: {{ template "daemonset.apiVersion" . }}
-kind: DaemonSet
+apiVersion: batch/v1
+kind: Job
 metadata:
+  name: argocd-post-delete-hook
+  labels:
+{{ include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
     "argocd.argoproj.io/hook": PostDelete
     "argocd.argoproj.io/hook-delete-policy": HookSucceeded
-  name: argocd-post-delete-hook
 spec:
-  selector:
-    matchLabels:
-      app: argocd-post-delete-hook
+  backoffLimit: 0
   template:
     metadata:
       labels:
-        app: argocd-post-delete-hook
+        {{- include "sentinelone.helper.labels" . | nindent 8 }}
+      name: argocd-post-delete-hook
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
-      hostPID: true
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
-      securityContext:
-        runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
-        runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
-      affinity: {{- toYaml $finalAffinity | nindent 8 }}
+      restartPolicy: Never
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
-        - name: "{{ include "agent.container_name" . }}-cleanup-labeler"
+        - name: argocd-post-delete-hook
           image: "{{ include "helper.full_url" . }}"
-          imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
-          env:
-            - name: S1_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
           command: [ "/bin/bash", "-c" ]
           args:
             - >
-              set -x;
               tar xzf /s1-helper/kubectl.tar.gz -C /;
-              /s1-helper/kubectl label node "$S1_NODE_NAME" k8s.amazee.io/node-cleanup-id={{ $cleanupTag }} --overwrite;
+              /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+                grep {{ include "helper.fullname" . }} |
+                  xargs -I _ bash -c 'for i in {1..3}; do
+                    /s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
+              for i in {1..2}; do
+                /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+                  grep {{ include "agent.fullname" . }} |
+                    xargs -P 0 -I % bash -c '
+                      out=$(for i in {1..3}; do
+                              timeout 10 /s1-helper/kubectl exec % -- bash -c "
+                                    sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
+                                " && exit 0 || sleep 2;
+                            done;
+                            exit 1
+                      ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
+                if [[ $? == 0 ]]; then break; fi
+                echo -e "\n----------------------------------\n";
+                sleep 1;
+              done;
+              /s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found;
+              /s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found;
               echo "Done";
-      initContainers:
-        - name: "{{ include "agent.container_name" . }}-cleanup"
-          image: "{{ include "agent.full_url" . }}"
-          command: ["/bin/bash", "-c"]
-          args: ["/opt/deployment.sh k8s_agent_cleanup"]
-          imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
-          env:
-            - name: S1_AGENT_TYPE
-              value: "k8s"
-            - name: S1_PERSISTENT_DIR
-              value: "{{ include "persistentDir" . }}"
-          volumeMounts:
-            - name: host
-              mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
-              mountPropagation: HostToContainer
-{{- if .Values.configuration.platform.gke.autopilot }}
-              readOnly: true
-            - name: persistence
-              mountPath: {{ include "persistentDir" . }}
-{{- end }}
-      volumes:
-        - name: host
-          hostPath:
-            path: /
-    {{- with .Values.agent.nodeSelector }}
-      nodeSelector: {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- if default .Values.helper.priorityClassName .Values.agent.priorityClassName }}
-      priorityClassName: {{ default .Values.helper.priorityClassName .Values.agent.priorityClassName }}
-    {{- end }}
-    {{- with .Values.agent.tolerations }}
-      tolerations: {{- toYaml . | nindent 8 }}
-    {{- end }}
-{{- end }}
+{{ end }}

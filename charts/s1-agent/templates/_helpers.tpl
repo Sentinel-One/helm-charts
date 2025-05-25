@@ -425,6 +425,16 @@ runAsNonRoot: false
 {{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
 "helm.sh/resource-policy": keep
 {{- end -}}
+{{- if and
+  (or
+    (not .Values.configuration.env.injection.enabled)
+    (eq (include "serverlessOnlyMode" .) "false")
+  )
+  (not .Values.configuration.inventory_only)
+  (eq .Values.configuration.deployment_type "argocd")
+}}
+"argocd.argoproj.io/sync-options": Delete=false
+{{- end -}}
 {{- end -}}
 
 {{- define "helperResources" -}}

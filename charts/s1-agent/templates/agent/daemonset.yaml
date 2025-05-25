@@ -4,6 +4,17 @@ kind: DaemonSet
 metadata:
   name: {{ include "agent.fullname" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  {{- if and
+    (or
+      (not .Values.configuration.env.injection.enabled)
+      (eq (include "serverlessOnlyMode" .) "false")
+    )
+    (not .Values.configuration.inventory_only)
+    (eq .Values.configuration.deployment_type "argocd")
+  }}
+  annotations:
+    argocd.argoproj.io/sync-options: Delete=false
+  {{- end }}
 spec:
   updateStrategy:
     type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}
