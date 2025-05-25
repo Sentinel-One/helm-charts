@@ -4,6 +4,10 @@ kind: DaemonSet
 metadata:
   name: {{ include "agent.fullname" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+  {{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+  annotations:
+    argocd.argoproj.io/sync-options: Delete=false
+  {{- end }}
 spec:
   updateStrategy:
     type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}
