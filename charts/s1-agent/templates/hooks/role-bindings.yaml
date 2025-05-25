@@ -1,9 +1,14 @@
-{{ if include "preDeleteHook.enabled" . }}
+{{- if or (include "preDeleteHook.enabled" .) (include "argocdPostDeleteHook.enabled" .) }}
 apiVersion: {{ template "clusterRoleBindings.apiVersion" . }}
 kind: RoleBinding
 metadata:
   name: {{ include "preDeleteHook.name" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+{{- if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+  annotations:
+    "argocd.argoproj.io/hook": PostDelete
+    "argocd.argoproj.io/hook-delete-policy": HookSucceeded, BeforeHookCreation, HookFailed
+{{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
