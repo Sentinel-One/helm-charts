@@ -6,6 +6,8 @@ configuration:
   argocd:
     post_delete_hook_enabled: "true"
     post_delete_hook_timeout: 600  # In seconds
+  helm_hooks:
+    pre_delete_hook_timeout: 600 # In seconds
   cluster:
     name: "" # set the name of your cluster
     uid: "" # set the cluster uid
