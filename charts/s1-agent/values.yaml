@@ -175,8 +175,8 @@ agent:
   nodeSelector: {}
   priorityClassName: ""
   podAnnotations: ""
-  apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/s1-agent
-  apparmorPolicy: unconfined
+  apparmorPolicy: Unconfined
+  apparmorLocalhostProfileName: "" # Set to a custom AppArmor profile name if type is Localhost, otherwise leave empty
   tolerations:
     - effect: NoExecute
       operator: Exists
