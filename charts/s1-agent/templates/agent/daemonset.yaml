@@ -23,7 +23,9 @@ spec:
       {{- if .Values.agent.podAnnotations }}
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
-        {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" .Values.agent.apparmorPolicy }}
+      {{- if semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor) }}
+      {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" (lower .Values.agent.apparmorPolicy) }}
+      {{- end }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
       imagePullSecrets:
@@ -35,6 +37,17 @@ spec:
       securityContext:
         runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
         runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
+        {{- if semverCompare ">=1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor) }}
+        appArmorProfile:
+          type: {{ default "Unconfined" .Values.agent.apparmorPolicy }}
+          {{- if eq .Values.agent.apparmorPolicy "Localhost" }}
+          {{- if .Values.agent.apparmorLocalhostProfileName }}
+          localhostProfile: {{ .Values.agent.apparmorLocalhostProfileName }}
+          {{- else }}
+          {{- fail "AppArmor Configuration Error: When agent.apparmorPolicy is 'Localhost', agent.localhostProfileName must be specified." }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
       restartPolicy: Always
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
