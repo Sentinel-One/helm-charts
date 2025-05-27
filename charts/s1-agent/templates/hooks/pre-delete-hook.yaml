@@ -7,9 +7,10 @@ metadata:
 {{ include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-delete
-    "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation
+    "helm.sh/hook-delete-policy": hook-succeeded, before-hook-creation, hook-failed
 spec:
   backoffLimit: 0
+  activeDeadlineSeconds: {{ .Values.configuration.helm_hooks.pre_delete_hook_timeout }}
   template:
     metadata:
       labels:
