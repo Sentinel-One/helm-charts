@@ -1,11 +1,24 @@
-{{ if include "preDeleteHook.enabled" . }}
+{{- if or (include "preDeleteHook.enabled" .) (include "argocdPostDeleteHook.enabled" .) }}
 apiVersion: {{ template "clusterRole.apiVersion" . }}
 kind: Role
 metadata:
   name: {{ include "preDeleteHook.name" . }}
   labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
+{{- if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+  annotations:
+    "argocd.argoproj.io/hook": PostDelete
+    "argocd.argoproj.io/hook-delete-policy": HookSucceeded, BeforeHookCreation, HookFailed
+{{- end }}
 rules:
 - apiGroups: [""]
   resources: ["pods/exec"]
   verbs: ["create"]
+{{- if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+- apiGroups: ["apps"]
+  resources: ["daemonsets", "statefulsets"]
+  verbs: ["delete"]
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["delete"]
+{{- end }}
 {{ end }}
