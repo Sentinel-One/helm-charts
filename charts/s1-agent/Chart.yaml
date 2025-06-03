@@ -1,7 +1,7 @@
 apiVersion: v2
-appVersion: "25.1.2"
+appVersion: "25.1.3"
 description: SentinelOne Kubernetes Agent
 name: s1-agent
 type: application
-version: 25.1.2
+version: 25.1.3
 
