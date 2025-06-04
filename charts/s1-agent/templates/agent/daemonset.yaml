@@ -21,9 +21,7 @@ spec:
       labels:
 {{- include "sentinelone.agent.labels" . | nindent 8 }}
       annotations:
-      {{- if .Values.configuration.inventory_only }}
-        timestamp: {{ now | quote }}
-      {{- end }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/common/secrets.yaml") . | sha256sum }}
       {{- if .Values.agent.podAnnotations }}
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
