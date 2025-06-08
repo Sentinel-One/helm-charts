@@ -17,9 +17,7 @@ spec:
       labels:
 {{- include "sentinelone.agent.labels" . | nindent 8 }}
       annotations:
-      {{- if .Values.configuration.inventory_only }}
         timestamp: {{ now | quote }}
-      {{- end }}
       {{- if .Values.agent.podAnnotations }}
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
