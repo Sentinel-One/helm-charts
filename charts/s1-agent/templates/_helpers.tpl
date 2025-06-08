@@ -349,7 +349,7 @@ certificates:
     {{- if include "helper_token.secret.create" . }}
       optional: true
     {{- end }}
-{{- if .Values.configuration.env.agent.persistent_dir_removal_upon_installation }}
+{{- if and .Values.configuration.env.agent.persistent_dir_removal_upon_installation (eq .Values.configuration.deployment_type "helm") }}
 - name: S1_DEPLOYMENT_TIMESTAMP
   value: {{ now | quote }}
 - name: S1_DEPLOYMENT_REVISION
