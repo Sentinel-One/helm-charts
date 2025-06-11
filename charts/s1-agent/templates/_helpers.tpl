@@ -192,7 +192,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "helper.secret.create" -}}
-{{- empty .Values.secrets.helper_certificate | ternary "true" "" }}
+{{- or (empty .Values.secrets.helper_certificate) (eq .Values.configuration.deployment_type "argocd") | ternary "true" "" }}
 {{- end -}}
 
 {{- define "webhooks.enabled" -}}
