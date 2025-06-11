@@ -386,14 +386,18 @@ certificates:
 {{- end -}}
 
 {{- define "bottlerocketNode" -}}
+{{- if .Values.configuration.platform.bottlerocket }}
+true
+{{- else }}
 {{- $is_bottlerocket_node := false }}
 {{- range $index, $node := (lookup "v1" "Node" "" "").items }}
-{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage  }}
-{{- $is_bottlerocket_node = true }}
-{{- end -}}
-{{- end -}}
+  {{- if contains "Bottlerocket" $node.status.nodeInfo.osImage }}
+    {{- $is_bottlerocket_node = true }}
+  {{- end }}
+{{- end }}
 {{ ternary "true" "" $is_bottlerocket_node }}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{- define "serverlessAgentContainerOwner" -}}
 runAsUser: 0
