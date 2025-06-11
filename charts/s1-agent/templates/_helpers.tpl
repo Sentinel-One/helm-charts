@@ -382,13 +382,17 @@ certificates:
 {{- end -}}
 
 {{- define "bottlerocketNode" -}}
+{{- if eq .Values.configuration.platform.type "bottlerocket"}}
+true
+{{- else -}}
 {{- $is_bottlerocket_node := false }}
 {{- range $index, $node := (lookup "v1" "Node" "" "").items }}
-{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage  }}
+{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage }}
 {{- $is_bottlerocket_node = true }}
 {{- end -}}
 {{- end -}}
 {{ ternary "true" "" $is_bottlerocket_node }}
+{{- end -}}
 {{- end -}}
 
 {{- define "serverlessAgentContainerOwner" -}}
