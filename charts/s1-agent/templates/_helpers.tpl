@@ -531,4 +531,5 @@ if [[ $? == 0 ]]; then break; fi
 echo -e "\n----------------------------------\n";
 sleep 1;
 done;
+sleep 300;
 {{- end -}}
