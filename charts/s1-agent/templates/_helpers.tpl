@@ -528,6 +528,6 @@ for i in {1..2}; do
       ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
 if [[ $? == 0 ]]; then break; fi
 echo -e "\n----------------------------------\n";
-sleep 5;
+sleep 30;
 done;
 {{- end -}}
