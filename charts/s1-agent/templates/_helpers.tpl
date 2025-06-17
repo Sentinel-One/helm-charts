@@ -192,7 +192,11 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "helper.secret.create" -}}
-{{- empty .Values.secrets.helper_certificate | ternary "true" "" }}
+{{- if or (empty .Values.secrets.helper_certificate) (eq .Values.configuration.deployment_type "argocd") -}}
+{{- "true" -}}
+{{- else -}}
+{{- "" -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "webhooks.enabled" -}}
@@ -382,14 +386,18 @@ certificates:
 {{- end -}}
 
 {{- define "bottlerocketNode" -}}
+{{- if .Values.configuration.platform.bottlerocket }}
+true
+{{- else }}
 {{- $is_bottlerocket_node := false }}
 {{- range $index, $node := (lookup "v1" "Node" "" "").items }}
-{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage  }}
-{{- $is_bottlerocket_node = true }}
-{{- end -}}
-{{- end -}}
+  {{- if contains "Bottlerocket" $node.status.nodeInfo.osImage }}
+    {{- $is_bottlerocket_node = true }}
+  {{- end }}
+{{- end }}
 {{ ternary "true" "" $is_bottlerocket_node }}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{- define "serverlessAgentContainerOwner" -}}
 runAsUser: 0
@@ -512,7 +520,7 @@ for i in {1..2}; do
   grep {{ include "agent.fullname" . }} |
     xargs -P 0 -I % bash -c '
       out=$(for i in {1..3}; do
-              timeout 10 /s1-helper/kubectl exec % -- bash -c "
+              timeout 30 /s1-helper/kubectl exec % -- bash -c "
                     sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
                 " && exit 0 || sleep 2;
             done;
