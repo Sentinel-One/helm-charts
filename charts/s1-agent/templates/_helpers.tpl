@@ -517,7 +517,7 @@ for i in {1..2}; do
   grep {{ include "agent.fullname" . }} |
     xargs -P 0 -I % bash -c '
       out=$(for i in {1..3}; do
-              timeout 10 /s1-helper/kubectl exec % -- bash -c "
+              timeout 30 /s1-helper/kubectl exec % -- bash -c "
                     sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
                 " && exit 0 || sleep 2;
             done;
