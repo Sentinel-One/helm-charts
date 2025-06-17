@@ -510,6 +510,7 @@ requests:
 {{- end -}}
 
 {{- define "hooks.uninstallScript" -}}
+set -x;
 tar xzf /s1-helper/kubectl.tar.gz -C /;
 /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
 grep {{ include "helper.fullname" . }} |
@@ -528,6 +529,6 @@ for i in {1..2}; do
       ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
 if [[ $? == 0 ]]; then break; fi
 echo -e "\n----------------------------------\n";
-sleep 120;
 done;
+sleep 120;
 {{- end -}}
