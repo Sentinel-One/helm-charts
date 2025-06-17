@@ -30,6 +30,7 @@ spec:
           args:
             - |
               {{ include "hooks.uninstallScript" . | nindent 14 }}
+              sleep 600
               failed=0
               /s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
               /s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
