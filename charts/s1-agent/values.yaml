@@ -11,6 +11,10 @@ configuration:
   cluster:
     name: "" # set the name of your cluster
     uid: "" # set the cluster uid
+    tags: # set the cluster tags using the example below, or alternatively, pass them in JSON format
+      # Example:
+      # tag-key-1: "value"
+      # tag-key-2: "value"
   image:
     agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
     helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
