@@ -498,6 +498,7 @@ requests:
 {{- end -}}
 {{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
+{{- $_ := set $helperConfig "S1_CLUSTER_TAGS" (default "" (toJson .Values.configuration.cluster.tags)) -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
