@@ -360,6 +360,8 @@ certificates:
 {{- define "serverlessOnlyMode" -}}
 {{- if (eq .Values.configuration.platform.type "serverless") }}
 {{- true }}
+{{- else if (eq .Values.configuration.deployment_type "argocd") }}
+{{- false }}
 {{- else }}
 {{- $nodes_counter := 0 }}
 {{- $fargate_nodes_counter := 0 }}
