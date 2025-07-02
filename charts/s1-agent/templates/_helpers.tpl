@@ -151,7 +151,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "preDeleteHook.enabled" -}}
-{{- or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+{{- (eq .Values.configuration.deployment_type "helm") }}
 {{- end -}}
 
 {{- define "preDeleteHook.rbac.name" -}}
