@@ -25,7 +25,10 @@ spec:
       {{- if .Values.agent.podAnnotations }}
 {{ toYaml .Values.agent.podAnnotations | indent 8 }}
       {{- end }}
-      {{- if semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor) }}
+      {{- if and
+          (semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor))
+          (not (eq .Values.configuration.platform.type "openshift"))
+      }}
       {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" (lower .Values.agent.apparmorPolicy) }}
       {{- end }}
     spec:
@@ -82,7 +85,7 @@ spec:
         - name: S1_AGENT_CONFIG_PATH
           value: "/opt/configmaps/config"
         - name: S1_EBPF_ENABLED
-          value: "{{ .Values.configuration.env.agent.ebpf_enabled }}"
+          value: "{{ default "true" .Values.configuration.env.agent.ebpf_enabled }}"
 {{- if .Values.configuration.platform.gke.autopilot }}
         - name: S1_GKE_AUTOPILOT
           value: "true"
