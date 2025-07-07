@@ -515,18 +515,18 @@ requests:
 {{- end -}}
 
 {{- define "hooks.uninstallScript" -}}
-tar xzf /s1-helper/kubectl.tar.gz -C /tmp;
-/tmp/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+tar xzf /s1-helper/kubectl.tar.gz -C /;
+/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
 grep {{ include "helper.fullname" . }} |
   xargs -I _ bash -c 'for i in {1..3}; do
-    /tmp/s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
+    /s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
 for i in {1..2}; do
-/tmp/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
   grep {{ include "agent.fullname" . }} |
     xargs -P 0 -I % bash -c '
       out=$(for i in {1..3}; do
-              timeout 30 /tmp/s1-helper/kubectl exec % -- bash -c "
-                    sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
+              timeout 30 /s1-helper/kubectl exec % -- bash -c "
+                    sudo test -f /opt/sentinelone/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
                 " && exit 0 || sleep 2;
             done;
             exit 1

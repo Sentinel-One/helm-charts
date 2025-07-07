@@ -25,15 +25,20 @@ spec:
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
         - name: {{ include "argocdPostDeleteHook.name" . }}
+          securityContext:
+            {{- toYaml .Values.helper.securityContext | nindent 12 }}
           image: "{{ include "helper.full_url" . }}"
           command: [ "/bin/bash", "-c" ]
           args:
             - |
               {{ include "hooks.uninstallScript" . | nindent 14 }}
               failed=0
-              /tmp/s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
-              /tmp/s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
-              /tmp/s1-helper/kubectl delete statefulset {{ include "helper.fullname" . }} --ignore-not-found || failed=1;
+              /s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
+              /s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
+              /s1-helper/kubectl delete statefulset {{ include "helper.fullname" . }} --ignore-not-found || failed=1;
+              {{- if (and (eq .Values.configuration.platform.type "openshift") .Values.configuration.platform.openshift.scc.create) }}
+              /s1-helper/kubectl delete scc s1 --ignore-not-found || failed=1;
+              {{- end }}
               sleep 300;
               if [[ $failed -ne 0 ]]; then
                 echo "One or more resources failed to get deleted"
