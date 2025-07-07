@@ -31,9 +31,9 @@ spec:
             - |
               {{ include "hooks.uninstallScript" . | nindent 14 }}
               failed=0
-              /s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
-              /s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
-              /s1-helper/kubectl delete statefulset {{ include "helper.fullname" . }} --ignore-not-found || failed=1;
+              /tmp/s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
+              /tmp/s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
+              /tmp/s1-helper/kubectl delete statefulset {{ include "helper.fullname" . }} --ignore-not-found || failed=1;
 
               if [[ $failed -ne 0 ]]; then
                 echo "One or more resources failed to get deleted"
