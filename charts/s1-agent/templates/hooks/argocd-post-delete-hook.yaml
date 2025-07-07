@@ -25,6 +25,8 @@ spec:
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
       containers:
         - name: {{ include "argocdPostDeleteHook.name" . }}
+          securityContext:
+            {{- toYaml .Values.helper.securityContext | nindent 12 }}
           image: "{{ include "helper.full_url" . }}"
           command: [ "/bin/bash", "-c" ]
           args:
