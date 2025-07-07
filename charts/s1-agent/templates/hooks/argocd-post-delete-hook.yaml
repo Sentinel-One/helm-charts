@@ -39,6 +39,8 @@ spec:
               {{- if (and (eq .Values.configuration.platform.type "openshift") .Values.configuration.platform.openshift.scc.create) }}
               /s1-helper/kubectl delete scc s1 --ignore-not-found || failed=1;
               {{- end }}
+              /s1-helper/kubectl delete clusterrole {{ include "helper.rbac.name" . }} --ignore-not-found || failed=1;
+              /s1-helper/kubectl delete clusterrolebinding {{ include "helper.rbac.name" . }} --ignore-not-found || failed=1;
               sleep 300;
               if [[ $failed -ne 0 ]]; then
                 echo "One or more resources failed to get deleted"
