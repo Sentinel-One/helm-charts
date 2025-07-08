@@ -22,7 +22,7 @@ spec:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
       restartPolicy: Never
-      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}-delete-hook
       containers:
         - name: {{ include "argocdPostDeleteHook.name" . }}
           image: "{{ include "helper.full_url" . }}"
@@ -32,7 +32,6 @@ spec:
               {{ include "hooks.uninstallScript" . | nindent 14 }}
               failed=0
               /s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
-              /s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
               /s1-helper/kubectl delete statefulset {{ include "helper.fullname" . }} --ignore-not-found || failed=1;
 
               if [[ $failed -ne 0 ]]; then

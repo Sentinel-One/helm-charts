@@ -22,7 +22,7 @@ spec:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
       restartPolicy: Never
-      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}-delete-hook
       containers:
         - name: {{ include "preDeleteHook.name" . }}
           image: "{{ include "helper.full_url" . }}"
