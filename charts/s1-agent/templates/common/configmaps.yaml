@@ -37,7 +37,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "agent.fullname" . }}-config
+  name: {{ include "agentConfiguration.name" . }}
   labels:
     {{- include "sentinelone.agent.labels" . | nindent 4 }}
 data:
@@ -52,7 +52,15 @@ data:
   {{ end }}
 {{- end }}
 {{- end }}
-{{ end }}
+{{- end }}
+{{- if .Values.configuration.env.dynamic_configuration.enabled }}
+  config.yaml: |
+    {{- if kindIs "map" .Values.agent.dynamicConfiguration }}
+    {{- mustToPrettyJson .Values.agent.dynamicConfiguration | nindent 4 }}
+    {{- else }}
+    {{- .Values.agent.dynamicConfiguration | nindent 4 }}
+    {{- end }}
+{{- end }}
 {{ end }}
 
 ---

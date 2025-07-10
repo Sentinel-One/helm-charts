@@ -7,6 +7,7 @@ metadata:
   {{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
   annotations:
     argocd.argoproj.io/sync-options: Delete=false
+    "helm.sh/hook": post-install
   {{- end }}
 spec:
   updateStrategy:

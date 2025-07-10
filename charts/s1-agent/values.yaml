@@ -53,6 +53,8 @@ configuration:
     admission_controllers:
       validating:
         enabled: false # to enable validating admission controller, set to 'true'
+    dynamic_configuration:
+      enabled: false # Enable dynamic configuration for the agent pod
   # If you are using an on-prem console with an un-trusted CA, you need to provide the CA
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
@@ -213,6 +215,18 @@ agent:
     requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
       cpu: 100m
       memory: 800Mi
+  dynamicConfiguration:
+    resources:
+      # The values below are in percent of the node capacity, and will be used to calculate the CPU and memory requests and limits
+      # for the agent pod when dynamic configuration is enabled.
+      # Note: These values are only applied if dynamicConfiguration.enabled is set to true.
+      # If you want to use absolute values, set dynamicConfiguration.enabled to false and specify the resources directly under agent.resources.
+      limits:
+        cpu: 10 # CPU limit 10 percent of node capacity
+        memory: 10 # Memory limit 10 percent of node capacity
+      requests:
+        cpu: 5 # CPU request 5 percent of node capacity
+        memory: 5 # Memory request 5 percent of node capacity
 
 service:
   annotations: {}
