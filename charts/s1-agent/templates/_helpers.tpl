@@ -175,6 +175,10 @@ Create the name of the service account to use
 {{- ( printf "%s-%s" (include "agent.fullname" .) "injection" ) -}}
 {{- end -}}
 
+{{- define "agentConfiguration.name" -}}
+{{- ( printf "%s-%s" (include "agent.fullname" .) "config" ) -}}
+{{- end -}}
+
 {{- define "admissionControllers.validating.name" -}}
 {{- ( printf "%s-%s" .Release.Name "validating-admission-controller" ) -}}
 {{- end -}}
@@ -197,7 +201,8 @@ Create the name of the service account to use
 
 {{- define "webhooks.enabled" -}}
 {{- or .Values.configuration.env.injection.enabled
-       .Values.configuration.env.admission_controllers.validating.enabled}}
+       .Values.configuration.env.admission_controllers.validating.enabled
+       .Values.configuration.env.dynamic_configuration.enabled}}
 {{- end -}}
 
 {{- define "helper.secret.name" -}}

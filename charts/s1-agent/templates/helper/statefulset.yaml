@@ -84,11 +84,17 @@ spec:
             value: "{{ .Values.configuration.env.injection.enabled }}"
 {{- if .Values.configuration.env.injection.enabled }}
           - name: AGENT_INJECTION_CONFIG_FILE
-            value: "/s1-helper/agent-injection/config.yaml"
+            value: "/s1-helper/config/injection/config.yaml"
         {{- if eq (include "serverlessOnlyMode" .) "true" }}
           - name: S1_HELPER_RBAC_NAME
             value: {{ include "helper.rbac.name" . }}
         {{- end }}
+{{- end }}
+{{- if .Values.configuration.env.dynamic_configuration.enabled }}
+          - name: S1_AGENT_CONFIG_ENABLED
+            value: "{{ .Values.configuration.env.dynamic_configuration.enabled }}"
+          - name: S1_AGENT_CONFIG_FILE
+            value: "/s1-helper/config/agent/config.yaml"
 {{- end }}
 {{- if or .Values.configuration.env.injection.enabled .Values.configuration.env.helper.communicator_enabled }}
         {{- if and (include "site_key.secret.create" .)  (include "site_key.secret.name" .) }}
@@ -123,10 +129,14 @@ spec:
 {{- end }}
           resources:
             {{- include "helperResources" . | nindent 12 }}
-{{- if .Values.configuration.env.injection.enabled }}
           volumeMounts:
+{{- if .Values.configuration.env.dynamic_configuration.enabled }}
+          - name: agent-config
+            mountPath: /s1-helper/config/agent
+{{- end }}
+{{- if .Values.configuration.env.injection.enabled }}
           - name: agent-injection-config
-            mountPath: /s1-helper/agent-injection
+            mountPath: /s1-helper/config/injection
     {{- if eq (include "serverlessOnlyMode" .) "true" }}
         {{- include "serverlessAgentContainer" . | nindent 8 }}
           - name: S1_AGENT_CONTAINER_NAME
@@ -137,7 +147,14 @@ spec:
             value: Always
       shareProcessNamespace: true
     {{- end }}
+{{- end }}
       volumes:
+{{- if .Values.configuration.env.dynamic_configuration.enabled }}
+        - name: agent-config
+          configMap:
+            name: {{ include "agentConfiguration.name" . }}
+{{- end }}
+{{- if .Values.configuration.env.injection.enabled }}      
         - name: agent-injection-config
           configMap:
             name: {{ include "agentInjection.name" . }}
