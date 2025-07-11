@@ -26,6 +26,8 @@ spec:
       containers:
         - name: {{ include "preDeleteHook.name" . }}
           image: "{{ include "helper.full_url" . }}"
+          securityContext:
+            {{- toYaml .Values.helper.securityContext | nindent 12 }}
           resources:
             requests:
               cpu: 250m

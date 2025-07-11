@@ -151,7 +151,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "preDeleteHook.enabled" -}}
-{{- or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+{{- (eq .Values.configuration.deployment_type "helm") }}
 {{- end -}}
 
 {{- define "preDeleteHook.rbac.name" -}}
@@ -305,14 +305,20 @@ certificates:
   value: "{{ .Values.configuration.custom_ca }}"
 - name: S1_HELPER_PORT
   value: "{{ include "service.port" . }}"
+{{- if .Values.configuration.proxy }}
 - name: S1_MANAGEMENT_PROXY
   value: "{{ default "" .Values.configuration.proxy }}"
+{{- end }}
+{{- if .Values.configuration.dv_proxy }}
 - name: S1_DV_PROXY
   value: "{{ default "" .Values.configuration.dv_proxy }}"
+{{- end }}
 - name: S1_HEAP_TRIMMING_ENABLE
-  value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
+  value: "{{ default "true" .Values.configuration.env.agent.heap_trimming_enable }}"
+{{- if .Values.configuration.env.agent.heap_trimming_interval }}
 - name: S1_HEAP_TRIMMING_INTERVAL
   value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
+{{- end }}
 - name: S1_LOG_LEVEL
   value: "{{ .Values.configuration.env.agent.log_level }}"
 - name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
@@ -322,9 +328,9 @@ certificates:
 - name: S1_HELPER_HEALTHCHECK_INTERVAL
   value: "{{ .Values.configuration.env.agent.helper_healthcheck_interval }}"
 - name: S1_FIPS_ENABLED
-  value: "{{ .Values.configuration.env.agent.fips_enabled }}"
+  value: "{{ default "false" .Values.configuration.env.agent.fips_enabled }}"
 - name: S1_AGENT_ENABLED
-  value: "{{ .Values.configuration.env.agent.enabled }}"
+  value: "{{ default "true" .Values.configuration.env.agent.enabled }}"
 - name: S1_POD_NAME
   valueFrom:
     fieldRef:
@@ -360,6 +366,8 @@ certificates:
 {{- define "serverlessOnlyMode" -}}
 {{- if (eq .Values.configuration.platform.type "serverless") }}
 {{- true }}
+{{- else if (eq .Values.configuration.deployment_type "argocd") }}
+{{- false }}
 {{- else }}
 {{- $nodes_counter := 0 }}
 {{- $fargate_nodes_counter := 0 }}
