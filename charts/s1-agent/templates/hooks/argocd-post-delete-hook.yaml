@@ -37,7 +37,7 @@ spec:
               {{- if or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
               /s1-helper/kubectl delete serviceaccount {{ include "sentinelone.serviceAccountName" . }} --ignore-not-found || failed=1;
               {{- end -}}
-
+              sleep 300;
               if [[ $failed -ne 0 ]]; then
                 echo "One or more resources failed to get deleted"
                 exit 1
