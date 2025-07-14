@@ -68,6 +68,7 @@ configuration:
         create: true # enable only if you are using OpenShift; this enables creation of a SecurityContextConstraint required to run on OpenShift
     gke:
       autopilot: false # enable if you are using GKE autopilot.
+      allowlistVersion: "1.0.0"  # set the GKE autopilot WorkloadAllowlist version to be used.
   localConf: # set Agent's initial local.conf configuration.
   overrideConf: # set Agent's initial override.conf configuration.
   inventory_only: false # enable to deploy only inventory collector
