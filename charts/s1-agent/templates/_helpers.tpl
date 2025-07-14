@@ -151,13 +151,24 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "preDeleteHook.enabled" -}}
-{{- or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
+{{- (eq .Values.configuration.deployment_type "helm") }}
 {{- end -}}
 
 {{- define "preDeleteHook.rbac.name" -}}
 {{ if eq (include "preDeleteHook.enabled" .) "true" }}
 {{- include "preDeleteHook.name" . -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "argocdPostDeleteHook.enabled" -}}
+{{- and
+  (eq .Values.configuration.deployment_type "argocd")
+  (eq .Values.configuration.argocd.post_delete_hook_enabled "true")
+}}
+{{- end -}}
+
+{{- define "argocdPostDeleteHook.name" -}}
+{{- ( printf "%s-%s" .Release.Name "post-uninstall-agent-job" ) -}}
 {{- end -}}
 
 {{- define "agentInjection.name" -}}
@@ -181,7 +192,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "helper.secret.create" -}}
-{{- empty .Values.secrets.helper_certificate | ternary "true" "" }}
+{{- or (empty .Values.secrets.helper_certificate) (eq .Values.configuration.deployment_type "argocd") | ternary "true" "" }}
 {{- end -}}
 
 {{- define "webhooks.enabled" -}}
@@ -294,14 +305,20 @@ certificates:
   value: "{{ .Values.configuration.custom_ca }}"
 - name: S1_HELPER_PORT
   value: "{{ include "service.port" . }}"
+{{- if .Values.configuration.proxy }}
 - name: S1_MANAGEMENT_PROXY
   value: "{{ default "" .Values.configuration.proxy }}"
+{{- end }}
+{{- if .Values.configuration.dv_proxy }}
 - name: S1_DV_PROXY
   value: "{{ default "" .Values.configuration.dv_proxy }}"
+{{- end }}
 - name: S1_HEAP_TRIMMING_ENABLE
-  value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
+  value: "{{ default "true" .Values.configuration.env.agent.heap_trimming_enable }}"
+{{- if .Values.configuration.env.agent.heap_trimming_interval }}
 - name: S1_HEAP_TRIMMING_INTERVAL
   value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
+{{- end }}
 - name: S1_LOG_LEVEL
   value: "{{ .Values.configuration.env.agent.log_level }}"
 - name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
@@ -311,9 +328,9 @@ certificates:
 - name: S1_HELPER_HEALTHCHECK_INTERVAL
   value: "{{ .Values.configuration.env.agent.helper_healthcheck_interval }}"
 - name: S1_FIPS_ENABLED
-  value: "{{ .Values.configuration.env.agent.fips_enabled }}"
+  value: "{{ default "false" .Values.configuration.env.agent.fips_enabled }}"
 - name: S1_AGENT_ENABLED
-  value: "{{ .Values.configuration.env.agent.enabled }}"
+  value: "{{ default "true" .Values.configuration.env.agent.enabled }}"
 - name: S1_POD_NAME
   valueFrom:
     fieldRef:
@@ -338,7 +355,7 @@ certificates:
     {{- if include "helper_token.secret.create" . }}
       optional: true
     {{- end }}
-{{- if .Values.configuration.env.agent.persistent_dir_removal_upon_installation }}
+{{- if and .Values.configuration.env.agent.persistent_dir_removal_upon_installation (eq .Values.configuration.deployment_type "helm") }}
 - name: S1_DEPLOYMENT_TIMESTAMP
   value: {{ now | quote }}
 - name: S1_DEPLOYMENT_REVISION
@@ -349,6 +366,8 @@ certificates:
 {{- define "serverlessOnlyMode" -}}
 {{- if (eq .Values.configuration.platform.type "serverless") }}
 {{- true }}
+{{- else if (eq .Values.configuration.deployment_type "argocd") }}
+{{- false }}
 {{- else }}
 {{- $nodes_counter := 0 }}
 {{- $fargate_nodes_counter := 0 }}
@@ -371,13 +390,17 @@ certificates:
 {{- end -}}
 
 {{- define "bottlerocketNode" -}}
+{{- if eq .Values.configuration.platform.type "bottlerocket"}}
+true
+{{- else -}}
 {{- $is_bottlerocket_node := false }}
 {{- range $index, $node := (lookup "v1" "Node" "" "").items }}
-{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage  }}
+{{- if contains "Bottlerocket" $node.status.nodeInfo.osImage }}
 {{- $is_bottlerocket_node = true }}
 {{- end -}}
 {{- end -}}
 {{ ternary "true" "" $is_bottlerocket_node }}
+{{- end -}}
 {{- end -}}
 
 {{- define "serverlessAgentContainerOwner" -}}
@@ -424,6 +447,9 @@ runAsNonRoot: false
 {{- define "helper.rbac.annotations" -}}
 {{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
 "helm.sh/resource-policy": keep
+{{- if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+"argocd.argoproj.io/sync-options": Delete=false
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -458,6 +484,8 @@ requests:
 {{- define "persistentDir" -}}
 {{- if .Values.configuration.platform.gke.autopilot }}
 {{- "/var/lib/sentinelone" }}
+{{- else if eq .Values.configuration.platform.type "talos" }}
+{{- default "/host" .Values.configuration.env.agent.host_mount_path }}{{ default "/var/sentinelone" .Values.configuration.env.agent.persistent_dir }}
 {{- else }}
 {{- default "/host" .Values.configuration.env.agent.host_mount_path }}{{ default "/var/lib/sentinelone" .Values.configuration.env.agent.persistent_dir }}
 {{- end }}
@@ -469,6 +497,7 @@ requests:
 
 {{- define "helper.config" -}}
 {{- $helperConfig := dict }}
+{{- $_ := set $helperConfig "S1_PLATFORM_TYPE" (.Values.configuration.platform.type | toString) -}}
 {{- $_ := set $helperConfig "S1_HELPER_LOG_SIZE" (.Values.configuration.env.helper.log_size | toString) -}}
 {{- $_ := set $helperConfig "S1_COMMUNICATOR_ENABLED" (printf "%t" .Values.configuration.env.helper.communicator_enabled) -}}
 {{- if .Values.configuration.env.helper.communicator_enabled -}}
@@ -481,5 +510,29 @@ requests:
 {{- end -}}
 {{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
+{{- $_ := set $helperConfig "S1_CLUSTER_TAGS" (default "" (toJson .Values.configuration.cluster.tags)) -}}
 {{- $helperConfig | toYaml -}}
+{{- end -}}
+
+{{- define "hooks.uninstallScript" -}}
+tar xzf /s1-helper/kubectl.tar.gz -C /;
+/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+grep {{ include "helper.fullname" . }} |
+  xargs -I _ bash -c 'for i in {1..3}; do
+    /s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
+for i in {1..2}; do
+/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
+  grep {{ include "agent.fullname" . }} |
+    xargs -P 0 -I % bash -c '
+      out=$(for i in {1..3}; do
+              timeout 30 /s1-helper/kubectl exec % -- bash -c "
+                    sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
+                " && exit 0 || sleep 2;
+            done;
+            exit 1
+      ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
+if [[ $? == 0 ]]; then break; fi
+echo -e "\n----------------------------------\n";
+sleep 1;
+done;
 {{- end -}}

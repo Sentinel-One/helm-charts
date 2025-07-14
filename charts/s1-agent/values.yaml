@@ -2,9 +2,19 @@
 # that you typically need to edit are shown under "configuration"
 #
 configuration:
+  deployment_type: "helm"  # Default, could be "argocd" if using Argo CD
+  argocd:
+    post_delete_hook_enabled: "true"
+    post_delete_hook_timeout: 600  # In seconds
+  helm_hooks:
+    pre_delete_hook_timeout: 600 # In seconds
   cluster:
     name: "" # set the name of your cluster
     uid: "" # set the cluster uid
+    tags: # set the cluster tags using the example below, or alternatively, pass them in JSON format
+      # Example:
+      # tag-key-1: "value"
+      # tag-key-2: "value"
   image:
     agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
     helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
@@ -49,7 +59,7 @@ configuration:
   custom_ca_path:
   imagePullPolicy: "" # defaults to IfNotPresent
   platform:
-    type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, openshift and
+    type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, talos, openshift and
                      # serverless for kubernetes cluster without nodes (currently Fargate only). For serverless
                      # cluster with nodes as well, use kubernetes type.
     # optional settings, used with OpenShift only:

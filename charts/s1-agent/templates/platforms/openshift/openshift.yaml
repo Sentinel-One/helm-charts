@@ -5,6 +5,10 @@ metadata:
   name: s1 
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  {{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+  annotations:
+    argocd.argoproj.io/sync-options: Delete=false
+  {{- end }}
 allowPrivilegedContainer: false
 allowHostDirVolumePlugin: true
 allowHostIPC: false
