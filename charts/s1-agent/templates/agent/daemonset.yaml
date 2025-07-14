@@ -20,6 +20,9 @@ spec:
     metadata:
       labels:
 {{- include "sentinelone.agent.labels" . | nindent 8 }}
+      {{- if .Values.configuration.platform.gke.autopilot }}
+        cloud.google.com/matching-allowlist: sentinelone-v1.0.0
+      {{- end }}
       annotations:
         timestamp: {{ now | quote }}
       {{- if .Values.agent.podAnnotations }}
