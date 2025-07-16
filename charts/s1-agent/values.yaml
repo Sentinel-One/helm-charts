@@ -19,8 +19,8 @@ configuration:
     agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
     helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
   repositories:
-    agent: "cwpp_agent/s1agent" # Edit and add your own registry paths
-    helper: "cwpp_agent/s1helper" # Edit and add your own registry paths
+    agent: "cws-agent/s1agent" # Edit and add your own registry paths
+    helper: "cws-agent/s1helper" # Edit and add your own registry paths
   tag:
     agent: "25.2.2" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
     helper: "25.2.2" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
