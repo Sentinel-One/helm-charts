@@ -48,6 +48,7 @@ configuration:
       client_timeout: # client timeout. (seconds, default=120)
       inventory_enabled: true
       communicator_enabled: true
+      pvc_enabled: false # enable to create a persistent volume claim for the helper pod
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
     admission_controllers:
@@ -71,6 +72,21 @@ configuration:
   localConf: # set Agent's initial local.conf configuration.
   overrideConf: # set Agent's initial override.conf configuration.
   inventory_only: false # enable to deploy only inventory collector
+
+pvc:
+  storageClassName: "" # specify the storage class name, if needed (defaults to efs.csi.aws.com)
+  size: 10Gi # default size of the persistent volume claim
+  provisioner: "efs.csi.aws.com" # specify the provisioner to use for the persistent volume claim (defaults to efs.csi.aws.com)
+  efsConfig:
+    provisioningMode: "efs-ap" # specify the EFS provisioning mode (defaults to efs-ap)
+    directoryPerms: "700" # specify the EFS directory permissions (defaults to 700)
+    gidRangeStart: "1000" # specify the EFS GID range start (defaults to 1000)
+    gidRangeEnd: "2000" # specify the EFS GID range end (defaults to 2000)
+    basePath: "/var/lib/sentinelone" # specify the EFS base path (defaults to /var/lib/sentinelone)
+    volumeHandle: "" # specify the EFS volume handle
+    accessPointId: "fsap-07b0ca984a07bae41" # specify the EFS access point ID
+    fileSystemId: "fs-0e8c7f6373438515c" # specify the EFS filesystem ID
+    mountPointId: fsmt-0b0bec6bccf3473bc # specify the EFS mount point ID
 
 secrets:
   imagePullSecret: "" # you need to specify the name of the image pull secret (created outside this chart)

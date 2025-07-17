@@ -1,0 +1,32 @@
+{{ if false }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "helper.fullname" . }}-pv-cleanup
+  labels:
+{{ include "sentinelone.helper.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ include "helper.fullname" . }}-pv-cleanup
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: pv-cleanup
+          image: busybox:1.36
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Cleaning up PersistentVolume data...";
+              rm -rf *
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.pvc.efsConfig.basePath }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "helper.fullname" . }}
+{{ end }}

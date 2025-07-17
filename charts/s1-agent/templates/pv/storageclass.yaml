@@ -1,0 +1,17 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ include "helper.fullname" . }}
+provisioner: {{ .Values.pvc.provisioner }}
+parameters:
+  type: gp3
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  provisioningMode: "{{ .Values.pvc.efsConfig.provisioningMode }}"
+  fileSystemId: "{{ .Values.pvc.efsConfig.fileSystemId }}"
+  directoryPerms: "{{ .Values.pvc.efsConfig.directoryPerms }}"
+  gidRangeStart: "{{ .Values.pvc.efsConfig.gidRangeStart }}"
+  gidRangeEnd: "{{ .Values.pvc.efsConfig.gidRangeEnd }}"
+  basePath: "{{ .Values.pvc.efsConfig.basePath }}"
+  mountPointId: "{{ .Values.pvc.efsConfig.mountPointId }}"
