@@ -1,0 +1,9 @@
+{{- if .Values.configuration.platform.gke.autopilot }}
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  name: s1-agent-allowlist-synchronizer
+spec:
+  allowlistPaths:
+    - SentinelOne/s1-agent/sentinelone-v1.1.0
+{{- end }}

@@ -261,6 +261,8 @@ Generate server token for helper secret
 {{- define "helper.full_url" -}}
 {{- if .Values.configuration.image.helper -}}
 {{ .Values.configuration.image.helper }}
+{{- else if .Values.configuration.digest.helper -}}
+{{ required "Must set the appropriate registry for agent helper pulling" .Values.configuration.repositories.helper }}@sha256:{{ .Values.configuration.digest.helper }}
 {{- else -}}
 {{ required "Must set the appropriate registry for agent helper pulling" .Values.configuration.repositories.helper }}:{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}
 {{- end -}}
@@ -269,8 +271,10 @@ Generate server token for helper secret
 {{- define "agent.full_url" -}}
 {{- if .Values.configuration.image.agent -}}
 {{ .Values.configuration.image.agent }}
+{{- else if .Values.configuration.digest.agent -}}
+{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}@sha256:{{ .Values.configuration.digest.agent }}
 {{- else -}}
-{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for agent image pulling" .Values.configuration.tag.agent }}
+{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag/digest for agent image pulling" .Values.configuration.tag.agent }}
 {{- end -}}
 {{- end -}}
 
@@ -512,6 +516,42 @@ requests:
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
 {{- $_ := set $helperConfig "S1_CLUSTER_TAGS" (default "" (toJson .Values.configuration.cluster.tags)) -}}
 {{- $helperConfig | toYaml -}}
+{{- end -}}
+
+{{- define "agent.app_armor_policy" -}}
+{{- if .Values.configuration.platform.gke.autopilot }}
+{{- "Unconfined" }}
+{{- else }}
+{{- .Values.agent.apparmorPolicy }}
+{{- end -}}
+{{- end -}}
+
+{{- define "agent.capabilities" -}}
+{{- if .Values.configuration.platform.gke.autopilot }}
+- DAC_OVERRIDE
+- DAC_READ_SEARCH
+- FOWNER
+- SETGID
+- SETUID
+- SYS_ADMIN
+- SYS_PTRACE
+- SYS_RESOURCE
+- SYSLOG
+- SYS_CHROOT
+- CHOWN
+- SYS_MODULE
+- KILL
+- NET_ADMIN
+- NET_RAW
+{{- else if eq .Values.configuration.platform.type "talos" }}
+{{- range .Values.agent.capabilities }}
+{{- if ne . "SYS_MODULE" }}
+{{ printf "- %s" . | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{- toYaml .Values.agent.capabilities | nindent 0 }}
+{{- end }}
 {{- end -}}
 
 {{- define "hooks.uninstallScript" -}}
