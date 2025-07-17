@@ -16,14 +16,17 @@ configuration:
       # tag-key-1: "value"
       # tag-key-2: "value"
   image:
-    agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
-    helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
+    agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag or repo@sha256:digest) value to override them
+    helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag or repo@sha256:digest) value to override them
   repositories:
     agent: "cws-agent/s1agent" # Edit and add your own registry paths
     helper: "cws-agent/s1helper" # Edit and add your own registry paths
   tag:
     agent: "25.4.1" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
     helper: "25.4.1" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+  digest:
+    agent: "" # IF you want to use a different sha256 digest for the agent (only do so if advised by support), please replace this with the relevant sha256 for the agent image
+    helper: "" # IF you want to use a different sha256 digest for the helper (only do so if advised by support), please replace this with the relevant sha256 for the agent image
   proxy: "" # specify a proxy server (in URL format), if needed
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
