@@ -153,7 +153,7 @@ helper:
     limits:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
-    requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
+    requests: # The requests will be overridden by the limits if GKE autopilot platform configuration is set to true.
       cpu: 100m
       memory: 100Mi
   # Specifies whether cluster role and cluster role bindings should be created
@@ -186,7 +186,7 @@ agent:
   priorityClassName: ""
   podAnnotations: ""
   apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/s1-agent # support for k8s version < 1.30
-  apparmorPolicy: Unconfined # Unconfined, Localhost or RuntimeDefault (defaults to Unconfined)
+  apparmorPolicy: Unconfined # Unconfined, Localhost or RuntimeDefault (defaults to Unconfined). Cannot be changed in GKE Autopilot.
   apparmorLocalhostProfileName: "" # Set to a custom AppArmor profile name if type is Localhost, otherwise leave empty
   tolerations:
     - effect: NoExecute
@@ -210,7 +210,7 @@ agent:
     limits:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
-    requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
+    requests: # The requests will be overridden by the limits if GKE autopilot platform configuration is set to true.
       cpu: 100m
       memory: 800Mi
 
