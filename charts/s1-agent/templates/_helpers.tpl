@@ -514,6 +514,42 @@ requests:
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
+{{- define "agent.app_armor_policy" -}}
+{{- if .Values.configuration.platform.gke.autopilot }}
+{{- "Unconfined" }}
+{{- else }}
+{{- .Values.agent.apparmorPolicy }}
+{{- end -}}
+{{- end -}}
+
+{{- define "agent.capabilities" -}}
+{{- if .Values.configuration.platform.gke.autopilot }}
+- DAC_OVERRIDE
+- DAC_READ_SEARCH
+- FOWNER
+- SETGID
+- SETUID
+- SYS_ADMIN
+- SYS_PTRACE
+- SYS_RESOURCE
+- SYSLOG
+- SYS_CHROOT
+- CHOWN
+- SYS_MODULE
+- KILL
+- NET_ADMIN
+- NET_RAW
+{{- else if eq .Values.configuration.platform.type "talos" }}
+{{- range .Values.agent.capabilities }}
+{{- if ne . "SYS_MODULE" }}
+{{ printf "- %s" . | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{- toYaml .Values.agent.capabilities | nindent 0 }}
+{{- end }}
+{{- end -}}
+
 {{- define "hooks.uninstallScript" -}}
 tar xzf /s1-helper/kubectl.tar.gz -C /;
 /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
