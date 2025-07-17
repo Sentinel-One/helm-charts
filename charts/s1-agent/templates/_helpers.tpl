@@ -261,6 +261,8 @@ Generate server token for helper secret
 {{- define "helper.full_url" -}}
 {{- if .Values.configuration.image.helper -}}
 {{ .Values.configuration.image.helper }}
+{{- else if .Values.configuration.digest.helper -}}
+{{ required "Must set the appropriate registry for agent helper pulling" .Values.configuration.repositories.helper }}@sha256:{{ .Values.configuration.digest.helper }}
 {{- else -}}
 {{ required "Must set the appropriate registry for agent helper pulling" .Values.configuration.repositories.helper }}:{{ default .Values.configuration.tag.agent .Values.configuration.tag.helper }}
 {{- end -}}
@@ -269,8 +271,10 @@ Generate server token for helper secret
 {{- define "agent.full_url" -}}
 {{- if .Values.configuration.image.agent -}}
 {{ .Values.configuration.image.agent }}
+{{- else if .Values.configuration.digest.agent -}}
+{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}@sha256:{{ .Values.configuration.digest.agent }}
 {{- else -}}
-{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag for agent image pulling" .Values.configuration.tag.agent }}
+{{ required "Must set the appropriate registry for agent image pulling" .Values.configuration.repositories.agent }}:{{ required "Must set the appropriate tag/digest for agent image pulling" .Values.configuration.tag.agent }}
 {{- end -}}
 {{- end -}}
 
