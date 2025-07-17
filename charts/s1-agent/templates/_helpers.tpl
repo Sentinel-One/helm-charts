@@ -522,6 +522,14 @@ requests:
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
+{{- define "agent.app_armor_policy" -}}
+{{- if .Values.configuration.platform.gke.autopilot }}
+{{- "Unconfined" }}
+{{- else }}
+{{- .Values.agent.apparmorPolicy }}
+{{- end -}}
+{{- end -}}
+
 {{- define "hooks.uninstallScript" -}}
 tar xzf /s1-helper/kubectl.tar.gz -C /;
 /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
