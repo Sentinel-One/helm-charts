@@ -123,8 +123,12 @@ spec:
 {{- end }}
           resources:
             {{- include "helperResources" . | nindent 12 }}
-{{- if .Values.configuration.env.injection.enabled }}
           volumeMounts:
+{{- if .Values.configuration.env.helper.pvc_enabled }}
+          - name: helper-pvc
+            mountPath: {{ .Values.pvc.efsConfig.basePath }}
+{{- end }}
+{{- if .Values.configuration.env.injection.enabled }}          
           - name: agent-injection-config
             mountPath: /s1-helper/agent-injection
     {{- if eq (include "serverlessOnlyMode" .) "true" }}
@@ -137,7 +141,14 @@ spec:
             value: Always
       shareProcessNamespace: true
     {{- end }}
+{{- end }}    
       volumes:
+{{- if .Values.configuration.env.helper.pvc_enabled }}
+        - name: helper-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "helper.fullname" . }}
+{{- end }}
+{{- if .Values.configuration.env.injection.enabled }}      
         - name: agent-injection-config
           configMap:
             name: {{ include "agentInjection.name" . }}
