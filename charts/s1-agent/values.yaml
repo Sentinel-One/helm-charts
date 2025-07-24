@@ -41,7 +41,7 @@ configuration:
       helper_healthcheck_retry: 60 # amount of tries to verify the helper service is running before starting the agent.
       helper_healthcheck_interval: 5 # time to wait between each try. (seconds)
       fips_enabled: # to enable/disable FIPS mode, set to 'true'/'false'
-      ebpf_enabled: # to disable EBPF mode, set to 'false' (Unsupported in EKS Fargate)
+      ebpf_enabled: true # to disable EBPF mode, set to 'false' (Unsupported in EKS Fargate)
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       log_size: ""  # helper log file size in MBs. (defaults to 10)

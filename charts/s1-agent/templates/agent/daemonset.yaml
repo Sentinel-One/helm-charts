@@ -88,7 +88,7 @@ spec:
         - name: S1_AGENT_CONFIG_PATH
           value: "/opt/configmaps/config"
         - name: S1_EBPF_ENABLED
-          value: "{{ default "true" .Values.configuration.env.agent.ebpf_enabled }}"
+          value: "{{ .Values.configuration.env.agent.ebpf_enabled }}"
 {{- if .Values.configuration.platform.gke.autopilot }}
         - name: S1_GKE_AUTOPILOT
           value: "true"
