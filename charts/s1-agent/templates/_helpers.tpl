@@ -313,7 +313,7 @@ certificates:
 - name: S1_DV_PROXY
   value: "{{ default "" .Values.configuration.dv_proxy }}"
 {{- end }}
-{{- if .Values.configuration.env.agent.heap_trimming_enable }}
+{{- if kindIs "bool" .Values.configuration.env.agent.heap_trimming_enable }}
 - name: S1_HEAP_TRIMMING_ENABLE
   value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
 {{- end }}
@@ -329,11 +329,11 @@ certificates:
   value: "{{ .Values.configuration.env.agent.helper_healthcheck_retry }}"
 - name: S1_HELPER_HEALTHCHECK_INTERVAL
   value: "{{ .Values.configuration.env.agent.helper_healthcheck_interval }}"
-{{ if .Values.configuration.env.agent.fips_enabled }}
+{{- if kindIs "bool" .Values.configuration.env.agent.fips_enabled }}
 - name: S1_FIPS_ENABLED
   value: "{{ .Values.configuration.env.agent.fips_enabled }}"
 {{- end }}
-{{ if .Values.configuration.env.agent.enabled }}"
+{{- if kindIs "bool" .Values.configuration.env.agent.enabled }}
 - name: S1_AGENT_ENABLED
   value: "{{ .Values.configuration.env.agent.enabled }}"
 {{- end }}
