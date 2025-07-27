@@ -13,9 +13,6 @@ resource "aws_ecs_task_definition" "s1_agent_task_definition" {
       "credentialsParameter" : var.image_pull_secret
     }
     essential = true
-    command = [
-      "/opt/deployment.sh"
-    ]
     environment = [
       {
         "name" : "S1_AGENT_HOST_MOUNT_PATH",
