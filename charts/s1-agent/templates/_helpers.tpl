@@ -534,7 +534,7 @@ for i in {1..2}; do
     xargs -P 0 -I % bash -c '
       out=$(for i in {1..3}; do
               timeout 30 /s1-helper/kubectl exec % -- bash -c "
-                    sudo test -f /opt/sentinelone/tmp/uninstall_started && echo Already uninstalled || sudo sentinelctl control uninstall
+                    sentinelctl control uninstall
                 " && exit 0 || sleep 2;
             done;
             exit 1
