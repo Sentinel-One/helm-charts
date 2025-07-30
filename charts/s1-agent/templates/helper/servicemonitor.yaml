@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "service.name" . }}
+  # namespace : monitoring
+  labels:
+    release: prometheus  # ⚠️ must match the selector in Prometheus config
+spec:
+  selector:
+    matchLabels:
+      app: s1-agent
+  namespaceSelector:
+    matchNames:
+      - sentinelone
+  endpoints:
+      - port: metrics # Refers to the named port in the Service
+        interval: 30s # Scrape interval
+        path: /metrics # Path to the metrics endpoint

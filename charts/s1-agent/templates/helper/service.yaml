@@ -14,5 +14,8 @@ spec:
       targetPort: {{ include "service.target_port" . }}
       protocol: TCP
       name: https
+    - name: metrics
+      port: 8080
+      targetPort: 8080
   selector:
         {{- include "sentinelone.helper.selector.labels" . | nindent 4 }}

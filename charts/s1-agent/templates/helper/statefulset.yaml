@@ -105,6 +105,9 @@ spec:
             - name: https
               containerPort: {{ include "service.target_port" . }}
               protocol: TCP
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
 {{- if .Values.helper.probe }}
           livenessProbe:
             httpGet:
