@@ -15,7 +15,7 @@ rules:
 {{ if .Values.configuration.env.helper.inventory_enabled }}
 - apiGroups: ["*"]
   resources: ["cronjobs", "configmaps", "clusterroles", "clusterrolebindings", "roles", "rolebindings",
-              "networkpolicies", "serviceaccounts", "secrets"]
+              "networkpolicies", "serviceaccounts", "secrets", "ingresses"]
   verbs: ["get", "watch", "list"]
 {{ end }}
 {{ if .Values.configuration.env.injection.enabled }}
