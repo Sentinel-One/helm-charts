@@ -109,8 +109,7 @@ agentInjection:
 
 admissionControllers:
   validating:
-    selector:
-      namespaceSelector:
+    selector: # Selector for the validating webhook configuration (default is set to exclude the release namespace)
     rules:
     - apiGroups:
       - '*'
