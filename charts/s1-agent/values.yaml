@@ -16,14 +16,17 @@ configuration:
       # tag-key-1: "value"
       # tag-key-2: "value"
   image:
-    agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag) value to override them
-    helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag) value to override them
+    agent: "" # Leave empty to use agent repositories and tags values below, or provide a full image (with repo:tag or repo@sha256:digest) value to override them
+    helper: "" # Leave empty to use helper repositories and tags values below, or provide a full image (with repo:tag or repo@sha256:digest) value to override them
   repositories:
     agent: "cwpp_agent/s1agent" # Edit and add your own registry paths
     helper: "cwpp_agent/s1helper" # Edit and add your own registry paths
   tag:
     agent: "25.3.1" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
     helper: "25.3.1" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+  digest:
+    agent: "" # IF you want to use a different sha256 digest for the agent (only do so if advised by support), please replace this with the relevant sha256 for the agent image
+    helper: "" # IF you want to use a different sha256 digest for the helper (only do so if advised by support), please replace this with the relevant sha256 for the agent image
   proxy: "" # specify a proxy server (in URL format), if needed
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
@@ -68,6 +71,7 @@ configuration:
         create: true # enable only if you are using OpenShift; this enables creation of a SecurityContextConstraint required to run on OpenShift
     gke:
       autopilot: false # enable if you are using GKE autopilot.
+      allowlistVersion: "1.0.0"  # set the GKE autopilot WorkloadAllowlist version to be used.
   localConf: # set Agent's initial local.conf configuration.
   overrideConf: # set Agent's initial override.conf configuration.
   inventory_only: false # enable to deploy only inventory collector
@@ -153,7 +157,7 @@ helper:
     limits:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
-    requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
+    requests: # The requests will be overridden by the limits if GKE autopilot platform configuration is set to true.
       cpu: 100m
       memory: 100Mi
   # Specifies whether cluster role and cluster role bindings should be created
@@ -161,7 +165,7 @@ helper:
     create: true
 
 agent:
-  capabilities:
+  capabilities:  # Cannot be overridden in GKE Autopilot
     - DAC_OVERRIDE
     - DAC_READ_SEARCH
     - FOWNER
@@ -186,7 +190,7 @@ agent:
   priorityClassName: ""
   podAnnotations: ""
   apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/s1-agent # support for k8s version < 1.30
-  apparmorPolicy: Unconfined # Unconfined, Localhost or RuntimeDefault (defaults to Unconfined)
+  apparmorPolicy: Unconfined # Unconfined, Localhost or RuntimeDefault (defaults to Unconfined). Cannot be changed in GKE Autopilot.
   apparmorLocalhostProfileName: "" # Set to a custom AppArmor profile name if type is Localhost, otherwise leave empty
   tolerations:
     - effect: NoExecute
@@ -210,7 +214,7 @@ agent:
     limits:
       cpu: 900m
       memory: 1945Mi # Almost equals to 1.9Gi but isn't fractional
-    requests: # The requests will be overriden by the limits if GKE autopilot plaform configuration is set to true.
+    requests: # The requests will be overridden by the limits if GKE autopilot platform configuration is set to true.
       cpu: 100m
       memory: 800Mi
 
