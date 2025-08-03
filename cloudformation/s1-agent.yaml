@@ -124,7 +124,7 @@ Resources:
           RepositoryCredentials:
             CredentialsParameter: !Ref ImagePullSecret
           Essential: true
-          Command: ["/opt/deployment.sh"]
+          Command: ["/opt/cws_deployment"]
           Environment:
             - Name: "S1_AGENT_HOST_MOUNT_PATH"
               Value: !Ref HostMountPath

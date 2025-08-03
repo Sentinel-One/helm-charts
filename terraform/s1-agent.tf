@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "s1_agent_task_definition" {
     }
     essential = true
     command = [
-      "/opt/deployment.sh"
+      "/opt/cws_deployment"
     ]
     environment = [
       {
