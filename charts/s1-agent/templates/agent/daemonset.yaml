@@ -29,7 +29,7 @@ spec:
           (semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor))
           (not (eq .Values.configuration.platform.type "openshift"))
       }}
-      {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" (lower .Values.agent.apparmorPolicy) }}
+        {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" (lower .Values.agent.apparmorPolicy) }}
       {{- end }}
     spec:
 {{- if .Values.secrets.imagePullSecret }}
