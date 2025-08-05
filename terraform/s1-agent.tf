@@ -136,6 +136,7 @@ resource "aws_ecs_task_definition" "s1_agent_cleanup_task_definition" {
       "credentialsParameter" : var.image_pull_secret
     }
     memory = 128
+    user   = "${var.task_uid}:${var.task_gid}"
     command = [
       "sh", "-c",
       "mkdir -p ${var.host_mount_path}/var/lib/sentinelone/tmp && touch ${var.host_mount_path}/var/lib/sentinelone/tmp/uninstall_started"
