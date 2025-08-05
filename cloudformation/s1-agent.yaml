@@ -218,6 +218,7 @@ Resources:
           RepositoryCredentials:
             CredentialsParameter: !Ref ImagePullSecret
           Memory: 128
+          User: !Sub "${TaskUid}:${TaskGid}"
           Command:
             - "sh"
             - "-c"
