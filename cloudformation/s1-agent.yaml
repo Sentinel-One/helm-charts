@@ -218,6 +218,7 @@ Resources:
           RepositoryCredentials:
             CredentialsParameter: !Ref ImagePullSecret
           Memory: 128
+          User: "0:0"
           Command:
             - "sh"
             - "-c"
@@ -226,6 +227,15 @@ Resources:
             - SourceVolume: host-volume
               ContainerPath: /host
               ReadOnly: false
+          LogConfiguration:
+            Fn::If:
+              - IsDebuggingEnabled
+              - LogDriver: awslogs
+                Options:
+                  awslogs-group: "/ecs/s1-service-logs"
+                  awslogs-region: !Ref ClusterRegion
+                  awslogs-stream-prefix: "s1-agent"
+              - !Ref AWS::NoValue
       Volumes:
         - Name: host-volume
           Host:
