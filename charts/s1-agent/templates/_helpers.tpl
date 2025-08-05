@@ -510,6 +510,7 @@ requests:
 {{- $_ := set $helperConfig "S1_INVENTORY_ENABLED" (printf "%t" .Values.configuration.env.helper.inventory_enabled) -}}
 {{- $_ := set $helperConfig "S1_INVENTORY_ONLY" (printf "%t" .Values.configuration.inventory_only) -}}
 {{- $_ := set $helperConfig "S1_MANAGEMENT_PROXY" (default "" .Values.configuration.proxy) -}}
+{{- $_ := set $helperConfig "S1_MANAGEMENT_SECURED_PROTOCOL_MODE" (default "enforced" .Values.configuration.env.helper.secured_protocol_mode) -}}
 {{- end -}}
 {{- if .Values.configuration.env.injection.enabled -}}
 {{- $_ := set $helperConfig "S1_NAMESPACE_INJECTION_SELECTORS" (default "" (toJson .Values.agentInjection.selector.namespaceSelector.matchLabels)) -}}
