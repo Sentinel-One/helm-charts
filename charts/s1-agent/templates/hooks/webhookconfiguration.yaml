@@ -84,9 +84,18 @@ webhooks:
   matchPolicy: Equivalent
   failurePolicy: Ignore
   sideEffects: None
+{{- if .Values.admissionControllers.validating.selector -}}
+  {{ toYaml .Values.admissionControllers.validating.selector | nindent 2 }}
+{{- else }}
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+        - {{ .Release.Namespace }}
+{{- end }}
   rules:
     {{- toYaml .Values.admissionControllers.validating.rules | nindent 4 }}
-{{- toYaml .Values.admissionControllers.validating.selector | nindent 2 }}
   matchConditions:
     {{- toYaml .Values.admissionControllers.validating.matchConditions | nindent 4 }}
 {{- end }}
