@@ -129,6 +129,9 @@ spec:
           - name: dockerd
             mountPath: /var/run/cri-dockerd.sock
             readOnly: true
+          - name: k3s-containerd
+            mountPath: /run/k3s/containerd/containerd.sock
+            readOnly: true
 {{- end }}
           - name: config
             mountPath: /opt/configmaps/config
@@ -177,6 +180,9 @@ spec:
         - name: dockerd
           hostPath:
             path: /var/run/cri-dockerd.sock
+        - name: k3s-containerd
+          hostPath:
+            path: /run/k3s/containerd/containerd.sock
 {{- end }}
         - name: config
           configMap:
