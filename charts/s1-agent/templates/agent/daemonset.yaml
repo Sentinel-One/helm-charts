@@ -42,6 +42,7 @@ spec:
       securityContext:
         runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
         runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
+        readOnlyRootFilesystem: false  # Add this line explicitly
         {{- if and
           (semverCompare ">=1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor))
           (not (eq .Values.configuration.platform.type "openshift"))
