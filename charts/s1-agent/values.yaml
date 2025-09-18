@@ -60,6 +60,7 @@ configuration:
   # certificate(s) and intermediaries, if needed, under files/*.pem in PEM format
   custom_ca: false
   custom_ca_path:
+  custom_ca_name: "" # set the name of a pre-existing custom ca secret to use
   imagePullPolicy: "" # defaults to IfNotPresent
   platform:
     type: kubernetes # platform-specific support: defaults to kubernetes. possible values: kubernetes, talos, openshift and
