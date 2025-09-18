@@ -187,6 +187,8 @@ agent:
   apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/s1-agent # support for k8s version < 1.30
   apparmorPolicy: Unconfined # Unconfined, Localhost or RuntimeDefault (defaults to Unconfined)
   apparmorLocalhostProfileName: "" # Set to a custom AppArmor profile name if type is Localhost, otherwise leave empty
+  seccompProfile: # works for k8s version >= 1.19, older application was via annotation
+    type: Unconfined
   tolerations:
     - effect: NoExecute
       operator: Exists
