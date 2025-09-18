@@ -107,12 +107,9 @@ spec:
 {{- end }}
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
-{{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
-{{- range $cert := $agentCerts.certificates }}
           - name: ca-certs
-            mountPath: "/usr/local/share/ca-certificates/{{ $cert.name }}"
-            subPath: "{{ $cert.name }}"
-{{- end }}
+            mountPath: "/usr/local/share/ca-certificates"
+            readOnly: true
 {{- end }}
           - name: host
             mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
@@ -163,7 +160,7 @@ spec:
 {{- if .Values.configuration.custom_ca }}
         - name: ca-certs
           secret:
-            secretName: "{{ include "agent.fullname" . }}-custom-ca"
+            secretName: {{ include "custom_ca.secret.name" . }}
 {{- end }}
         - name: host
           hostPath:
