@@ -191,6 +191,18 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "custom_ca.secret.create" -}}
+{{- (and .Values.configuration.custom_ca (empty .Values.configuration.custom_ca_name)) | ternary "true" "" -}}
+{{- end -}}
+
+{{- define "custom_ca.secret.name" -}}
+{{- if include "custom_ca.secret.create" . }}
+{{- ( printf "%s-%s" (include "agent.fullname" .) "custom-ca" ) -}}
+{{- else -}}
+{{- .Values.configuration.custom_ca_name -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "helper.secret.create" -}}
 {{- or (empty .Values.secrets.helper_certificate) (eq .Values.configuration.deployment_type "argocd") | ternary "true" "" }}
 {{- end -}}
@@ -523,6 +535,7 @@ requests:
 {{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
 {{- $_ := set $helperConfig "S1_CLUSTER_TAGS" (default "" (toJson .Values.configuration.cluster.tags)) -}}
+{{- $_ := set $helperConfig "S1_USE_CUSTOM_CA" (printf "%t" .Values.configuration.custom_ca) -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
