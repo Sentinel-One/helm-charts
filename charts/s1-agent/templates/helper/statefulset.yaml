@@ -29,6 +29,24 @@ spec:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+{{- if and .Values.configuration.custom_ca .Values.configuration.env.helper.communicator_enabled }}
+      initContainers:
+        - name: init
+          image: "{{ include "helper.full_url" . }}"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Updating CA certificates..."
+              update-ca-certificates
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+          - name: ca-certs
+            mountPath: "/usr/local/share/ca-certificates"
+            readOnly: true
+          - name: ssl-certs
+            mountPath: /etc/ssl/certs
+{{- end }}
       containers:
         - name: helper
           securityContext:
@@ -123,8 +141,15 @@ spec:
 {{- end }}
           resources:
             {{- include "helperResources" . | nindent 12 }}
-{{- if .Values.configuration.env.injection.enabled }}
           volumeMounts:
+{{- if and .Values.configuration.custom_ca .Values.configuration.env.helper.communicator_enabled }}
+          - name: ca-certs
+            mountPath: "/usr/local/share/ca-certificates"
+            readOnly: true
+          - name: ssl-certs
+            mountPath: /etc/ssl/certs
+{{- end }}
+{{- if .Values.configuration.env.injection.enabled }}
           - name: agent-injection-config
             mountPath: /s1-helper/agent-injection
     {{- if eq (include "serverlessOnlyMode" .) "true" }}
@@ -137,7 +162,16 @@ spec:
             value: Always
       shareProcessNamespace: true
     {{- end }}
+{{- end }}
       volumes:
+{{- if and .Values.configuration.custom_ca .Values.configuration.env.helper.communicator_enabled }}
+        - name: ca-certs
+          secret:
+            secretName: {{ include "custom_ca.secret.name" . }}
+        - name: ssl-certs
+          emptyDir: {}
+{{- end }}
+{{- if .Values.configuration.env.injection.enabled }}
         - name: agent-injection-config
           configMap:
             name: {{ include "agentInjection.name" . }}
