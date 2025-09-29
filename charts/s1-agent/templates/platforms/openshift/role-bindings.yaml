@@ -1,0 +1,17 @@
+{{- if and (eq .Values.configuration.platform.type "openshift") .Values.configuration.platform.openshift.scc.create .Values.configuration.custom_ca .Values.configuration.env.helper.communicator_enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "helper.fullname" . }}-anyuid
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sentinelone.helper.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "sentinelone.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+{{- end }}
