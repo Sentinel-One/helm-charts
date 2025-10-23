@@ -28,6 +28,10 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.secrets.imagePullSecret }}
 {{- end }}
+{{- if .Values.configuration.env.helper.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+{{- end }}
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
 {{- if and .Values.configuration.custom_ca .Values.configuration.env.helper.communicator_enabled }}
       initContainers:
