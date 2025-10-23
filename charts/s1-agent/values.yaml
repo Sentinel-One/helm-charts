@@ -51,6 +51,10 @@ configuration:
       client_timeout: # client timeout. (seconds, default=120)
       inventory_enabled: true
       communicator_enabled: true
+      ports:
+        grpc: 5071 # gRPC server control port
+        target: 6443 # Server target port (HTTPS)
+      hostNetwork: false # set to 'true' in case you are running on EKS with amazon linux 2023 ami and hop limit for the instance metadata of 1 in order for the helper to fetch instance metadata
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
     admission_controllers:
