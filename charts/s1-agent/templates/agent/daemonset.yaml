@@ -69,6 +69,25 @@ spec:
         imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
         resources:
 {{- include "agentResources" . | nindent 10 }}
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - echo $(date) liveness probe run >> /var/log/probe.log; sentinelctl control status && echo "Agent is up" >> /var/log/probe.log
+          initialDelaySeconds: 90
+          periodSeconds: 60
+          timeoutSeconds: 30
+          failureThreshold: 2
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - echo $(date) liveness probe run >> /var/log/probe.log; sentinelctl control status && echo "Agent is up" >> /var/log/probe.log
+          periodSeconds: 300
+          timeoutSeconds: 30
+          failureThreshold: 1
         env:
 {{- include "agent.common_env" . | nindent 8 }}
 {{- if include "site_key.secret.name" . }}
