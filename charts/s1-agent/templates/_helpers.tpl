@@ -231,9 +231,9 @@ Generate certificates for helper secret
 */}}
 {{- define "helper.certificates" -}}
 {{- $altNames := list ( printf "%s" "localhost" ) ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace ) -}}
-{{- $ca := genCA ( printf "%s ca" .Release.Namespace ) 365 -}}
+{{- $ca := genCA ( printf "%s ca" .Release.Namespace ) (int .Values.secrets.helper_certificate_expiration_duration) -}}
 {{- $caCert := $ca.Cert | b64enc -}}
-{{- $cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames 365 $ca -}}
+{{- $cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames (int .Values.secrets.helper_certificate_expiration_duration) $ca -}}
 {{- $tlsCert := $cert.Cert | b64enc -}}
 {{- $tlsKey := $cert.Key | b64enc -}}
 {{- dict "tls.crt" $tlsCert "tls.key" $tlsKey "ca.crt" $caCert | toYaml -}}
