@@ -520,6 +520,8 @@ requests:
 {{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
 {{- $_ := set $helperConfig "S1_CLUSTER_TAGS" (default "" (toJson .Values.configuration.cluster.tags)) -}}
+{{- $_ := set $helperConfig "S1_EXCLUDE_NON_RUNNING_CONTAINERS" (printf "%t" .Values.configuration.env.helper.exclude_non_running_containers) -}}
+{{- $_ := set $helperConfig "S1_EXCLUDE_INIT_CONTAINERS" (printf "%t" .Values.configuration.env.helper.exclude_init_containers) -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
