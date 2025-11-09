@@ -25,11 +25,11 @@ Configuration options used to deploy:
 {{- end }}
 {{- if .Values.configuration.custom_ca }}
 {{- if .Values.configuration.custom_ca_path }}
-* A custom CA certificate will be loaded into the agent and helper image. These certificates were loaded with "--set-files". If the list is empty, check your arguments.
+* A custom CA certificate will be loaded into the agent and helper images. These certificates were loaded with "--set-files". If the list is empty, check your arguments.
 {{- else if .Values.configuration.custom_ca_name }}
-* A custom CA certificate will be loaded into the agent and helper image from PRE-EXISTING secret.
+* A custom CA certificate will be loaded into the agent and helper images from PRE-EXISTING secret.
 {{- else }}
-* A custom CA certificate will be loaded into the agent and agent image. These files were loaded. If the list is empty, then you probably did not copy the certificate files to "files/*.pem".
+* A custom CA certificate will be loaded into the agent and helper images. These files were loaded. If the list is empty, then you probably did not copy the certificate files to "files/*.pem".
 {{- end }}
 {{- $agentCerts := fromYaml (include "agent.certificates" .) -}}
 {{- range $cert := $agentCerts.certificates }}
