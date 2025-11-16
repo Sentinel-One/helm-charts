@@ -22,8 +22,8 @@ configuration:
     agent: "cws-agent/s1agent" # Edit and add your own registry paths
     helper: "cws-agent/s1helper" # Edit and add your own registry paths
   tag:
-    agent: "25.3.1" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
-    helper: "25.3.1" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+    agent: "25.3.2" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
+    helper: "25.3.2" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
   proxy: "" # specify a proxy server (in URL format), if needed
   dv_proxy: "" # specify a proxy server for Deep-Visibility (in URL format), if needed
   env:
