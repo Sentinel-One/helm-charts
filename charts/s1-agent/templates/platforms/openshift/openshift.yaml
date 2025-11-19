@@ -14,7 +14,7 @@ allowHostDirVolumePlugin: true
 allowHostIPC: false
 allowHostNetwork: true
 allowHostPID: true
-allowHostPorts: false
+allowHostPorts: {{ .Values.configuration.env.helper.hostNetwork }} # Running openshift with helper on host network takes ports from host
 allowedCapabilities: {{ toYaml .Values.agent.capabilities | nindent 2 }}
 fsGroup:
   type: RunAsAny
