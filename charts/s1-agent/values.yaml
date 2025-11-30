@@ -201,6 +201,22 @@ agent:
   apparmorLocalhostProfileName: "" # Set to a custom AppArmor profile name if type is Localhost, otherwise leave empty
   seccompProfile: # works for k8s version >= 1.19, older application was via annotation
     type: Unconfined
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 90
+    periodSeconds: 60
+    timeoutSeconds: 30
+    failureThreshold: 2
+  livenessProbe:
+    enabled: true
+    periodSeconds: 300
+    timeoutSeconds: 30
+    failureThreshold: 1
+  readinessProbe:
+    enabled: true
+    periodSeconds: 300
+    timeoutSeconds: 30
+    failureThreshold: 1
   tolerations:
     - effect: NoExecute
       operator: Exists
