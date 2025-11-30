@@ -69,6 +69,42 @@ spec:
         imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
         resources:
 {{- include "agentResources" . | nindent 10 }}
+        {{- if .Values.agent.startupProbe.enabled }}
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - sentinelctl health startup
+          initialDelaySeconds: {{ .Values.agent.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agent.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agent.startupProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agent.startupProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.agent.livenessProbe.enabled }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - sentinelctl health liveness
+          initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agent.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.agent.readinessProbe.enabled }}
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - sentinelctl health readiness
+          initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agent.readinessProbe.failureThreshold }}
+        {{- end }}
         env:
 {{- include "agent.common_env" . | nindent 8 }}
 {{- if include "site_key.secret.name" . }}
