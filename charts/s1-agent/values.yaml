@@ -51,6 +51,7 @@ configuration:
       client_timeout: # client timeout. (seconds, default=120)
       inventory_enabled: true
       communicator_enabled: true
+      ndr_enabled: false # to enable ndr mode, set to 'true' (Unsupported)
       exclude_non_running_containers: true # to enable non-running containers metadata discovery, set to 'false'
       exclude_init_containers: false # to exclude init containers metadata discovery, set to 'true'
       ports:
