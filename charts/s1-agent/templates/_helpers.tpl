@@ -533,6 +533,7 @@ requests:
 {{- $_ := set $helperConfig "S1_NAMESPACE_INJECTION_SELECTORS" (default "" (toJson .Values.agentInjection.selector.namespaceSelector.matchLabels)) -}}
 {{- $_ := set $helperConfig "S1_INJECTION_CREATE_SITE_TOKEN_SECRET" (include "site_key.secret.create" .) -}}
 {{- end -}}
+{{- $_ := set $helperConfig "S1_NDR_ENABLED" (printf "%t" .Values.configuration.env.helper.ndr_enabled) -}}
 {{- $_ := set $helperConfig "S1_VALIDATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" .Values.configuration.env.admission_controllers.validating.enabled) -}}
 {{- $_ := set $helperConfig "S1_MUTATING_ADMISSION_CONTROLLER_ENABLED" (printf "%t" false) -}}
 {{- $_ := set $helperConfig "S1_CLUSTER_TAGS" (default "" (toJson .Values.configuration.cluster.tags)) -}}
