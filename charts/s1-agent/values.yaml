@@ -203,10 +203,10 @@ agent:
     type: Unconfined
   startupProbe:
     enabled: true
-    initialDelaySeconds: 90
-    periodSeconds: 60
-    timeoutSeconds: 30
-    failureThreshold: 2
+    initialDelaySeconds: 0
+    periodSeconds: 1
+    timeoutSeconds: 60
+    failureThreshold: 500
   livenessProbe:
     enabled: true
     periodSeconds: 300

@@ -75,7 +75,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - sentinelctl health startup
+            - echo $(date) liveness probe run >> /var/log/probe.log; sentinelctl health startup >> /var/log/probe.log
           initialDelaySeconds: {{ .Values.agent.startupProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.agent.startupProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.agent.startupProbe.timeoutSeconds }}
