@@ -337,8 +337,10 @@ certificates:
 - name: S1_HEAP_TRIMMING_INTERVAL
   value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
 {{- end }}
+{{- if .Values.configuration.env.agent.log_level }}
 - name: S1_LOG_LEVEL
   value: "{{ .Values.configuration.env.agent.log_level }}"
+{{- end }}
 - name: S1_WATCHDOG_HEALTHCHECK_TIMEOUT
   value: "{{ .Values.configuration.env.agent.watchdog_healthcheck_timeout }}"
 - name: S1_HELPER_HEALTHCHECK_RETRY
