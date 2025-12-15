@@ -75,7 +75,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - sentinelctl health startup
+            - sentinelctl control status
           initialDelaySeconds: {{ .Values.agent.startupProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.agent.startupProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.agent.startupProbe.timeoutSeconds }}
@@ -87,7 +87,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - sentinelctl health liveness
+            - sentinelctl health status
           initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
@@ -99,7 +99,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - sentinelctl health readiness
+            - sentinelctl control status
           initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds }}
