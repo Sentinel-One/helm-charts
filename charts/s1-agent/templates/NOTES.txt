@@ -4,9 +4,6 @@
 {{- if not (mustRegexMatch "^(info|error|warning|debug|trace|)$" .Values.configuration.env.helper.log_level) -}}
 {{ fail "configuration.env.helper.log_level must be one of: info, error, warning, debug, trace [or empty to default to 'info']" }}
 {{- end -}}
-{{- if not (mustRegexMatch "^(info|error|warning|debug|trace|)$" .Values.configuration.env.agent.log_level) -}}
-{{ fail "configuration.env.agent.log_level must be one of: info, error, warning, debug, trace [or empty to default to 'info']" }}
-{{- end -}}
 
 Installed the SentinelOne Agent Helm chart to your cluster.
 
