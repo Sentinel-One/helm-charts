@@ -34,7 +34,7 @@ configuration:
       persistent_dir_removal_upon_installation: false # removes an existing persistent dir upon installation if uninstall hook failed in last uninstall operation (Unsupported with GitOps deployments)
       heap_trimming_enable: # to enable/disable heap trimming, set to 'true'/'false'
       heap_trimming_interval: # heap trimming default interval (s)
-      log_level: "info" # info, error, warning, debug, trace (defaults to 'info')
+      log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       pod_uid: 1000 # uid of the default pod user
       pod_gid: 1000 # gid of the default pod group
       watchdog_healthcheck_timeout: 15 # watchdog healthcheck timeout before exiting the pod entrypoint. (seconds, 0=disabled)
