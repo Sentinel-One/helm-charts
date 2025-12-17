@@ -45,6 +45,7 @@ configuration:
       helper_healthcheck_interval: 5 # time to wait between each try. (seconds)
       fips_enabled: # to enable/disable FIPS mode, set to 'true'/'false'
       ebpf_enabled: # to disable EBPF mode, set to 'false' (Unsupported in EKS Fargate)
+      container_runtime_endpoint: "" # leave empty for default, or specify without 'unix://' domain, e.g. "/run/containerd/containerd.sock"
     helper:
       log_level: "" # info, error, warning, debug, trace (defaults to 'info')
       log_size: ""  # helper log file size in MBs. (defaults to 10)
