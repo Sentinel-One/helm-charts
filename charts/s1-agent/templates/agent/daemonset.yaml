@@ -140,7 +140,7 @@ spec:
             readOnly: true
           - name: persistence
             mountPath: {{ include "persistentDir" . }}
-{{- else }}
+{{- else if empty .Values.configuration.env.agent.container_runtime_endpoint }}
           - name: crio
             mountPath: /run/crio/crio.sock
             readOnly: true
@@ -152,7 +152,7 @@ spec:
             readOnly: true
 {{- end }}
           - name: containerd
-            mountPath: /run/containerd/containerd.sock
+            mountPath: {{ default "/run/containerd/containerd.sock" .Values.configuration.env.agent.container_runtime_endpoint }}
             readOnly: true
           - name: config
             mountPath: /opt/configmaps/config
@@ -172,7 +172,7 @@ spec:
         - name: persistence
           hostPath:
             path: {{ include "persistentDir" . }}
-{{- else }}
+{{- else if empty .Values.configuration.env.agent.container_runtime_endpoint }}
         - name: crio
           hostPath:
             path: /run/crio/crio.sock
@@ -185,7 +185,7 @@ spec:
 {{- end }}
         - name: containerd
           hostPath:
-            path: /run/containerd/containerd.sock
+            path:  {{ default "/run/containerd/containerd.sock" .Values.configuration.env.agent.container_runtime_endpoint }}
         - name: config
           configMap:
             name: {{ include "agent.fullname" . }}-config
