@@ -245,6 +245,31 @@ agent:
     requests: # The requests will be overridden by the limits if GKE autopilot platform configuration is set to true.
       cpu: 100m
       memory: 800Mi
+  # Optional: define multiple daemonsets targeting different node groups by instance type
+  # Each entry creates a separate DaemonSet with its own nodeSelector and resources
+  # Example:
+  # daemonSets:
+  #   - name: small       # suffix for the daemonset name
+  #     nodeSelector:
+  #       node.kubernetes.io/instance-type: t3.small
+  #     resources:
+  #       limits:
+  #         cpu: 500m
+  #         memory: 1Gi
+  #       requests:
+  #         cpu: 100m
+  #         memory: 500Mi
+  #   - name: large
+  #     nodeSelector:
+  #       node.kubernetes.io/instance-type: m5.2xlarge
+  #     resources:
+  #       limits:
+  #         cpu: 2000m
+  #         memory: 4Gi
+  #       requests:
+  #         cpu: 200m
+  #         memory: 1Gi
+  daemonSets: []
 
 service:
   annotations: {}

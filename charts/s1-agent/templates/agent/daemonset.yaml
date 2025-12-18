@@ -1,162 +1,173 @@
 {{ if and (or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false")) (not .Values.configuration.inventory_only) }}
-apiVersion: {{ template "daemonset.apiVersion" . }}
+{{- $daemonSets := .Values.agent.daemonSets | default (list (dict "name" "" "nodeSelector" .Values.agent.nodeSelector "resources" .Values.agent.resources)) }}
+{{- range $idx, $ds := $daemonSets }}
+{{- if $idx }}
+---
+{{- end }}
+apiVersion: {{ template "daemonset.apiVersion" $ }}
 kind: DaemonSet
 metadata:
-  name: {{ include "agent.fullname" . }}
-  labels: {{- include "sentinelone.agent.labels" . | nindent 4 }}
-  {{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+  name: {{ include "agent.fullname" $ }}{{ if $ds.name }}-{{ $ds.name }}{{ end }}
+  labels: {{- include "sentinelone.agent.labels" $ | nindent 4 }}
+  {{ if eq (include "argocdPostDeleteHook.enabled" $) "true" }}
   annotations:
     argocd.argoproj.io/sync-options: Delete=false
   {{- end }}
 spec:
   updateStrategy:
-    type: {{ default "RollingUpdate" .Values.agent.updateStrategy }}
+    type: {{ default "RollingUpdate" $.Values.agent.updateStrategy }}
     rollingUpdate:
-      maxUnavailable: {{ default 1 .Values.agent.rollingUpdateMaxUnavailable }}
+      maxUnavailable: {{ default 1 $.Values.agent.rollingUpdateMaxUnavailable }}
   selector:
     matchLabels:
-{{- include "sentinelone.agent.selector.labels" . | nindent 6 }}
+{{- include "sentinelone.agent.selector.labels" $ | nindent 6 }}
+{{- if $ds.name }}
+      sentinelone.com/daemonset-variant: {{ $ds.name }}
+{{- end }}
   template:
     metadata:
       labels:
-{{- include "sentinelone.agent.labels" . | nindent 8 }}
-      {{- if and .Values.configuration.platform.gke.autopilot .Values.configuration.platform.gke.allowlistVersion }}
-        cloud.google.com/matching-allowlist: sentinelone-s1-agent-v{{ .Values.configuration.platform.gke.allowlistVersion }}
+{{- include "sentinelone.agent.labels" $ | nindent 8 }}
+{{- if $ds.name }}
+        sentinelone.com/daemonset-variant: {{ $ds.name }}
+{{- end }}
+      {{- if and $.Values.configuration.platform.gke.autopilot $.Values.configuration.platform.gke.allowlistVersion }}
+        cloud.google.com/matching-allowlist: sentinelone-s1-agent-v{{ $.Values.configuration.platform.gke.allowlistVersion }}
       {{- end }}
       annotations:
         timestamp: {{ now | quote }}
-      {{- if .Values.agent.podAnnotations }}
-{{ toYaml .Values.agent.podAnnotations | indent 8 }}
+      {{- if $.Values.agent.podAnnotations }}
+{{ toYaml $.Values.agent.podAnnotations | indent 8 }}
       {{- end }}
       {{- if and
-          (semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor))
-          (not (eq .Values.configuration.platform.type "openshift"))
+          (semverCompare "<1.30.0" (printf "%d.%d.0" (semver $.Capabilities.KubeVersion.Version).Major (semver $.Capabilities.KubeVersion.Version).Minor))
+          (not (eq $.Values.configuration.platform.type "openshift"))
       }}
-        {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" .Values.agent.apparmorAnnotation }}: {{ default "unconfined" (lower (include "agent.app_armor_policy" .)) }}
+        {{ default "container.apparmor.security.beta.kubernetes.io/s1-agent" $.Values.agent.apparmorAnnotation }}: {{ default "unconfined" (lower (include "agent.app_armor_policy" $)) }}
       {{- end }}
     spec:
-{{- if .Values.secrets.imagePullSecret }}
+{{- if $.Values.secrets.imagePullSecret }}
       imagePullSecrets:
-        - name: {{ .Values.secrets.imagePullSecret }}
+        - name: {{ $.Values.secrets.imagePullSecret }}
 {{- end }}
       hostPID: true
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       securityContext:
-        runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
-        runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
+        runAsUser: {{ $.Values.configuration.env.agent.pod_uid }}
+        runAsGroup: {{ $.Values.configuration.env.agent.pod_gid }}
         {{- if and
-          (semverCompare ">=1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor))
-          (not (eq .Values.configuration.platform.type "openshift"))
+          (semverCompare ">=1.30.0" (printf "%d.%d.0" (semver $.Capabilities.KubeVersion.Version).Major (semver $.Capabilities.KubeVersion.Version).Minor))
+          (not (eq $.Values.configuration.platform.type "openshift"))
         }}
         appArmorProfile:
-          type: {{ default "Unconfined" (include "agent.app_armor_policy" .) }}
-          {{- if eq (include "agent.app_armor_policy" .) "Localhost" }}
-          {{- if .Values.agent.apparmorLocalhostProfileName }}
-          localhostProfile: {{ .Values.agent.apparmorLocalhostProfileName }}
+          type: {{ default "Unconfined" (include "agent.app_armor_policy" $) }}
+          {{- if eq (include "agent.app_armor_policy" $) "Localhost" }}
+          {{- if $.Values.agent.apparmorLocalhostProfileName }}
+          localhostProfile: {{ $.Values.agent.apparmorLocalhostProfileName }}
           {{- else }}
           {{- fail "AppArmor Configuration Error: When agent.apparmorPolicy is 'Localhost', agent.localhostProfileName must be specified." }}
           {{- end }}
           {{- end }}
         {{- end }}
         seccompProfile:
-          type: {{ include "agent.secure_computing_profile" . }}
+          type: {{ include "agent.secure_computing_profile" $ }}
       restartPolicy: Always
-      serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      serviceAccountName: {{ include "sentinelone.serviceAccountName" $ }}
       containers:
-      - name: "{{ include "agent.container_name" . }}"
-        image: "{{ include "agent.full_url" . }}"
-        imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
+      - name: "{{ include "agent.container_name" $ }}"
+        image: "{{ include "agent.full_url" $ }}"
+        imagePullPolicy: {{ default "IfNotPresent" $.Values.configuration.imagePullPolicy }}
         resources:
-{{- include "agentResources" . | nindent 10 }}
-        {{- if .Values.agent.startupProbe.enabled }}
+{{- include "agentResources" (dict "Values" $.Values "resources" $ds.resources) | nindent 10 }}
+        {{- if $.Values.agent.startupProbe.enabled }}
         startupProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - sentinelctl health startup
-          initialDelaySeconds: {{ .Values.agent.startupProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.agent.startupProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.agent.startupProbe.timeoutSeconds }}
-          failureThreshold: {{ .Values.agent.startupProbe.failureThreshold }}
+          initialDelaySeconds: {{ $.Values.agent.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ $.Values.agent.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ $.Values.agent.startupProbe.timeoutSeconds }}
+          failureThreshold: {{ $.Values.agent.startupProbe.failureThreshold }}
         {{- end }}
-        {{- if .Values.agent.livenessProbe.enabled }}
+        {{- if $.Values.agent.livenessProbe.enabled }}
         livenessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - sentinelctl health liveness
-          initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
-          failureThreshold: {{ .Values.agent.livenessProbe.failureThreshold }}
+          initialDelaySeconds: {{ $.Values.agent.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ $.Values.agent.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ $.Values.agent.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ $.Values.agent.livenessProbe.failureThreshold }}
         {{- end }}
-        {{- if .Values.agent.readinessProbe.enabled }}
+        {{- if $.Values.agent.readinessProbe.enabled }}
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - sentinelctl health readiness
-          initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds }}
-          failureThreshold: {{ .Values.agent.readinessProbe.failureThreshold }}
+          initialDelaySeconds: {{ $.Values.agent.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ $.Values.agent.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ $.Values.agent.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ $.Values.agent.readinessProbe.failureThreshold }}
         {{- end }}
         env:
-{{- include "agent.common_env" . | nindent 8 }}
-{{- if include "site_key.secret.name" . }}
+{{- include "agent.common_env" $ | nindent 8 }}
+{{- if include "site_key.secret.name" $ }}
         - name: SITE_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ include "site_key.secret.name" . }}
+              name: {{ include "site_key.secret.name" $ }}
               key: site-key
 {{- end }}
         - name: S1_AGENT_TYPE
           value: "k8s"
         - name: S1_HELPER_HOST
-          value: {{ include "service.name" . }}
+          value: {{ include "service.name" $ }}
         - name: S1_AGENT_HOST_MOUNT_PATH
-          value: "{{ default "/host" .Values.configuration.env.agent.host_mount_path }}"
+          value: "{{ default "/host" $.Values.configuration.env.agent.host_mount_path }}"
         - name: S1_PERSISTENT_DIR
-          value: "{{ include "persistentDir" . }}"
+          value: "{{ include "persistentDir" $ }}"
         - name: S1_POD_UID
-          value: "{{ .Values.configuration.env.agent.pod_uid }}"
+          value: "{{ $.Values.configuration.env.agent.pod_uid }}"
         - name: S1_POD_GID
-          value: "{{ .Values.configuration.env.agent.pod_gid }}"
+          value: "{{ $.Values.configuration.env.agent.pod_gid }}"
         - name: S1_AGENT_CONFIG_PATH
           value: "/opt/configmaps/config"
-        {{- if kindIs "bool" .Values.configuration.env.agent.ebpf_enabled }}
+        {{- if kindIs "bool" $.Values.configuration.env.agent.ebpf_enabled }}
         - name: S1_EBPF_ENABLED
-          value: "{{ .Values.configuration.env.agent.ebpf_enabled }}"
+          value: "{{ $.Values.configuration.env.agent.ebpf_enabled }}"
         {{- end }}
-{{- if .Values.configuration.platform.gke.autopilot }}
+{{- if $.Values.configuration.platform.gke.autopilot }}
         - name: S1_GKE_AUTOPILOT
           value: "true"
 {{- end }}
-{{- if .Values.configuration.localConf }}
+{{- if $.Values.configuration.localConf }}
         - name: S1_AGENT_LOCAL_CONF
           value: "/opt/configmaps/config/local.conf"
 {{- end }}
-{{- if .Values.configuration.overrideConf }}
+{{- if $.Values.configuration.overrideConf }}
         - name: S1_AGENT_OVERRIDE_CONF
           value: "/opt/configmaps/config/override.conf"
 {{- end }}
         volumeMounts:
-{{- if .Values.configuration.custom_ca }}
+{{- if $.Values.configuration.custom_ca }}
           - name: ca-certs
             mountPath: "/usr/local/share/ca-certificates"
             readOnly: true
 {{- end }}
           - name: host
-            mountPath: {{ default "/host" .Values.configuration.env.agent.host_mount_path }}
+            mountPath: {{ default "/host" $.Values.configuration.env.agent.host_mount_path }}
             mountPropagation: HostToContainer
-{{- if .Values.configuration.platform.gke.autopilot }}
+{{- if $.Values.configuration.platform.gke.autopilot }}
             readOnly: true
           - name: persistence
-            mountPath: {{ include "persistentDir" . }}
+            mountPath: {{ include "persistentDir" $ }}
 {{- else }}
           - name: crio
             mountPath: /run/crio/crio.sock
@@ -175,7 +186,7 @@ spec:
             mountPath: /opt/configmaps/config
             readOnly: true
         securityContext:
-{{- if include "bottlerocketNode" . }}
+{{- if include "bottlerocketNode" $ }}
           seLinuxOptions:
             user: system_u
             role: system_r
@@ -186,28 +197,28 @@ spec:
             drop:
               - all
             add:
-{{- if eq .Values.configuration.platform.type "talos" }}
-{{- range .Values.agent.capabilities }}
+{{- if eq $.Values.configuration.platform.type "talos" }}
+{{- range $.Values.agent.capabilities }}
 {{- if ne . "SYS_MODULE" }}
 {{ printf "- %s" . | indent 14 }}
 {{- end }}
 {{- end }}
 {{- else }}
-{{- toYaml .Values.agent.capabilities | nindent 14 }}
+{{- toYaml $.Values.agent.capabilities | nindent 14 }}
 {{- end }}
       volumes:
-{{- if .Values.configuration.custom_ca }}
+{{- if $.Values.configuration.custom_ca }}
         - name: ca-certs
           secret:
-            secretName: {{ include "custom_ca.secret.name" . }}
+            secretName: {{ include "custom_ca.secret.name" $ }}
 {{- end }}
         - name: host
           hostPath:
             path: /
-{{- if .Values.configuration.platform.gke.autopilot }}
+{{- if $.Values.configuration.platform.gke.autopilot }}
         - name: persistence
           hostPath:
-            path: {{ include "persistentDir" . }}
+            path: {{ include "persistentDir" $ }}
 {{- else }}
         - name: crio
           hostPath:
@@ -224,17 +235,19 @@ spec:
             path: /run/containerd/containerd.sock
         - name: config
           configMap:
-            name: {{ include "agent.fullname" . }}-config
-    {{- with .Values.agent.nodeSelector }}
-      nodeSelector: {{- toYaml . | nindent 8 }}
+            name: {{ include "agent.fullname" $ }}-config
+    {{- $nodeSelector := $ds.nodeSelector | default $.Values.agent.nodeSelector }}
+    {{- if $nodeSelector }}
+      nodeSelector: {{- toYaml $nodeSelector | nindent 8 }}
     {{- end }}
-    {{- if default .Values.helper.priorityClassName .Values.agent.priorityClassName }}
-      priorityClassName: {{ default .Values.helper.priorityClassName .Values.agent.priorityClassName }}
+    {{- if default $.Values.helper.priorityClassName $.Values.agent.priorityClassName }}
+      priorityClassName: {{ default $.Values.helper.priorityClassName $.Values.agent.priorityClassName }}
     {{- end }}
-    {{- with .Values.agent.affinity }}
+    {{- with $.Values.agent.affinity }}
       affinity: {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.agent.tolerations }}
+    {{- with $.Values.agent.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
     {{- end }}
+{{- end }}
 {{ end }}
