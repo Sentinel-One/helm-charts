@@ -33,6 +33,8 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
 {{- end }}
       serviceAccountName: {{ include "sentinelone.serviceAccountName" . }}
+      securityContext:
+        {{- include "helperPodSecurityContext" . | nindent 8 }}
 {{- if and .Values.configuration.custom_ca .Values.configuration.env.helper.communicator_enabled }}
       initContainers:
         - name: init
@@ -54,11 +56,7 @@ spec:
       containers:
         - name: helper
           securityContext:
-          {{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
-            {{- include "serverlessAgentContainerOwner" . | nindent 12 }}
-          {{- else }}
-            {{- toYaml .Values.helper.securityContext | nindent 12 }}
-          {{- end }}
+            {{- include "helperContainerSecurityContext" . | nindent 12 }}
           image: "{{ include "helper.full_url" . }}"
           imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
           envFrom:
