@@ -428,7 +428,79 @@ true
 {{- define "serverlessAgentContainerOwner" -}}
 runAsUser: 0
 runAsGroup: 0
+{{- end -}}
+
+{{- define "agentPodSecurityContext" -}}
+runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
+runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
+fsGroup: {{ .Values.configuration.env.agent.pod_gid }}
 runAsNonRoot: false
+fsGroupChangePolicy: "Always"
+{{- if and
+  (semverCompare ">=1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor))
+  (not (eq .Values.configuration.platform.type "openshift"))
+}}
+appArmorProfile:
+  type: {{ default "Unconfined" (include "agent.app_armor_policy" .) }}
+  {{- if eq (include "agent.app_armor_policy" .) "Localhost" }}
+  {{- if .Values.agent.apparmorLocalhostProfileName }}
+  localhostProfile: {{ .Values.agent.apparmorLocalhostProfileName }}
+  {{- else }}
+  {{- fail "AppArmor Configuration Error: When agent.apparmorPolicy is 'Localhost', agent.localhostProfileName must be specified." }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+seccompProfile:
+  type: {{ include "agent.secure_computing_profile" . }}
+{{- end -}}
+
+{{- define "agentContainerSecurityContext" -}}
+runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
+runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
+{{- include "containerSecurityContextDefaults" . }}
+{{- if include "bottlerocketNode" . }}
+seLinuxOptions:
+  user: system_u
+  role: system_r
+  type: control_t
+  level: "s0"
+{{- end }}
+capabilities:
+  drop:
+    - all
+  add:
+{{- if eq .Values.configuration.platform.type "talos" }}
+{{- range .Values.agent.capabilities }}
+{{- if ne . "SYS_MODULE" }}
+{{ printf "- %s" . | indent 4 }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{ toYaml .Values.agent.capabilities | nindent 4 }}
+{{- end }}
+{{- end -}}
+
+{{- define "helperPodSecurityContext" -}}
+{{ toYaml .Values.helper.securityContext }}
+fsGroup: {{ .Values.helper.securityContext.runAsGroup }}
+runAsNonRoot: false
+fsGroupChangePolicy: "Always"
+{{- end -}}
+
+{{- define "containerSecurityContextDefaults" -}}
+runAsNonRoot: false
+privileged: false
+readOnlyRootFilesystem: false
+procMount: Default
+{{- end -}}
+
+{{- define "helperContainerSecurityContext" -}}
+{{- include "containerSecurityContextDefaults" . }}
+{{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
+{{- include "serverlessAgentContainerOwner" . }}
+{{- else }}
+{{ toYaml .Values.helper.securityContext }}
+{{- end }}
 {{- end -}}
 
 {{- define "serverlessAgentContainer" -}}
@@ -437,6 +509,7 @@ runAsNonRoot: false
   imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
   securityContext:
     {{- include "serverlessAgentContainerOwner" . | nindent 4 }}
+    {{- include "containerSecurityContextDefaults" . | nindent 4 }}
     capabilities:
       add:
         - AUDIT_WRITE
