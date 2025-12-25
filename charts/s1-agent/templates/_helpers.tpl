@@ -457,7 +457,7 @@ seccompProfile:
 {{- define "agentContainerSecurityContext" -}}
 runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
 runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
-{{- include "containerSecurityContextDefaults" . }}
+{{ include "containerSecurityContextDefaults" . }}
 {{- if include "bottlerocketNode" . }}
 seLinuxOptions:
   user: system_u
