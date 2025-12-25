@@ -457,7 +457,7 @@ seccompProfile:
 {{- define "agentContainerSecurityContext" -}}
 runAsUser: {{ .Values.configuration.env.agent.pod_uid }}
 runAsGroup: {{ .Values.configuration.env.agent.pod_gid }}
-{{- include "containerSecurityContextDefaults" . }}
+{{ include "containerSecurityContextDefaults" . }}
 {{- if include "bottlerocketNode" . }}
 seLinuxOptions:
   user: system_u
@@ -497,7 +497,7 @@ procMount: Default
 {{- define "helperContainerSecurityContext" -}}
 {{- include "containerSecurityContextDefaults" . }}
 {{- if and .Values.configuration.env.injection.enabled (eq (include "serverlessOnlyMode" .) "true") }}
-{{- include "serverlessAgentContainerOwner" . }}
+{{ include "serverlessAgentContainerOwner" . }}
 {{- else }}
 {{ toYaml .Values.helper.securityContext }}
 {{- end }}
