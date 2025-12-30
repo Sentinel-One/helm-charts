@@ -127,6 +127,8 @@ spec:
         - name: S1_AGENT_OVERRIDE_CONF
           value: "/opt/configmaps/config/override.conf"
 {{- end }}
+        - name: S1_CONTAINER_RUNTIME_ENDPOINT
+          value: "{{ .Values.configuration.env.agent.container_runtime_endpoint }}"
         volumeMounts:
 {{- if .Values.configuration.custom_ca }}
           - name: ca-certs
