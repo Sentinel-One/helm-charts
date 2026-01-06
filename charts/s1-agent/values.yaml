@@ -209,19 +209,19 @@ agent:
   seccompProfile: # works for k8s version >= 1.19, older application was via annotation
     type: Unconfined
   startupProbe:
-    enabled: false
+    enabled: true
     initialDelaySeconds: 10
     periodSeconds: 30
     timeoutSeconds: 30
     failureThreshold: 6
   livenessProbe:
-    enabled: false
+    enabled: true
     initialDelaySeconds: 0
     periodSeconds: 60
     timeoutSeconds: 30
     failureThreshold: 5
   readinessProbe:
-    enabled: false
+    enabled: true
     initialDelaySeconds: 0
     periodSeconds: 60
     timeoutSeconds: 30
