@@ -82,7 +82,8 @@ webhooks:
       path: /admissioncontrollers/validate
       port: {{ include "service.port" . }}
   matchPolicy: Equivalent
-  failurePolicy: Ignore
+  failurePolicy: {{ .Values.admissionControllers.validating.failurePolicy }}
+  timeoutSeconds: {{ .Values.admissionControllers.validating.timeoutSeconds }}
   sideEffects: None
 {{- if .Values.admissionControllers.validating.selector -}}
   {{ toYaml .Values.admissionControllers.validating.selector | nindent 2 }}
