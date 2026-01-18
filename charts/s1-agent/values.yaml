@@ -124,6 +124,11 @@ agentInjection:
 admissionControllers:
   validating:
     selector: # Selector for the validating webhook configuration (default is set to exclude the release namespace)
+    # failurePolicy Determines what Kubernetes does if the Admission Controller is down or unresponsive.
+    # - "Fail":   SECURITY PREFERRED. Rejects the resource creation request.
+    # - "Ignore": AVAILABILITY PREFERRED. Allows the resource creation request anyway.
+    failurePolicy: Ignore
+    timeoutSeconds: 10 # 10 seconds is the standard K8s default, Allowed range is between 1 and 30 seconds.
     rules:
     - apiGroups:
       - '*'
