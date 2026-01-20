@@ -70,7 +70,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - sentinelctl health status
+            - sentinelctl control status
           initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
