@@ -22,8 +22,8 @@ configuration:
     agent: "cws-agent/s1agent" # Edit and add your own registry paths
     helper: "cws-agent/s1helper" # Edit and add your own registry paths
   tag:
-    agent: "26.2.1" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
-    helper: "26.2.1" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
+    agent: "26.2.1-ea" # IF you want to use a different tag for the agent (only do so if advised by support), please replace this with the relevant tag for the agent image
+    helper: "26.2.1-ea" # IF you want to use a different tag for the helper (only do so if advised by support), please replace this with the relevant tag for the helper image
   digest:
     agent: "" # IF you want to use a different sha256 digest for the agent (only do so if advised by support), please replace this with the relevant sha256 for the agent image
     helper: "" # IF you want to use a different sha256 digest for the helper (only do so if advised by support), please replace this with the relevant sha256 for the agent image
