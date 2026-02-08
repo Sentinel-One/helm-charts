@@ -13,6 +13,12 @@ Configuration options used to deploy:
   This will be reported as the "Cluster Name" in your console, in the details of every node of this cluster.
 * Platform support enabled for: '{{ .Values.configuration.platform.type }}'
 
+{{- if .Values.agent.useMultipleDaemonSets }}
+* WARNING: Multi-DaemonSet mode is enabled. Ensure agent.daemonSets covers every
+  node group that should run the agent exactly once. You can add a catch-all DaemonSet using
+  nodeAffinity with a NotIn operator to target nodes not matched by other entries.
+{{- end }}
+
 {{- if include "site_key.secret.create" . }}
 * A site-key secret named '{{ include "site_key.secret.name" . }}' was CREATED (or overwritten if it already existed).
 {{- else if include "site_key.secret.name" . }}
