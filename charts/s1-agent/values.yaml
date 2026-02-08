@@ -251,6 +251,15 @@ agent:
     requests: # The requests will be overridden by the limits if GKE autopilot platform configuration is set to true.
       cpu: 100m
       memory: 800Mi
+  # Enable multiple DaemonSet support. Use with caution. When set to true, the daemonSets array
+  # below must include an entry for every node group that should run the agent, and make sure it targets exactly one node
+  # Defaults to false, which deploys a single DaemonSet with default resources set above.
+  useMultipleDaemonSets: false
+  # Optional: list of DaemonSet variants (one per node group)
+  # Supports nodeSelector or nodeAffinity; resources override agent.resources.
+  # Per-DaemonSet affinity is merged with global agent.affinity.
+  # Please read documentation for deployment of multiple DaemonSets before enabling this feature.
+  daemonSets: []
 
 service:
   annotations: {}
