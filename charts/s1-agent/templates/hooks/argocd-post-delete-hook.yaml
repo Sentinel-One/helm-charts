@@ -33,7 +33,7 @@ spec:
             - |
               {{ include "hooks.uninstallScript" . | nindent 14 }}
               failed=0
-              /s1-helper/kubectl delete daemonset {{ include "agent.fullname" . }} --ignore-not-found || failed=1;
+              /s1-helper/kubectl delete daemonset -l app={{ include "sentinelone.name" . }},component=agent --ignore-not-found || failed=1;
               /s1-helper/kubectl delete statefulset {{ include "helper.fullname" . }} --ignore-not-found || failed=1;
 
               {{- if or (not .Values.configuration.env.injection.enabled) (eq (include "serverlessOnlyMode" .) "false") }}
