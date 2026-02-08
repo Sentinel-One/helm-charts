@@ -19,7 +19,7 @@ rules:
 {{- if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
 - apiGroups: ["apps"]
   resources: ["daemonsets", "statefulsets"]
-  verbs: ["delete"]
+  verbs: ["get", "list", "delete"]
 - apiGroups: [""]
   resources: ["serviceaccounts"]
   verbs: ["delete"]
