@@ -562,19 +562,20 @@ requests:
 {{- end -}}
 
 {{- define "agentResources" -}}
+{{- $resources := .resources | default .Values.agent.resources -}}
 limits:
-{{ toYaml .Values.agent.resources.limits | indent 2 }}
-{{- if and .Values.configuration.platform.gke.autopilot (not (index .Values.agent.resources.limits "ephemeral-storage")) }}
+{{ toYaml $resources.limits | indent 2 }}
+{{- if and .Values.configuration.platform.gke.autopilot (not (index $resources.limits "ephemeral-storage")) }}
   ephemeral-storage: 1Gi
 {{- end }}
 requests:
 {{- if .Values.configuration.platform.gke.autopilot }}
-{{ toYaml .Values.agent.resources.limits | indent 2 }}
-{{- if not (index .Values.agent.resources.requests "ephemeral-storage") }}
+{{ toYaml $resources.limits | indent 2 }}
+{{- if not (index $resources.requests "ephemeral-storage") }}
   ephemeral-storage: 1Gi
 {{- end }}
 {{- else }}
-{{ toYaml .Values.agent.resources.requests | indent 2 }}
+{{ toYaml $resources.requests | indent 2 }}
 {{- end -}}
 {{- end -}}
 
