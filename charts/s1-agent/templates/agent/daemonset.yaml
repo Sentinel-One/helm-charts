@@ -156,6 +156,9 @@ spec:
           - name: containerd
             mountPath: {{ default "/run/containerd/containerd.sock" .Values.configuration.env.agent.container_runtime_endpoint }}
             readOnly: true
+          - name: containerd-storage
+            mountPath: /var/lib/containerd
+            readOnly: true
           - name: config
             mountPath: /opt/configmaps/config
             readOnly: true
@@ -188,6 +191,10 @@ spec:
         - name: containerd
           hostPath:
             path:  {{ default "/run/containerd/containerd.sock" .Values.configuration.env.agent.container_runtime_endpoint }}
+        - name: containerd-storage
+          hostPath:
+            path: /var/lib/containerd
+            type: Directory
         - name: config
           configMap:
             name: {{ include "agent.fullname" . }}-config
