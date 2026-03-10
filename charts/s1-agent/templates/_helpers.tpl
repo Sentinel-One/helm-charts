@@ -329,14 +329,6 @@ certificates:
 - name: S1_DV_PROXY
   value: "{{ default "" .Values.configuration.dv_proxy }}"
 {{- end }}
-{{- if kindIs "bool" .Values.configuration.env.agent.heap_trimming_enable }}
-- name: S1_HEAP_TRIMMING_ENABLE
-  value: "{{ .Values.configuration.env.agent.heap_trimming_enable }}"
-{{- end }}
-{{- if .Values.configuration.env.agent.heap_trimming_interval }}
-- name: S1_HEAP_TRIMMING_INTERVAL
-  value: "{{ .Values.configuration.env.agent.heap_trimming_interval }}"
-{{- end }}
 {{- if .Values.configuration.env.agent.log_level }}
 - name: S1_LOG_LEVEL
   value: "{{ .Values.configuration.env.agent.log_level }}"
