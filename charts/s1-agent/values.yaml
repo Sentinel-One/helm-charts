@@ -147,6 +147,7 @@ admissionControllers:
         expression: '!(request.resource.group == "coordination.k8s.io" && request.resource.resource == "leases")' # Match non-lease resources.
 
 helper:
+  replicas: 1 # Number of helper replicas. Admission controller validation requests are always routed to pod-0.
   fullnameOverride: ""
   nameOverride: ""
   labels: {}
