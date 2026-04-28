@@ -16,3 +16,27 @@ spec:
       name: https
   selector:
         {{- include "sentinelone.helper.selector.labels" . | nindent 4 }}
+---
+# Primary service — routes exclusively to helper pod-0 (the admission-controller
+# primary). Kubernetes automatically labels every StatefulSet pod with
+# statefulset.kubernetes.io/pod-name=<sts-name>-<ordinal>, so adding that label
+# to this selector is enough to pin traffic to the first replica.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "service.admission.name" . }}
+  labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
+{{- with .Values.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ include "service.port" . }}
+      targetPort: {{ include "service.target_port" . }}
+      protocol: TCP
+      name: https
+  selector:
+        {{- include "sentinelone.helper.selector.labels" . | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: {{ include "helper.fullname" . }}-0

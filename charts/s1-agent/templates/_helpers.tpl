@@ -230,7 +230,14 @@ Create the name of the service account to use
 Generate certificates for helper secret
 */}}
 {{- define "helper.certificates" -}}
-{{- $altNames := list ( printf "%s" "localhost" ) ( printf "%s" (include "helper.fullname" .) ) ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace ) -}}
+{{- $altNames := list
+    ( printf "%s" "localhost" )
+    ( printf "%s" (include "helper.fullname" .) )
+    ( printf "%s.%s" (include "helper.fullname" .) .Release.Namespace )
+    ( printf "%s.%s.svc" (include "helper.fullname" .) .Release.Namespace )
+    ( printf "%s" (include "service.admission.name" .) )
+    ( printf "%s.%s" (include "service.admission.name" .) .Release.Namespace )
+    ( printf "%s.%s.svc" (include "service.admission.name" .) .Release.Namespace ) -}}
 {{- $ca := genCA ( printf "%s ca" .Release.Namespace ) (int .Values.secrets.helper_certificate_expiration_duration) -}}
 {{- $caCert := $ca.Cert | b64enc -}}
 {{- $cert := genSignedCert ( include "helper.secret.name" . ) nil $altNames (int .Values.secrets.helper_certificate_expiration_duration) $ca -}}
@@ -260,6 +267,16 @@ Generate server token for helper secret
 
 {{- define "service.name" -}}
 {{- include "helper.fullname" . -}}
+{{- end -}}
+
+{{/*
+Name of the admission-only service that routes exclusively to helper pod-0.
+Used by ValidatingWebhookConfiguration (and MutatingWebhookConfiguration when
+agent injection is enabled) to ensure admission-controller requests always land
+on the primary replica.
+*/}}
+{{- define "service.admission.name" -}}
+{{- printf "%s-%s" (include "helper.fullname" .) "primary" -}}
 {{- end -}}
 
 {{- define "service.port" -}}
