@@ -40,7 +40,7 @@ webhooks:
   clientConfig:
     caBundle: {{ $caBundle }}
     service:
-      name: {{ include "service.name" . }}
+      name: {{ include "service.admission.name" . }}
       namespace: {{ .Release.Namespace }}
       path: /agent/inject
       port: {{ include "service.port" . }}
@@ -77,7 +77,7 @@ webhooks:
   clientConfig:
     caBundle: {{ $caBundle }}
     service:
-      name: {{ include "service.name" . }}
+      name: {{ include "service.admission.name" . }}
       namespace: {{ .Release.Namespace }}
       path: /admissioncontrollers/validate
       port: {{ include "service.port" . }}
