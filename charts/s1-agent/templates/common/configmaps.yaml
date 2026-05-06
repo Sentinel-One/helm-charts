@@ -25,10 +25,20 @@ data:
           volumeMounts:
           - name: {{ include "agent.fullname" . }}
             mountPath: /{{ include "agent.fullname" . }}
+{{- if .Values.configuration.custom_ca }}
+          - name: ca-certs
+            mountPath: "/usr/local/share/ca-certificates"
+            readOnly: true
+{{- end }}
       volumes:
       - name: {{ include "agent.fullname" . }}
         configMap:
           name: {{ include "agent.fullname" . }}
+{{- if .Values.configuration.custom_ca }}
+      - name: ca-certs
+        secret:
+          secretName: {{ include "custom_ca.secret.name" . }}
+{{- end }}
 {{ end }}
 
 ---
