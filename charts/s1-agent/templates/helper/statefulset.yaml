@@ -121,6 +121,10 @@ spec:
 {{- end }}
           - name: AGENT_CONTAINER_NAME
             value: "{{ include "agent.container_name" . }}"
+{{- if and .Values.configuration.env.injection.enabled .Values.configuration.env.injection.fargate_ptrace_allow }}
+          - name: LD_PRELOAD
+            value: "/s1-helper/bin/libptrace_allow.so"
+{{- end }}
           ports:
             - name: https
               containerPort: {{ include "service.target_port" . }}
