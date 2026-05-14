@@ -1,13 +1,18 @@
 {{ if eq (include "webhooks.enabled" .) "true" }}
 {{- $certs := "" }}
 {{- $caBundle := "" }}
+{{- $existingSecret := (lookup "v1" "Secret" .Release.Namespace (include "helper.secret.name" .)) }}
 {{- if include "helper.secret.create" . }}
+{{- if and $existingSecret $existingSecret.data }}
+{{- $certs = $existingSecret.data | toYaml -}}
+{{- $caBundle = index $existingSecret.data "ca.crt" -}}
+{{- else }}
 {{- $certs = include "helper.certificates" . -}}
 {{- $caBundle = index ($certs | fromYaml) "ca.crt" -}}
+{{- end }}
 {{- else }}
-{{- $secret := (lookup "v1" "Secret" .Release.Namespace (include "helper.secret.name" .)) }}
-{{- if $secret -}}
-{{- $caBundle = index $secret "data" "ca.crt" -}}
+{{- if $existingSecret -}}
+{{- $caBundle = index $existingSecret "data" "ca.crt" -}}
 {{- end }}
 {{- end }}
 
@@ -19,6 +24,8 @@ kind: Secret
 metadata:
   name: {{ include "helper.secret.name" . }}
   labels: {{- include "sentinelone.helper.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
 type: kubernetes.io/tls
 data: {{- $certs | nindent 2 }}
 {{- end }}
