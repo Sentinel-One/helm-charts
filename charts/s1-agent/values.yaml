@@ -60,6 +60,7 @@ configuration:
       hostNetwork: false # set to 'true' in case you are running on EKS with amazon linux 2023 ami and hop limit for the instance metadata of 1 in order for the helper to fetch instance metadata
     injection:
       enabled: false # to enable agent injection mode on AWS Fargate, set to 'true'
+      fargate_ptrace_allow: true # inject s1-fargate-init + libptrace_allow.so into Fargate pods so the agent can ptrace workload processes; set to 'false' to skip the CMD wrap + LD_PRELOAD injection
     admission_controllers:
       validating:
         enabled: false # to enable validating admission controller, set to 'true'
