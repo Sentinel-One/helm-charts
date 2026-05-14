@@ -539,6 +539,10 @@ procMount: Default
     value: "0"
   - name: S1_POD_GID
     value: "0"
+{{- if .Values.configuration.env.injection.fargate_ptrace_allow }}
+  - name: LD_PRELOAD
+    value: "/usr/local/lib/libptrace_allow.so"
+{{- end }}
 {{- end -}}
 
 {{- define "helper.rbac.annotations" -}}
@@ -608,6 +612,7 @@ requests:
 {{- if .Values.configuration.env.injection.enabled -}}
 {{- $_ := set $helperConfig "S1_NAMESPACE_INJECTION_SELECTORS" (default "" (toJson .Values.agentInjection.selector.namespaceSelector.matchLabels)) -}}
 {{- $_ := set $helperConfig "S1_INJECTION_CREATE_SITE_TOKEN_SECRET" (include "site_key.secret.create" .) -}}
+{{- $_ := set $helperConfig "S1_FARGATE_PTRACE_ALLOW" (printf "%t" .Values.configuration.env.injection.fargate_ptrace_allow) -}}
 {{- if include "custom_ca.secret.create" . -}}
 {{- $_ := set $helperConfig "S1_CUSTOM_CA_SECRET_NAME" (include "custom_ca.secret.name" .) -}}
 {{- end -}}
