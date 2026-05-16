@@ -140,6 +140,7 @@ admissionControllers:
       - CONNECT
       resources:
       - '*'
+      - 'pods/*'
       scope: '*'
     matchConditions:
       - name: 'exclude-leases'
