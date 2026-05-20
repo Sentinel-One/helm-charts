@@ -55,6 +55,17 @@ configuration:
       ndr_enabled: false # to enable ndr mode, set to 'true' (Unsupported)
       exclude_non_running_containers: true # to enable non-running containers metadata discovery, set to 'false'
       exclude_init_containers: false # to exclude init containers metadata discovery, set to 'true'
+      pod_filter:
+        # Optional: restrict the pods informer to specific namespaces (OR logic).
+        # Leave empty to watch all namespaces (default behaviour).
+        # Example: ["default", "production"]
+        namespaces: []
+        # Optional: restrict the pods informer to pods matching these label selectors (OR logic).
+        # Each list entry is a standard Kubernetes label selector string where commas mean AND
+        # within that entry (e.g. "app=frontend,env=prod"). Multiple entries are OR-ed together.
+        # Leave empty for no label filtering (default behaviour).
+        # Example: ["app=myapp", "tier=backend,env=prod"]
+        label_selectors: []
       ports:
         grpc: 5071 # gRPC server control port
         target: 6443 # Server target port (HTTPS)
