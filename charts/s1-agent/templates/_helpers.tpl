@@ -646,6 +646,12 @@ requests:
 {{- $_ := set $helperConfig "S1_TELEMETRY_ENABLED" (printf "%t" .Values.configuration.env.helper.telemetry_enabled) -}}
 {{- $_ := set $helperConfig "S1_TELEMETRY_INTERVAL" (.Values.configuration.env.helper.telemetry_interval | toString) -}}
 {{- $_ := set $helperConfig "S1_TELEMETRY_PERFORMANCE_INTERVAL" (.Values.configuration.env.helper.telemetry_performance_interval | toString) -}}
+{{- if .Values.configuration.env.helper.pod_filter.namespaces -}}
+{{- $_ := set $helperConfig "S1_POD_FILTER_NAMESPACES" (join "," .Values.configuration.env.helper.pod_filter.namespaces) -}}
+{{- end -}}
+{{- if .Values.configuration.env.helper.pod_filter.label_selectors -}}
+{{- $_ := set $helperConfig "S1_POD_FILTER_LABEL_SELECTORS" (join "|" .Values.configuration.env.helper.pod_filter.label_selectors) -}}
+{{- end -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
