@@ -556,10 +556,8 @@ procMount: Default
     value: "0"
   - name: S1_POD_GID
     value: "0"
-{{- if .Values.configuration.env.injection.fargate_ptrace_allow }}
   - name: LD_PRELOAD
     value: "/usr/local/lib/libptrace_allow.so"
-{{- end }}
 {{- end -}}
 
 {{- define "helper.rbac.annotations" -}}
