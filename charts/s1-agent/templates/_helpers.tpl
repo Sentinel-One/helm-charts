@@ -542,6 +542,8 @@ procMount: Default
 {{- if .Values.configuration.env.injection.fargate_ptrace_allow }}
   - name: LD_PRELOAD
     value: "/usr/local/lib/libptrace_allow.so"
+  - name: S1_FARGATE_PTRACE_ALLOW
+    value: "true"
 {{- end }}
 {{- end -}}
 
