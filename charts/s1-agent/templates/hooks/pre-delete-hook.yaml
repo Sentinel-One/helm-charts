@@ -32,9 +32,7 @@ spec:
             requests:
               cpu: 250m
               memory: 512Mi
-          command: [ "/bin/bash", "-c" ]
-          args:
-            - |
-              {{ include "hooks.uninstallScript" . | nindent 14 }}
-              echo "Done";
+          command: [ "s1-helper-app" ]
+          env:
+            {{- include "hooks.uninstallEnv" . | nindent 12 }}
 {{ end }}

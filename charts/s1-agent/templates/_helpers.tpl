@@ -651,25 +651,24 @@ requests:
 {{- default "Unconfined" .Values.agent.seccompProfile.type -}}
 {{- end -}}
 
-{{- define "hooks.uninstallScript" -}}
-tar xzf /s1-helper/kubectl.tar.gz -C /;
-/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
-grep {{ include "helper.fullname" . }} |
-  xargs -I _ bash -c 'for i in {1..3}; do
-    /s1-helper/kubectl exec _ -- bash -c "touch /s1-helper/uninstall-started && killall -SIGUSR1 s1-helper-app" 2>&1 && exit 0 || sleep 1; done';
-for i in {1..2}; do
-/s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
-  grep {{ include "agent.fullname" . }} |
-    xargs -P 0 -I % bash -c '
-      out=$(for i in {1..3}; do
-              timeout 30 /s1-helper/kubectl exec % -- bash -c "
-                    sentinelctl control uninstall
-                " && exit 0 || sleep 2;
-            done;
-            exit 1
-      ) && echo -e "\nSuccess For Pod %:\n$out" || (echo -e "\nError For Pod %:\n$out" && exit 1)'
-if [[ $? == 0 ]]; then break; fi
-echo -e "\n----------------------------------\n";
-sleep 1;
-done;
+{{/*
+Environment for the uninstall hook (UNINSTALL_MODE), which drives teardown via
+the Kubernetes API in the helper binary instead of a bundled kubectl. The
+ArgoCD post-delete hook adds ARGOCD_MODE / S1_UNINSTALL_DELETE_SA on top.
+*/}}
+{{- define "hooks.uninstallEnv" -}}
+- name: UNINSTALL_MODE
+  value: "true"
+- name: S1_POD_NAMESPACE
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.namespace
+- name: S1_UNINSTALL_APP
+  value: {{ include "sentinelone.name" . | quote }}
+- name: S1_UNINSTALL_RELEASE
+  value: {{ .Release.Name | quote }}
+- name: S1_UNINSTALL_HELPER_NAME
+  value: {{ include "helper.fullname" . | quote }}
+- name: S1_UNINSTALL_SERVICE_ACCOUNT
+  value: {{ include "sentinelone.serviceAccountName" . | quote }}
 {{- end -}}
