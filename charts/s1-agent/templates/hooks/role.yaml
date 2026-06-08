@@ -10,9 +10,11 @@ metadata:
     "argocd.argoproj.io/hook-delete-policy": HookSucceeded, BeforeHookCreation, HookFailed
 {{- end }}
 rules:
+# "create" covers SPDY exec (POST); "get" covers WebSocket exec (GET), which is
+# the default transport in client-go's remotecommand fallback executor.
 - apiGroups: [""]
   resources: ["pods/exec"]
-  verbs: ["create"]
+  verbs: ["get", "create"]
 - apiGroups: [""]
   resources: ["pods"]
   verbs: ["list", "get"]
