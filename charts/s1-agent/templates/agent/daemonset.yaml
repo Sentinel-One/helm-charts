@@ -110,7 +110,7 @@ spec:
               key: site-key
 {{- end }}
         - name: S1_AGENT_TYPE
-          value: "{{ $.Values.configuration.env.agent.agent_type }}"
+          value: "k8s"
         - name: S1_HELPER_HOST
           value: {{ include "service.name" $ }}
         - name: S1_AGENT_HOST_MOUNT_PATH
