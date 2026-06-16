@@ -1,7 +1,7 @@
 apiVersion: v2
-appVersion: "26.1.1-ga"
+appVersion: "26.1.2-ga"
 description: SentinelOne Kubernetes Agent
 name: s1-agent
 type: application
-version: 26.1.1
+version: 26.1.2
 
