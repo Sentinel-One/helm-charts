@@ -642,7 +642,7 @@ requests:
 {{- end -}}
 
 {{- define "hooks.uninstallScript" -}}
-tar xzf /s1-helper/kubectl.tar.gz -C /;
+tar xzf /s1-helper/kubectl.tar.gz -C /s1-helper/;
 /s1-helper/kubectl get pods --no-headers --field-selector status.phase=Running -o custom-columns=':metadata.name' |
 grep {{ include "helper.fullname" . }} |
   xargs -I _ bash -c 'for i in {1..3}; do
