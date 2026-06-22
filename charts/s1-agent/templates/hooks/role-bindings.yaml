@@ -8,6 +8,8 @@ metadata:
   annotations:
     "argocd.argoproj.io/hook": PostDelete
     "argocd.argoproj.io/hook-delete-policy": HookSucceeded, BeforeHookCreation, HookFailed
+    # Bind RBAC in wave 0, ahead of the post-delete Job (wave 1).
+    "argocd.argoproj.io/sync-wave": "0"
 {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
