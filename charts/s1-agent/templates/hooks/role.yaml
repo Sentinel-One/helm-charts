@@ -8,6 +8,9 @@ metadata:
   annotations:
     "argocd.argoproj.io/hook": PostDelete
     "argocd.argoproj.io/hook-delete-policy": HookSucceeded, BeforeHookCreation, HookFailed
+    # Run RBAC ahead of the post-delete Job (wave 1) so the binding exists and
+    # is authorized before the Job pod issues its kubectl calls.
+    "argocd.argoproj.io/sync-wave": "0"
 {{- end }}
 rules:
 - apiGroups: [""]

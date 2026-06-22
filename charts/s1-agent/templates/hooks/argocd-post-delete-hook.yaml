@@ -8,7 +8,11 @@ metadata:
   annotations:
     "argocd.argoproj.io/hook": PostDelete
     "argocd.argoproj.io/hook-delete-policy": HookSucceeded, BeforeHookCreation, HookFailed
+    # Run after the hook Role/RoleBinding (wave 0) so RBAC exists before the
+    # Job pod starts issuing kubectl calls.
+    "argocd.argoproj.io/sync-wave": "1"
 spec:
+  ttlSecondsAfterFinished: 30
   backoffLimit: 0
   activeDeadlineSeconds: {{ .Values.configuration.argocd.post_delete_hook_timeout }}
   template:
