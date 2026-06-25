@@ -643,6 +643,12 @@ requests:
 {{- $_ := set $helperConfig "S1_USE_CUSTOM_CA" (printf "%t" .Values.configuration.custom_ca) -}}
 {{- $_ := set $helperConfig "S1_EXCLUDE_NON_RUNNING_CONTAINERS" (printf "%t" .Values.configuration.env.helper.exclude_non_running_containers) -}}
 {{- $_ := set $helperConfig "S1_EXCLUDE_INIT_CONTAINERS" (printf "%t" .Values.configuration.env.helper.exclude_init_containers) -}}
+{{- if .Values.configuration.env.helper.pod_filter.namespaces -}}
+{{- $_ := set $helperConfig "S1_POD_FILTER_NAMESPACES" (join "," .Values.configuration.env.helper.pod_filter.namespaces) -}}
+{{- end -}}
+{{- if .Values.configuration.env.helper.pod_filter.label_selectors -}}
+{{- $_ := set $helperConfig "S1_POD_FILTER_LABEL_SELECTORS" (join "|" .Values.configuration.env.helper.pod_filter.label_selectors) -}}
+{{- end -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 
