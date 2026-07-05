@@ -1,7 +1,0 @@
-apiVersion: auto.gke.io/v1
-kind: AllowlistSynchronizer
-metadata:
-  name: s1-agent-allowlist-synchronizer
-spec:
-  allowlistPaths:
-    - SentinelOne/s1-agent/*
