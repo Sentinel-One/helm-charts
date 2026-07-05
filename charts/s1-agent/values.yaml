@@ -166,6 +166,7 @@ helper:
   nameOverride: ""
   labels: {}
   podAnnotations: ""
+  statefulsetAnnotations: ""
   nodeSelector: {}
   priorityClassName: ""
   tolerations: {}
@@ -219,6 +220,7 @@ agent:
   nodeSelector: {}
   priorityClassName: ""
   podAnnotations: ""
+  daemonsetAnnotations: ""
   apparmorAnnotation: container.apparmor.security.beta.kubernetes.io/s1-agent # support for k8s version < 1.30
   apparmorPolicy: Unconfined # Unconfined, Localhost or RuntimeDefault (defaults to Unconfined). Cannot be changed in GKE Autopilot.
   apparmorLocalhostProfileName: "" # Set to a custom AppArmor profile name if type is Localhost, otherwise leave empty

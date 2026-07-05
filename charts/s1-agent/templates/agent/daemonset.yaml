@@ -10,10 +10,13 @@ kind: DaemonSet
 metadata:
   name: {{ include "agent.fullname" $ }}{{ if $ds.name }}-{{ $ds.name }}{{ end }}
   labels: {{- include "sentinelone.agent.labels" $ | nindent 4 }}
-  {{ if eq (include "argocdPostDeleteHook.enabled" $) "true" }}
   annotations:
+    {{- if eq (include "argocdPostDeleteHook.enabled" $) "true" }}
     argocd.argoproj.io/sync-options: Delete=false
-  {{- end }}
+    {{- end }}
+    {{- if $.Values.agent.daemonsetAnnotations }}
+{{ toYaml $.Values.agent.daemonsetAnnotations | indent 4 }}
+    {{- end }}
 spec:
   updateStrategy:
     type: {{ default "RollingUpdate" $.Values.agent.updateStrategy }}

@@ -5,8 +5,11 @@ metadata:
   labels:
     {{- include "sentinelone.helper.labels" . | nindent 4 }}
   annotations:
-    {{ if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
+    {{- if eq (include "argocdPostDeleteHook.enabled" .) "true" }}
     argocd.argoproj.io/sync-options: Delete=false
+    {{- end }}
+    {{- if .Values.helper.statefulsetAnnotations }}
+{{ toYaml .Values.helper.statefulsetAnnotations | indent 4 }}
     {{- end }}
 spec:
   replicas: {{ .Values.helper.replicas }}
