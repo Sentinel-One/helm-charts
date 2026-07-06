@@ -100,6 +100,11 @@ spec:
             value: {{ .Values.configuration.env.helper.log_level }}
           - name: S1_CLIENT_TIMEOUT
             value: "{{ .Values.configuration.env.helper.client_timeout }}"
+          # Tell the s1-fargate-init wrapper (the image CMD) to relax the Yama
+          # ptrace scope only on serverless/Fargate, where the injected agent
+          # must ptrace the workload. On regular clusters it stays a no-op.
+          - name: S1_FARGATE_MODE
+            value: "{{ include "serverlessOnlyMode" . }}"
           - name: AGENT_INJECTION_ENABLED
             value: "{{ .Values.configuration.env.injection.enabled }}"
 {{- if .Values.configuration.env.injection.enabled }}
