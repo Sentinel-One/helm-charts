@@ -59,6 +59,16 @@ spec:
             {{- include "helperContainerSecurityContext" . | nindent 12 }}
           image: "{{ include "helper.full_url" . }}"
           imagePullPolicy: {{ default "IfNotPresent" .Values.configuration.imagePullPolicy }}
+{{- if and (eq (include "serverlessOnlyMode" .) "true") .Values.configuration.env.injection.enabled .Values.configuration.env.injection.fargate_ptrace_allow }}
+          # Wrap the image CMD with s1-fargate-init so it relaxes the Yama ptrace
+          # scope (prctl PR_SET_PTRACER) before exec'ing the helper app. Only in
+          # serverlessOnlyMode does the helper run on a Fargate node with the agent
+          # sidecar sharing its PID namespace, so only then must it be ptrace-able.
+          # LD_PRELOAD below covers dynamic children, this covers the
+          # statically-linked entrypoint. Keep this argv in sync with the image
+          # CMD in helper/build/Dockerfile.
+          command: ["/s1-helper/bin/s1-fargate-init", "/bin/sh", "-c", "(rm -f ./kubectl.tar.gz || true) && exec s1-helper-app"]
+{{- end }}
           envFrom:
           - configMapRef:
               name: {{ include "helper.config.name" .}}
