@@ -643,6 +643,9 @@ requests:
 {{- $_ := set $helperConfig "S1_USE_CUSTOM_CA" (printf "%t" .Values.configuration.custom_ca) -}}
 {{- $_ := set $helperConfig "S1_EXCLUDE_NON_RUNNING_CONTAINERS" (printf "%t" .Values.configuration.env.helper.exclude_non_running_containers) -}}
 {{- $_ := set $helperConfig "S1_EXCLUDE_INIT_CONTAINERS" (printf "%t" .Values.configuration.env.helper.exclude_init_containers) -}}
+{{- $_ := set $helperConfig "S1_TELEMETRY_ENABLED" (printf "%t" .Values.configuration.env.helper.telemetry_enabled) -}}
+{{- $_ := set $helperConfig "S1_TELEMETRY_INTERVAL" (.Values.configuration.env.helper.telemetry_interval | toString) -}}
+{{- $_ := set $helperConfig "S1_TELEMETRY_PERFORMANCE_INTERVAL" (.Values.configuration.env.helper.telemetry_performance_interval | toString) -}}
 {{- $helperConfig | toYaml -}}
 {{- end -}}
 

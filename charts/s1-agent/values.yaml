@@ -53,6 +53,9 @@ configuration:
       inventory_enabled: true
       communicator_enabled: true
       ndr_enabled: false # to enable ndr mode, set to 'true' (Unsupported)
+      telemetry_enabled: true # to disable telemetry, set to 'false'
+      telemetry_interval: "300" # telemetry interval in seconds. (defaults to 300)
+      telemetry_performance_interval: "1" # telemetry performance interval in seconds. (defaults to 1)
       exclude_non_running_containers: true # to enable non-running containers metadata discovery, set to 'false'
       exclude_init_containers: false # to exclude init containers metadata discovery, set to 'true'
       ports:
