@@ -148,15 +148,19 @@ spec:
               path: /health
               port: {{ include "service.target_port" . }}
               scheme: HTTPS
-            initialDelaySeconds: 30
-            periodSeconds: 5
+            initialDelaySeconds: {{ .Values.helper.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.helper.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.helper.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.helper.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /health
               port: {{ include "service.target_port" . }}
               scheme: HTTPS
-            initialDelaySeconds: 30
-            periodSeconds: 5
+            initialDelaySeconds: {{ .Values.helper.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.helper.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.helper.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.helper.readinessProbe.failureThreshold }}
 {{- end }}
           resources:
             {{- include "helperResources" . | nindent 12 }}

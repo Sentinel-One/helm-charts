@@ -179,6 +179,16 @@ helper:
             values:
             - linux
   probe: false
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 60
+    timeoutSeconds: 30
+    failureThreshold: 5
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 60
+    timeoutSeconds: 30
+    failureThreshold: 5
   # Default values for the helper security context
   securityContext:
     runAsUser: 1000
